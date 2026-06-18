@@ -72,7 +72,6 @@
         .user-status .active { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.5); }
         .user-status .expired { color: #ff4444; }
 
-        /* Video Player Section & Blocker Fix */
         .video-section { width: 100%; background: #000; border-bottom: 2px solid var(--gold); position: relative; }
         .video-container { position: relative; width: 100%; aspect-ratio: 9/16; background: #000; margin: auto; max-height: 72vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         #youtubePlayer { width: 100%; height: 100%; pointer-events: none !important; display: block; object-fit: contain; }
@@ -112,7 +111,6 @@
         }
         .time-text { font-family: monospace; font-size: 0.75rem; color: #ccc; }
 
-        /* Top Header Navigation */
         .top-bar {
             padding: 12px 14px;
             display: flex;
@@ -142,7 +140,6 @@
         .time-bar-small { width: 30px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
         .time-bar-small .fill { height: 100%; background: var(--gold-gradient); transition: width 1s; }
 
-        /* Marquee Section */
         .marquee-container {
             margin: 0 14px 12px 14px; padding: 8px; background: rgba(255,215,0,0.03);
             border: 1px dashed var(--border-neon); border-radius: 12px; overflow: hidden;
@@ -150,7 +147,6 @@
         .marquee-text { display: inline-block; white-space: nowrap; font-size: 0.8rem; font-weight: bold; color: var(--text-sub); animation: marquee var(--speed, 15s) linear infinite; padding-left: 100%; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
-        /* Movie Grid */
         .movie-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 14px; }
         .movie-card {
             background: var(--bg-card); backdrop-filter: var(--glass); border-radius: 20px;
@@ -173,21 +169,18 @@
         .grid-section.hide { display: none; }
         .expired-overlay { text-align: center; padding: 50px 20px; color: #ff4444; grid-column: span 2; font-size: 0.95rem; }
 
-        /* Fullscreen Subtitle Mode Layout Fixes */
         .video-container.fullscreen {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-height: 100vh; z-index: 100000; background: #000; display: flex; align-items: center; justify-content: center;
         }
         .video-container.fullscreen #youtubePlayer { width: 100vw; height: 100vh; object-fit: contain; }
         .video-container.fullscreen .youtube-blocker { width: 100vw; height: 100vh; }
 
-        /* Floating Exit Small Button - Top Right of Screen when Fullscreen */
         #exitFsFloatingBtn {
             position: fixed; top: 20px; right: 20px; background: rgba(255, 68, 102, 0.9);
             color: #fff; border: none; border-radius: 30px; padding: 10px 20px; font-weight: 900;
             font-size: 0.85rem; z-index: 100005; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: none;
         }
 
-        /* Subtitle Position Fixed */
         .subtitle-text {
             position: fixed; bottom: 26%; left: 0; right: 0; text-align: center; z-index: 100002; pointer-events: none; padding: 0 16px; display: none;
         }
@@ -201,7 +194,6 @@
             text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 4px 8px rgba(0,0,0,0.9);
         }
         
-        /* Fullscreen Layout View State Active */
         .player-section.fs-active .video-controls,
         .player-section.fs-active .status-section,
         .player-section.fs-active > .filter-btn { display: none !important; }
@@ -319,11 +311,11 @@
         const screenInfo = window.screen.width + 'x' + window.screen.height + 'x' + window.screen.colorDepth;
         const navigatorInfo = navigator.hardwareConcurrency + '-' + (navigator.deviceMemory || 'M');
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const rawString = screenInfo + navigatorInfo + timezone;
         let hash = 0;
+        const rawString = screenInfo + navigatorInfo + timezone;
         for (let i = 0; i < rawString.length; i++) {
             hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
-            hash = hash & hash;
+            hash |= 0;
         }
         return 'DEV-' + Math.abs(hash).toString(36).toUpperCase();
     }
@@ -332,7 +324,7 @@
         let hash = 0;
         for (let i = 0; i < deviceId.length; i++) {
             hash = ((hash << 5) - hash) + deviceId.charCodeAt(i);
-            hash = hash & hash;
+            hash |= 0;
         }
         return 'UID-' + Math.abs(hash).toString(36).toUpperCase().padStart(8, '0').substring(0, 8);
     }
@@ -356,12 +348,13 @@
         loadMoviesFromCache();
         
         try {
-            let defaultMinutes = 60;
-            const settingsSnap = await database.ref('settings/defaultMinutes').once('value');
-            if (settingsSnap.val()) defaultMinutes = settingsSnap.val();
-            const userRef = database.ref('devices/' + deviceId);
-            const snapshot = await userRef.once('value');
-            const data = snapshot.val();
+            const [settingsSnap, userSnap] = await Promise.all([
+                database.ref('settings/defaultMinutes').once('value'),
+                database.ref('devices/' + deviceId).once('value')
+            ]);
+            
+            let defaultMinutes = settingsSnap.val() || 60;
+            const data = userSnap.val();
             
             if (data) {
                 currentUserData = data;
@@ -371,7 +364,7 @@
             } else {
                 const expiry = Date.now() + defaultMinutes * 60 * 1000;
                 const newUserData = { deviceId, accountId, expiry, createdAt: Date.now(), isAdmin: false };
-                await userRef.set(newUserData);
+                await database.ref('devices/' + deviceId).set(newUserData);
                 currentUserData = newUserData;
                 isExpired = false;
                 showNoti('🎉 အကောင့်အသစ် ဖွင့်လှစ်ပြီးပါပြီ။ (၁ နာရီစမ်းသုံးခွင့်ရပါသည်)');
@@ -385,6 +378,7 @@
 
     function onYouTubeIframeAPIReady() { ytReady = true; autoLogin(); }
 
+    // Optimization: Expiry Checker interval 1s
     function startExpiryChecker() {
         if (expiryCheckInterval) clearInterval(expiryCheckInterval);
         expiryCheckInterval = setInterval(() => {
@@ -452,6 +446,7 @@
         } catch(e) {}
     }
 
+    // Optimization: DocumentFragment Render Method
     function renderMovies() {
         let grid = document.getElementById('movieGrid');
         let searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -467,6 +462,8 @@
         }
         
         grid.innerHTML = '';
+        const fragment = document.createDocumentFragment();
+        
         filtered.forEach(v => {
             let isFav = favorites.includes(v.videoId);
             let card = document.createElement('div');
@@ -483,8 +480,9 @@
                 updatePlayerState();
                 createPlayer(v.videoId);
             };
-            grid.appendChild(card);
+            fragment.appendChild(card);
         });
+        grid.appendChild(fragment);
     }
 
     function createPlayer(videoId) {
@@ -552,6 +550,7 @@
         return parseInt(parts[0])*3600 + parseInt(parts[1])*60 + parseFloat(parts[2]);
     }
 
+    // Optimization: Polling Time Interval 350ms
     function startPolling() {
         if (intervalId) clearInterval(intervalId);
         intervalId = setInterval(() => {
@@ -571,7 +570,7 @@
                 document.getElementById('progressSlider').value = (time / duration) * 100;
                 document.getElementById('timeDisplay').innerText = `${Math.floor(time/60)}:${String(Math.floor(time%60)).padStart(2,'0')} / ${Math.floor(duration/60)}:${String(Math.floor(duration%60)).padStart(2,'0')}`;
             } catch(e){}
-        }, 200);
+        }, 350);
     }
 
     window.togglePlayPause = function() {
@@ -619,13 +618,12 @@
     function searchMovies() { renderMovies(); }
     function refreshMovies() { loadMovies(true); }
     
-    // 🛠️ ဇာတ်ကားပိတ်ပြီး Home ထွက်ချိန် စာတန်းထိုး Polling ကို ရပ်တန့်စေရန် သေချာပြင်ဆင်ထားသော Function
     function showGrid() {
-        if (intervalId) { clearInterval(intervalId); intervalId = null; } // 1. Polling ကို ချက်ချင်းအပြီးရပ်မယ်
-        subtitles = []; // 2. လက်ရှိဖတ်ထားတဲ့ စာတန်းတွေကို သိမ်းဆည်းထားမှု ရှင်းလင်းမယ်
+        if (intervalId) { clearInterval(intervalId); intervalId = null; } 
+        subtitles = []; 
         
         const container = document.getElementById('subtitleText');
-        if (container) { container.style.display = 'none'; } // 3. စာတန်းထိုး Box ကြီးကို မျက်နှာပြင်ပေါ်က အပြီးဖျောက်မယ်
+        if (container) { container.style.display = 'none'; } 
         
         if (player) { try{player.destroy()}catch(e){} player = null; }
         
