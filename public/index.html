@@ -345,6 +345,7 @@
         document.getElementById('userBanner').style.display = 'flex';
         document.getElementById('accountIdDisplay').textContent = accountId;
         
+        // ⚡ [၁] Cache စနစ်: ဝင်ဝင်ချင်း စက္ကန့်ပိုင်းအတွင်း ဖုန်းထဲက ဇာတ်ကားဟောင်းကို တန်းပြပြီး နှောင့်နှေးမှု လုံးဝမရှိစေရပါ။
         loadMoviesFromCache();
         
         try {
@@ -360,6 +361,7 @@
                 currentUserData = data;
                 isExpired = Date.now() > data.expiry;
                 startExpiryChecker();
+                // ⚡ [၂] Background မှာ Data အသစ်ထပ်ဆွဲမယ်
                 await loadMovies(false);
             } else {
                 const expiry = Date.now() + defaultMinutes * 60 * 1000;
@@ -378,7 +380,6 @@
 
     function onYouTubeIframeAPIReady() { ytReady = true; autoLogin(); }
 
-    // Optimization: Expiry Checker interval 1s
     function startExpiryChecker() {
         if (expiryCheckInterval) clearInterval(expiryCheckInterval);
         expiryCheckInterval = setInterval(() => {
@@ -419,10 +420,14 @@
         }
     }
 
+    // ⚡ Local Cache ကနေ Data ဖတ်ပြီး ချက်ချင်းပြသခြင်း
     function loadMoviesFromCache() {
         try {
             const cachedMovies = localStorage.getItem('cached_movies');
-            if (cachedMovies) { allMovies = JSON.parse(cachedMovies); renderMovies(); }
+            if (cachedMovies) { 
+                allMovies = JSON.parse(cachedMovies); 
+                renderMovies(); 
+            }
         } catch(e) {}
     }
 
@@ -436,6 +441,7 @@
             let data = await res.json();
             if (data.success && data.videos && data.videos.length > 0) {
                 allMovies = data.videos;
+                // ⚡ Data အသစ်ရတာနဲ့ ဖုန်းထဲမှာ Cache အဖြစ် ချက်ချင်းသိမ်းမယ်
                 localStorage.setItem('cached_movies', JSON.stringify(allMovies));
                 if (currentUserId) {
                     const favSnap = await database.ref('favorites/' + currentUserId).once('value');
@@ -446,7 +452,7 @@
         } catch(e) {}
     }
 
-    // Optimization: DocumentFragment Render Method
+    // ⚡ High-Speed DOM Rendering System (Document Fragment)
     function renderMovies() {
         let grid = document.getElementById('movieGrid');
         let searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
@@ -550,7 +556,6 @@
         return parseInt(parts[0])*3600 + parseInt(parts[1])*60 + parseFloat(parts[2]);
     }
 
-    // Optimization: Polling Time Interval 350ms
     function startPolling() {
         if (intervalId) clearInterval(intervalId);
         intervalId = setInterval(() => {
