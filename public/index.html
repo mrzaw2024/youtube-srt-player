@@ -15,7 +15,9 @@
             --border-neon: rgba(255, 215, 0, 0.25);
             --gold: #FFD700;
             --cyan: #00f2fe;
+            --purple: #bf55ec;
             --gold-gradient: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
+            --viber-gradient: linear-gradient(135deg, #7b51a1 0%, #593181 100%);
             --text-main: #f5f5f7;
             --text-sub: #c5a880;
             --glass: blur(16px) saturate(180%);
@@ -80,11 +82,11 @@
         .video-placeholder {
             width: 100%; height: 100%; background: #111; display: flex; justify-content: center;
             align-items: center; flex-direction: column; gap: 12px; text-align: center; color: #ff4444;
-            position: absolute; top: 0; left: 0; z-index: 10000;
+            position: absolute; top: 0; left: 0; z-index: 10000; padding: 20px;
         }
         .video-placeholder .contact-link {
-            color: var(--gold); text-decoration: none; font-weight: bold; padding: 6px 16px;
-            border: 1px solid var(--gold); border-radius: 20px; margin-top: 5px; display: inline-block;
+            color: var(--gold); text-decoration: none; font-weight: bold; padding: 8px 20px;
+            border: 1px solid var(--gold); border-radius: 20px; margin-top: 5px; display: inline-block; font-size: 0.85rem;
         }
         
         .status-section { padding: 12px; background: rgba(20,20,20,0.8); text-align: center; position: relative; z-index: 100001; }
@@ -144,7 +146,7 @@
             margin: 0 14px 12px 14px; padding: 8px; background: rgba(255,215,0,0.03);
             border: 1px dashed var(--border-neon); border-radius: 12px; overflow: hidden;
         }
-        .marquee-text { display: inline-block; white-space: nowrap; font-size: 0.8rem; font-weight: bold; color: var(--text-sub); animation: marquee var(--speed, 15s) linear infinite; padding-left: 100%; }
+        .marquee-text { display: inline-block; white-space: nowrap; font-size: 0.8rem; font-weight: bold; color: var(--text-sub); animation: marquee var(--speed, 18s) linear infinite; padding-left: 100%; }
         @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
 
         .movie-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 14px; }
@@ -167,7 +169,20 @@
         .player-section { display: none; }
         .player-section.active { display: block; }
         .grid-section.hide { display: none; }
-        .expired-overlay { text-align: center; padding: 50px 20px; color: #ff4444; grid-column: span 2; font-size: 0.95rem; }
+        
+        /* Expired Overlay Multi-Buttons Custom Styling */
+        .expired-overlay { 
+            text-align: center; padding: 50px 16px; color: #ff4444; grid-column: span 2; font-size: 0.95rem;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+        }
+        .btn-group { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 260px; margin-top: 10px; }
+        .admin-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px; color: #000; border: none; font-weight: 900;
+            padding: 12px 20px; font-size: 0.85rem; border-radius: 30px; text-decoration: none; transition: transform 0.2s;
+        }
+        .admin-btn.viber { background: var(--viber-gradient); color: #fff; box-shadow: 0 4px 15px rgba(123, 81, 161, 0.4); }
+        .admin-btn.telegram { background: var(--gold-gradient); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); }
+        .admin-btn:active { transform: scale(0.95); }
 
         .video-container.fullscreen {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-height: 100vh; z-index: 100000; background: #000; display: flex; align-items: center; justify-content: center;
@@ -191,7 +206,7 @@
             font-family: system-ui, -apple-system, sans-serif; 
             line-height: 1.25 !important;
             text-align: center; word-break: break-word; max-width: 96%;
-            text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, -2px 2px 0 #000, 0 4px 8px rgba(0,0,0,0.9);
+            text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 4px 8px rgba(0,0,0,0.9);
         }
         
         .player-section.fs-active .video-controls,
@@ -227,8 +242,10 @@
             <div class="video-container" id="videoContainer">
                 <div id="youtubePlayer"></div>
                 <div class="video-placeholder" id="videoPlaceholder" style="display:none;">
-                    <div>⛔ သင့်အသုံးပြုခွင့် ကုန်ဆုံးသွားပါပြီ</div>
-                    <a href="https://t.me/mmmovies002" target="_blank" class="contact-link">Admin သို့ ဆက်သွယ်ရန်</a>
+                    <div>⛔ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ</div>
+                    <div style="font-size:0.8rem; color:#aaa; margin: 4px 0 10px 0;">သက်တမ်းတိုးရန် အောက်ပါအတိုင်း ဆက်သွယ်နိုင်ပါသည်</div>
+                    <a href="viber://chat?number=%2B959777966119" class="contact-link" style="border-color:#bf55ec; color:#bf55ec;">💜 Viber: 09777966119</a>
+                    <a href="https://t.me/mmmovies002" target="_blank" class="contact-link">💙 Telegram Admin ဆီသွားရန်</a>
                 </div>
             </div>
         </div>
@@ -263,7 +280,7 @@
         </div>
         
         <div class="marquee-container">
-            <div class="marquee-text" id="marqueeText">✨ မင်္ဂလာပါ Premium Movie App မှ ကြိုဆိုပါတယ်။ ဇာတ်ကားများကို စိတ်ကြိုက် ရွေးချယ်ကြည့်ရှုနိုင်ပါပြီ။ 🍿</div>
+            <div class="marquee-text" id="marqueeText">✨ Movie App သက်တမ်းတိုးလိုပါက Admin Viber 09777966119 သို့ ဆက်သွယ်နိုင်ပါသည်။ 🍿</div>
         </div>
         
         <div id="movieGrid" class="movie-grid">
@@ -311,11 +328,11 @@
         const screenInfo = window.screen.width + 'x' + window.screen.height + 'x' + window.screen.colorDepth;
         const navigatorInfo = navigator.hardwareConcurrency + '-' + (navigator.deviceMemory || 'M');
         const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        let hash = 0;
         const rawString = screenInfo + navigatorInfo + timezone;
+        let hash = 0;
         for (let i = 0; i < rawString.length; i++) {
             hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
-            hash |= 0;
+            hash = hash & hash;
         }
         return 'DEV-' + Math.abs(hash).toString(36).toUpperCase();
     }
@@ -324,7 +341,7 @@
         let hash = 0;
         for (let i = 0; i < deviceId.length; i++) {
             hash = ((hash << 5) - hash) + deviceId.charCodeAt(i);
-            hash |= 0;
+            hash = hash & hash;
         }
         return 'UID-' + Math.abs(hash).toString(36).toUpperCase().padStart(8, '0').substring(0, 8);
     }
@@ -348,13 +365,12 @@
         loadMoviesFromCache();
         
         try {
-            const [settingsSnap, userSnap] = await Promise.all([
-                database.ref('settings/defaultMinutes').once('value'),
-                database.ref('devices/' + deviceId).once('value')
-            ]);
-            
-            let defaultMinutes = settingsSnap.val() || 60;
-            const data = userSnap.val();
+            let defaultMinutes = 60;
+            const settingsSnap = await database.ref('settings/defaultMinutes').once('value');
+            if (settingsSnap.val()) defaultMinutes = settingsSnap.val();
+            const userRef = database.ref('devices/' + deviceId);
+            const snapshot = await userRef.once('value');
+            const data = snapshot.val();
             
             if (data) {
                 currentUserData = data;
@@ -364,7 +380,7 @@
             } else {
                 const expiry = Date.now() + defaultMinutes * 60 * 1000;
                 const newUserData = { deviceId, accountId, expiry, createdAt: Date.now(), isAdmin: false };
-                await database.ref('devices/' + deviceId).set(newUserData);
+                await userRef.set(newUserData);
                 currentUserData = newUserData;
                 isExpired = false;
                 showNoti('🎉 အကောင့်အသစ် ဖွင့်လှစ်ပြီးပါပြီ။ (၁ နာရီစမ်းသုံးခွင့်ရပါသည်)');
@@ -451,14 +467,25 @@
                     renderIncrementalMovie(data.videos[i], i === 0); 
                 }
             }
-        } catch(e) {
-            console.log(e);
-        }
+        } catch(e) {}
     }
 
+    // ⚡ [ပြင်ဆင်ချက်] - သက်တမ်းကုန်ဆုံးချိန်တွင် Viber နှင့် Telegram ဆက်သွယ်ရန် ခလုတ်များပြသပေးမည့်စနစ်
     function renderIncrementalMovie(v, isFirst) {
         let grid = document.getElementById('movieGrid');
-        if (isFirst || grid.querySelector('.loading-text-center')) {
+        if (isExpired) { 
+            grid.innerHTML = `
+                <div class="expired-overlay">
+                    <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
+                    <div class="btn-group">
+                        <a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a>
+                        <a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
+                    </div>
+                </div>`; 
+            return; 
+        }
+        
+        if (isFirst || grid.querySelector('.loading-text-center') || grid.querySelector('.expired-overlay')) {
             grid.innerHTML = ''; 
         }
         
@@ -486,11 +513,22 @@
         let filtered = allMovies;
         if (currentFilter === 'favorites') filtered = filtered.filter(m => favorites.includes(m.videoId));
         if (searchTerm) filtered = filtered.filter(m => (m.title || "").toLowerCase().includes(searchTerm));
-        if (isExpired) { grid.innerHTML = `<div class="expired-overlay">⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</div>`; return; }
+        
+        if (isExpired) { 
+            grid.innerHTML = `
+                <div class="expired-overlay">
+                    <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
+                    <div class="btn-group">
+                        <a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a>
+                        <a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
+                    </div>
+                </div>`; 
+            return; 
+        }
         
         if (filtered.length === 0) {
-            if (allMovies.length === 0) { grid.innerHTML = `<div class="loading-text-center">⏳ Loading Movies...</div>`; }
-            else { grid.innerHTML = `<div class="loading-text-center">📭 ဇာတ်ကားများ မရှိသေးပါ။</div>`; }
+            if (allMovies.length === 0) { grid.innerHTML = '<div class="loading-text-center">⏳ Loading Movies...</div>'; }
+            else { grid.innerHTML = '<div class="loading-text-center">📭 ဇာတ်ကားများ မရှိသေးပါ။</div>'; }
             return;
         }
         
