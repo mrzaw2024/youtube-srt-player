@@ -191,7 +191,7 @@
             font-family: system-ui, -apple-system, sans-serif; 
             line-height: 1.25 !important;
             text-align: center; word-break: break-word; max-width: 96%;
-            text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 4px 8px rgba(0,0,0,0.9);
+            text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, -2px 2px 0 #000, 0 4px 8px rgba(0,0,0,0.9);
         }
         
         .player-section.fs-active .video-controls,
@@ -345,7 +345,6 @@
         document.getElementById('userBanner').style.display = 'flex';
         document.getElementById('accountIdDisplay').textContent = accountId;
         
-        // ⚡ [၁] Cache စနစ်: ဝင်ဝင်ချင်း စက္ကန့်ပိုင်းအတွင်း ဖုန်းထဲက ဇာတ်ကားဟောင်းကို တန်းပြပြီး နှောင့်နှေးမှု လုံးဝမရှိစေရပါ။
         loadMoviesFromCache();
         
         try {
@@ -361,7 +360,6 @@
                 currentUserData = data;
                 isExpired = Date.now() > data.expiry;
                 startExpiryChecker();
-                // ⚡ [၂] Background မှာ Data အသစ်ထပ်ဆွဲမယ်
                 await loadMovies(false);
             } else {
                 const expiry = Date.now() + defaultMinutes * 60 * 1000;
@@ -420,7 +418,6 @@
         }
     }
 
-    // ⚡ Local Cache ကနေ Data ဖတ်ပြီး ချက်ချင်းပြသခြင်း
     function loadMoviesFromCache() {
         try {
             const cachedMovies = localStorage.getItem('cached_movies');
@@ -437,22 +434,52 @@
             grid.innerHTML = '<div class="loading-text-center">⏳ Loading Movies...</div>';
         }
         try {
+            if (currentUserId) {
+                const favSnap = await database.ref('favorites/' + currentUserId).once('value');
+                favorites = favSnap.val() || [];
+            }
+
             let res = await fetch(API_URL);
             let data = await res.json();
+            
             if (data.success && data.videos && data.videos.length > 0) {
-                allMovies = data.videos;
-                // ⚡ Data အသစ်ရတာနဲ့ ဖုန်းထဲမှာ Cache အဖြစ် ချက်ချင်းသိမ်းမယ်
-                localStorage.setItem('cached_movies', JSON.stringify(allMovies));
-                if (currentUserId) {
-                    const favSnap = await database.ref('favorites/' + currentUserId).once('value');
-                    favorites = favSnap.val() || [];
+                allMovies = []; 
+                localStorage.setItem('cached_movies', JSON.stringify(data.videos));
+                
+                for (let i = 0; i < data.videos.length; i++) {
+                    allMovies.push(data.videos[i]);
+                    renderIncrementalMovie(data.videos[i], i === 0); 
                 }
-                renderMovies();
             }
-        } catch(e) {}
+        } catch(e) {
+            console.log(e);
+        }
     }
 
-    // ⚡ High-Speed DOM Rendering System (Document Fragment)
+    function renderIncrementalMovie(v, isFirst) {
+        let grid = document.getElementById('movieGrid');
+        if (isFirst || grid.querySelector('.loading-text-center')) {
+            grid.innerHTML = ''; 
+        }
+        
+        let isFav = favorites.includes(v.videoId);
+        let card = document.createElement('div');
+        card.className = 'movie-card';
+        card.innerHTML = `
+            <button class="favorite-btn ${isFav?'active':''}" onclick="toggleFavorite('${v.videoId}', event)">${isFav?'❤️':'🤍'}</button>
+            <img class="movie-poster" src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg">
+            <div class="movie-title">${v.title || "Premium Video"}</div>
+        `;
+        card.onclick = () => {
+            if (isExpired) return;
+            document.getElementById('gridSection').classList.add('hide');
+            document.getElementById('playerSection').classList.add('active');
+            updatePlayerState();
+            createPlayer(v.videoId);
+        };
+        grid.appendChild(card);
+    }
+
     function renderMovies() {
         let grid = document.getElementById('movieGrid');
         let searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
