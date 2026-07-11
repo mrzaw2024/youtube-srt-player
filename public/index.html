@@ -42,7 +42,7 @@
 
     ::-webkit-scrollbar { width: 0; height: 0; }
 
-    /* App Navigation Tabs (2D First, Movies Second) */
+    /* App Navigation Tabs */
     .app-tabs {
       display: flex;
       background: rgba(20, 20, 20, 0.8);
@@ -74,6 +74,7 @@
 
     .tab-content {
       display: none;
+      padding-bottom: 80px;
     }
 
     .tab-content.active {
@@ -87,15 +88,15 @@
       background: var(--panel-bg);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      padding: 20px;
+      padding: 20px 16px;
       border-radius: 24px;
-      margin: 20px auto;
+      margin: 16px auto;
       color: var(--text-2d-main);
     }
 
     .header-area { text-align: center; margin-bottom: 20px; }
     .header-area h2 {
-      font-size: 26px; font-weight: 900; letter-spacing: 0.5px;
+      font-size: 24px; font-weight: 900; letter-spacing: 0.5px;
       background: linear-gradient(135deg, #3742fa 0%, #9c88ff 100%);
       -webkit-background-clip: text; -webkit-text-fill-color: transparent;
     }
@@ -109,34 +110,34 @@
     }
     .table-wrapper {
       width: 100%; overflow-x: auto; border-radius: 16px; border: 1px solid #dcdde1;
-      background: #ffffff; margin-bottom: 20px;
+      background: #ffffff; margin-bottom: 16px;
     }
-    table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px; text-align: center; }
+    table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 12px; text-align: center; }
     th {
       background: linear-gradient(180deg, #747d8c 0%, #2f3542 100%);
-      color: #ffffff; font-weight: 700; padding: 14px 4px; font-size: 12px;
+      color: #ffffff; font-weight: 700; padding: 12px 4px; font-size: 11px;
     }
-    td { border-bottom: 1px solid #dee2e6; border-right: 1px solid #eef0f2; padding: 12px 6px; color: #2f3542; font-weight: 600; }
+    td { border-bottom: 1px solid #dee2e6; border-right: 1px solid #eef0f2; padding: 10px 4px; color: #2f3542; font-weight: 600; }
     td:last-child { border-right: none; }
     tr:nth-child(even) td { background-color: #f9fbfd; }
     .num-box-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; }
     .num-box {
-      display: inline-block; width: 90%; max-width: 85px; font-weight: 800; font-size: 16px;
-      background: linear-gradient(135deg, #fff3cd 0%, #ffe066 100%); padding: 8px 0; border-radius: 10px; border: 1px solid #ffe066;
+      display: inline-block; width: 90%; max-width: 70px; font-weight: 800; font-size: 15px;
+      background: linear-gradient(135deg, #fff3cd 0%, #ffe066 100%); padding: 6px 0; border-radius: 8px; border: 1px solid #ffe066;
     }
-    .count-text { font-size: 11px; font-weight: 900; color: #e74c3c; margin-left: 2px; vertical-align: super; }
+    .count-text { font-size: 10px; font-weight: 900; color: #e74c3c; margin-left: 2px; vertical-align: super; }
     .highlight-am-pm-match { background: linear-gradient(135deg, #a8e6cf 0%, #2ecc71 100%) !important; }
     .highlight-am-pm-match .num-box {
       background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; border-color: #10b981;
     }
     .highlight-am-pm-match .count-text { color: #fff200; }
     .badge-hit {
-      color: #fff; font-weight: 800; font-size: 13px; background: linear-gradient(135deg, #2ed573 0%, #1ebd60 100%);
-      padding: 5px 12px; border-radius: 10px; display: inline-block;
+      color: #fff; font-weight: 800; font-size: 12px; background: linear-gradient(135deg, #2ed573 0%, #1ebd60 100%);
+      padding: 4px 10px; border-radius: 8px; display: inline-block;
     }
     .khway-style {
-      color: #2f3542; font-weight: 700; font-size: 13px; background: #e8f0fe;
-      padding: 6px 8px; border-radius: 8px; display: inline-block; border: 1px solid #d2e3fc;
+      color: #2f3542; font-weight: 700; font-size: 12px; background: #e8f0fe;
+      padding: 4px 6px; border-radius: 6px; display: inline-block; border: 1px solid #d2e3fc;
     }
     .empty-status { color: #57606f; padding: 30px !important; font-weight: 700; }
     .admin-footer-box {
@@ -148,8 +149,14 @@
     .view-count-num { color: var(--neon-blue); font-weight: 800; }
 
     /* Movie Section Styles */
-    .video-section { width: 100%; background: #000; border-bottom: 2px solid var(--gold); position: relative; }
-    .video-container { position: relative; width: 100%; aspect-ratio: 9/16; background: #000; margin: auto; max-height: 72vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+    .movie-section-wrapper {
+      max-width: 650px;
+      margin: 0 auto;
+      padding: 0 10px;
+    }
+
+    .video-section { width: 100%; background: #000; border-bottom: 2px solid var(--gold); position: relative; border-radius: 12px 12px 0 0; overflow: hidden; }
+    .video-container { position: relative; width: 100%; aspect-ratio: 9/16; background: #000; margin: auto; max-height: 65vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
     #youtubePlayer { width: 100%; height: 100%; display: block; border: none; }
     
     .video-placeholder {
@@ -162,64 +169,74 @@
       border: 1px solid var(--gold); border-radius: 20px; margin-top: 5px; display: inline-block; font-size: 0.85rem;
     }
     
-    .status-section { padding: 12px; background: rgba(20,20,20,0.8); text-align: center; position: relative; z-index: 100001; }
-    .status-text { color: var(--gold); font-size: 0.85rem; font-weight: bold; }
-    .fullscreen-hint { color: var(--cyan); font-size: 0.75rem; font-weight: bold; margin-top: 4px; animation: blink 1.5s infinite; }
+    .status-section { padding: 10px; background: rgba(20,20,20,0.8); text-align: center; position: relative; z-index: 100001; }
+    .status-text { color: var(--gold); font-size: 0.8rem; font-weight: bold; }
+    .fullscreen-hint { color: var(--cyan); font-size: 0.7rem; font-weight: bold; margin-top: 4px; animation: blink 1.5s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
     
     .video-controls {
-      display: flex; gap: 10px; padding: 14px; background: rgba(15,15,15,0.95);
+      display: flex; gap: 8px; padding: 12px; background: rgba(15,15,15,0.95);
       flex-wrap: wrap; justify-content: center; align-items: center;
       position: relative; z-index: 100001;
+      border-radius: 0 0 12px 12px;
     }
     .video-controls button {
-      background: rgba(255,255,255,0.07); color: #fff; font-size: 0.8rem; padding: 10px 16px;
-      border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; cursor: pointer; font-weight: bold;
+      background: rgba(255,255,255,0.07); color: #fff; font-size: 0.7rem; padding: 8px 12px;
+      border: 1px solid rgba(255,255,255,0.15); border-radius: 16px; cursor: pointer; font-weight: bold;
       transition: all 0.2s;
     }
     .video-controls button:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
     .video-controls button.primary { background: var(--gold-gradient); color: #000; border: none; font-weight: 900; }
-    .progress-container { flex: 2; display: flex; align-items: center; gap: 8px; min-width: 140px; }
-    .progress-slider { flex: 1; height: 5px; -webkit-appearance: none; background: #333; border-radius: 10px; outline: none; }
+    .progress-container { flex: 2; display: flex; align-items: center; gap: 6px; min-width: 120px; }
+    .progress-slider { flex: 1; height: 4px; -webkit-appearance: none; background: #333; border-radius: 10px; outline: none; }
     .progress-slider::-webkit-slider-thumb {
-      -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--gold); cursor: pointer;
+      -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: var(--gold); cursor: pointer;
     }
-    .time-text { font-family: monospace; font-size: 0.75rem; color: #ccc; }
+    .time-text { font-family: monospace; font-size: 0.65rem; color: #ccc; }
+
+    /* Movie Grid */
+    .movie-grid-wrapper {
+      max-width: 650px;
+      margin: 16px auto;
+      padding: 0 10px;
+    }
 
     .top-bar {
-      padding: 12px 14px;
+      padding: 10px 12px;
       display: flex;
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
-      gap: 8px;
+      gap: 6px;
       width: 100%;
+      flex-wrap: wrap;
     }
+    .nav-controls-group { display: flex; align-items: center; gap: 6px; }
     .filter-btn {
       background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
-      border-radius: 20px; padding: 8px 14px; color: #ccc; cursor: pointer; font-size: 0.75rem; font-weight: bold;
+      border-radius: 20px; padding: 6px 12px; color: #ccc; cursor: pointer; font-size: 0.7rem; font-weight: bold;
     }
     .filter-btn.active { background: var(--gold-gradient); color: #000; border-color: transparent; box-shadow: 0 4px 12px rgba(255,215,0,0.25); }
     
     .search-input {
-      padding: 8px 14px; border-radius: 20px; border: 1px solid var(--border-neon);
-      background: rgba(255,255,255,0.05); color: #fff; font-size: 0.75rem; outline: none; width: 100px; transition: all 0.3s;
+      padding: 6px 12px; border-radius: 20px; border: 1px solid var(--border-neon);
+      background: rgba(255,255,255,0.05); color: #fff; font-size: 0.7rem; outline: none; width: 80px; transition: all 0.3s;
     }
-    .search-input:focus { width: 130px; border-color: var(--gold); background: rgba(255,255,255,0.1); }
+    .search-input:focus { width: 110px; border-color: var(--gold); background: rgba(255,255,255,0.1); }
 
-    .movie-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 14px; }
+    .movie-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; padding: 10px 0; }
     .movie-card {
-      background: var(--bg-card); backdrop-filter: var(--glass); border-radius: 20px;
-      overflow: hidden; cursor: pointer; padding: 10px; border: 1px solid rgba(255,255,255,0.06);
+      background: var(--bg-card); backdrop-filter: var(--glass); border-radius: 16px;
+      overflow: hidden; cursor: pointer; padding: 8px; border: 1px solid rgba(255,255,255,0.06);
       transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); position: relative;
     }
     .movie-card:hover { border-color: var(--gold); transform: translateY(-4px); }
-    .movie-poster { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 14px; }
-    .movie-title { font-size: 0.85rem; font-weight: 700; color: #fff; margin-top: 10px; text-align: center; padding: 0 4px; }
+    .movie-poster { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 12px; }
+    .movie-title { font-size: 0.8rem; font-weight: 700; color: #fff; margin-top: 8px; text-align: center; padding: 0 4px; }
     
     .favorite-btn {
-      position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.6);
-      border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 0.8rem;
+      position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6);
+      border: none; border-radius: 50%; width: 26px; height: 26px; font-size: 0.7rem;
       cursor: pointer; color: #fff; display: flex; justify-content: center; align-items: center; z-index: 5;
     }
     .favorite-btn.active { color: #ff4466; transform: scale(1.1); }
@@ -229,12 +246,12 @@
     .grid-section.hide { display: none; }
 
     .subtitle-text {
-      position: fixed; bottom: 26%; left: 0; right: 0; text-align: center; z-index: 100002; pointer-events: none; padding: 0 16px; display: none;
+      position: fixed; bottom: 22%; left: 0; right: 0; text-align: center; z-index: 100002; pointer-events: none; padding: 0 16px; display: none;
     }
-    .video-container.fullscreen ~ .subtitle-text { bottom: 24%; }
+    .video-container.fullscreen ~ .subtitle-text { bottom: 20%; }
     
     .subtitle-text .subtitle-inner {
-      display: inline-block; color: var(--gold); font-size: clamp(1.25rem, 5.8vw, 2.35rem); font-weight: 900;
+      display: inline-block; color: var(--gold); font-size: clamp(1rem, 5vw, 2rem); font-weight: 900;
       font-family: system-ui, -apple-system, sans-serif; 
       line-height: 1.25 !important;
       text-align: center; word-break: break-word; max-width: 96%;
@@ -256,12 +273,38 @@
     .player-section.fs-active .status-section,
     .player-section.fs-active > .filter-btn { display: none !important; }
 
-    .loading-text-center { text-align: center; padding: 40px; color: #aaa; font-size: 1rem; grid-column: span 2; }
+    .loading-text-center { text-align: center; padding: 30px; color: #aaa; font-size: 0.9rem; grid-column: span 2; }
+
+    #customNoti {
+      position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-100px);
+      background: rgba(31, 40, 51, 0.9); backdrop-filter: var(--glass);
+      border: 1px solid var(--gold); border-radius: 16px; padding: 14px 28px;
+      color: var(--text-main); font-size: 0.95rem; font-weight: 600; z-index: 9999998;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    #customNoti.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .back-btn {
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 20px;
+      padding: 8px 16px;
+      color: #ccc;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-weight: bold;
+      margin: 10px 0;
+      display: inline-block;
+    }
+    .back-btn:hover { background: rgba(255,255,255,0.15); }
   </style>
 </head>
 <body>
 
-<!-- App Navigation Tabs (2D First, Movies Second) -->
+<!-- Notification -->
+<div id="customNoti">📢 <span id="notiMessage">Notification</span></div>
+
+<!-- App Navigation Tabs -->
 <div class="app-tabs">
   <button class="tab-btn active" onclick="switchTab('twod')">📊 2D ခန့်မှန်းချက်</button>
   <button class="tab-btn" onclick="switchTab('movies')">🎬 ဇာတ်ကားများ</button>
@@ -271,7 +314,7 @@
 <div id="twodSection" class="tab-content active">
   <div class="twod-container" id="twodContainerInner">
     <div class="header-area">
-      <h2>Bozaw 2d ခန့်မှန်းချက်</h2>
+      <h2>Bozaw 2D ခန့်မှန်းချက်</h2>
       <div class="sub-status-area">
         <span class="status-icon" id="statusIcon">🔄</span> 
         <span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="viewCountDisplay">0</span> views</span>
@@ -307,59 +350,64 @@
 
 <!-- Movie App Section (Back) -->
 <div id="moviesSection" class="tab-content">
-  <div id="customNoti" style="position:fixed;top:70px;left:50%;transform:translateX(-50%) translateY(-100px);background:rgba(31,40,51,0.9);backdrop-filter:blur(16px);border:1px solid #FFD700;border-radius:16px;padding:14px 28px;color:#f5f5f7;font-size:0.95rem;font-weight:600;z-index:9999998;box-shadow:0 10px 40px rgba(0,0,0,0.5);opacity:0;transition:all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);">📢 <span id="notiMessage">Notification</span></div>
-
   <button id="exitFsFloatingBtn" onclick="toggleFullscreen()">✕ Exit Small</button>
 
   <div id="appContent">
+    <!-- Player Section -->
     <div id="playerSection" class="player-section">
-      <button class="filter-btn" onclick="showGrid()" style="margin: 12px;">← Back Home</button>
-      <div class="video-section">
-        <div class="video-container" id="videoContainer">
-          <iframe id="youtubePlayer" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
-          <div class="video-placeholder" id="videoPlaceholder" style="display:none;">
-            <div>⛔ ဗီဒီယိုဖွင့်၍မရပါ</div>
-            <div style="font-size:0.8rem; color:#aaa; margin: 4px 0 10px 0;">အောက်ပါအတိုင်း ဆက်သွယ်နိုင်ပါသည်</div>
-            <a href="viber://chat?number=%2B959777966119" class="contact-link" style="border-color:#bf55ec; color:#bf55ec;">💜 Viber: 09777966119</a>
-            <a href="https://t.me/mmmovies002" target="_blank" class="contact-link">💙 Telegram Admin</a>
+      <div class="movie-section-wrapper">
+        <button class="back-btn" onclick="showGrid()">← Back to Movies</button>
+        <div class="video-section">
+          <div class="video-container" id="videoContainer">
+            <iframe id="youtubePlayer" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
+            <div class="video-placeholder" id="videoPlaceholder" style="display:none;">
+              <div>⛔ ဗီဒီယိုဖွင့်၍မရပါ</div>
+              <div style="font-size:0.8rem; color:#aaa; margin: 4px 0 10px 0;">အောက်ပါအတိုင်း ဆက်သွယ်နိုင်ပါသည်</div>
+              <a href="viber://chat?number=%2B959777966119" class="contact-link" style="border-color:#bf55ec; color:#bf55ec;">💜 Viber: 09777966119</a>
+              <a href="https://t.me/mmmovies002" target="_blank" class="contact-link">💙 Telegram Admin</a>
+            </div>
           </div>
         </div>
-      </div>
-      <div class="status-section">
-        <div id="statusText" class="status-text">⏳ Loading...</div>
-        <div id="fullscreenHint" class="fullscreen-hint" style="display: none;">🎬 စာတန်းထိုးအတွက် Full ကိုနှိပ်ပါ</div>
-      </div>
-      <div class="video-controls">
-        <button onclick="seekVideo(-10)">⏪ -10s</button>
-        <button class="primary" id="playPauseBtn" onclick="togglePlayPause()">⏸ Pause</button>
-        <button onclick="seekVideo(10)">⏩ +10s</button>
-        <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Full</button>
-        <div class="progress-container">
-          <input type="range" id="progressSlider" class="progress-slider" min="0" max="100" value="0" onchange="seekToPosition()">
-          <div class="time-text" id="timeDisplay">0:00 / 0:00</div>
+        <div class="status-section">
+          <div id="statusText" class="status-text">⏳ Loading...</div>
+          <div id="fullscreenHint" class="fullscreen-hint" style="display: none;">🎬 စာတန်းထိုးအတွက် Full ကိုနှိပ်ပါ</div>
+        </div>
+        <div class="video-controls">
+          <button onclick="seekVideo(-10)">⏪ -10s</button>
+          <button class="primary" id="playPauseBtn" onclick="togglePlayPause()">⏸ Pause</button>
+          <button onclick="seekVideo(10)">⏩ +10s</button>
+          <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Full</button>
+          <div class="progress-container">
+            <input type="range" id="progressSlider" class="progress-slider" min="0" max="100" value="0" onchange="seekToPosition()">
+            <div class="time-text" id="timeDisplay">0:00 / 0:00</div>
+          </div>
         </div>
       </div>
     </div>
 
+    <!-- Grid Section -->
     <div id="gridSection" class="grid-section">
-      <div class="top-bar">
-        <div class="nav-controls-group">
-          <button class="filter-btn active" id="allBtn" onclick="setFilter('all')">All</button>
-          <button class="filter-btn" id="favBtn" onclick="setFilter('favorites')">Favorites</button>
+      <div class="movie-grid-wrapper">
+        <div class="top-bar">
+          <div class="nav-controls-group">
+            <button class="filter-btn active" id="allBtn" onclick="setFilter('all')">All</button>
+            <button class="filter-btn" id="favBtn" onclick="setFilter('favorites')">Favorites</button>
+          </div>
+          <input type="text" id="searchInput" class="search-input" placeholder="🔍 ရှာရန်..." onkeyup="searchMovies()">
         </div>
-        <input type="text" id="searchInput" class="search-input" placeholder="🔍 ရှာရန်..." onkeyup="searchMovies()">
-      </div>
-      
-      <div id="movieGrid" class="movie-grid">
-        <div class="loading-text-center">⏳ Loading Movies...</div>
+        
+        <div id="movieGrid" class="movie-grid">
+          <div class="loading-text-center">⏳ Loading Movies...</div>
+        </div>
       </div>
     </div>
   </div>
+  
   <div id="subtitleText" class="subtitle-text"><div id="subtitleInner" class="subtitle-inner"></div></div>
 </div>
 
 <script>
-  // Tab Switcher
+  // ==================== TAB SWITCHER ====================
   function switchTab(tabId) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -367,13 +415,24 @@
     if (tabId === 'movies') {
       document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
       document.getElementById('moviesSection').classList.add('active');
+      // Load movies when switching to movies tab
+      if (allMovies.length === 0) loadMovies();
     } else {
       document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
       document.getElementById('twodSection').classList.add('active');
     }
   }
 
-  // --- Movie Player with Subtitle ---
+  // ==================== NOTIFICATION ====================
+  function showNoti(message) {
+    const noti = document.getElementById('customNoti');
+    document.getElementById('notiMessage').textContent = message;
+    noti.classList.add('show');
+    clearTimeout(window.notiTimeout);
+    window.notiTimeout = setTimeout(() => noti.classList.remove('show'), 3000);
+  }
+
+  // ==================== MOVIE PLAYER ====================
   let subtitles = [];
   let intervalId = null;
   let isFullscreen = false;
@@ -383,18 +442,6 @@
   let allMovies = [];
   let currentFilter = 'all';
   let favorites = JSON.parse(localStorage.getItem('favorites') || '[]');
-
-  function showNoti(message) {
-    const noti = document.getElementById('customNoti');
-    document.getElementById('notiMessage').textContent = message;
-    noti.style.opacity = '1';
-    noti.style.transform = 'translateX(-50%) translateY(0)';
-    clearTimeout(window.notiTimeout);
-    window.notiTimeout = setTimeout(() => {
-      noti.style.opacity = '0';
-      noti.style.transform = 'translateX(-50%) translateY(-100px)';
-    }, 3000);
-  }
 
   const API_URL = 'https://script.google.com/macros/s/AKfycbzNn4ZuCu9jOghk9FoLehMvSlBMcd50r5XTTfhioCzaM8B7in5LUTvzRgaUtojaOGXJdg/exec';
 
@@ -411,9 +458,12 @@
         allMovies = data.videos;
         localStorage.setItem('cached_movies', JSON.stringify(data.videos));
         renderMovies();
+      } else {
+        grid.innerHTML = '<div class="loading-text-center">📭 ဇာတ်ကားများ မရှိသေးပါ။</div>';
       }
     } catch(e) {
       grid.innerHTML = '<div class="loading-text-center">❌ ကွန်ရက်ချိတ်ဆက်မှု ပြဿနာရှိနေပါသည်</div>';
+      showNoti('⚠️ ကွန်ရက်ချိတ်ဆက်မှု နှေးကွေးနေပါသည်။');
     }
   }
 
@@ -425,7 +475,11 @@
     if (searchTerm) filtered = filtered.filter(m => (m.title || "").toLowerCase().includes(searchTerm));
     
     if (filtered.length === 0) {
-      grid.innerHTML = '<div class="loading-text-center">📭 ဇာတ်ကားများ မရှိသေးပါ။</div>';
+      if (allMovies.length === 0) {
+        grid.innerHTML = '<div class="loading-text-center">⏳ Loading Movies...</div>';
+      } else {
+        grid.innerHTML = '<div class="loading-text-center">📭 ဇာတ်ကားများ မရှိသေးပါ။</div>';
+      }
       return;
     }
     
@@ -615,10 +669,9 @@
     document.getElementById('playerSection').classList.remove('fs-active');
     document.getElementById('exitFsFloatingBtn').style.display = 'none';
     isFullscreen = false;
-    loadMovies();
   }
 
-  // --- 2D Section ---
+  // ==================== 2D SECTION ====================
   const SHEET_ID = '1tNEhMx08S8rz84In1FdWLPcYlGJkzDCIXFMIhy5BrGU';
   const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 
@@ -654,6 +707,7 @@
       })
       .catch(error => {
         document.getElementById('statusIcon').innerText = '❌';
+        showNoti('⚠️ Google Sheet ဒေတာများ ဆွဲယူမရပါ');
       });
   }
 
@@ -781,7 +835,7 @@
 
       let finalHitHTML = hitNumbers.length > 0 
         ? `<span class="badge-hit">${hitNumbers.join(', ')}</span>` 
-        : (savedKhwayItems[index] && savedKhwayItems[index] !== '-' ? '<span style="color:#747d8c;font-size:12px;font-weight:700;">မပါဝင်ပါ</span>' : '-');
+        : (savedKhwayItems[index] && savedKhwayItems[index] !== '-' ? '<span style="color:#747d8c;font-size:11px;font-weight:700;">မပါဝင်ပါ</span>' : '-');
 
       let amCountStr = amHitCounts[index] > 0 ? `<span class="count-text">(${amHitCounts[index]})</span>` : '';
       let pmCountStr = pmHitCounts[index] > 0 ? `<span class="count-text">(${pmHitCounts[index]})</span>` : '';
