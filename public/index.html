@@ -20,13 +20,10 @@
       --text-main: #f5f5f7;
       --text-sub: #c5a880;
       --glass: blur(16px) saturate(180%);
-      
-      /* 2D Variables */
       --panel-bg: rgba(255, 255, 255, 0.95);
       --text-2d-main: #2c3e50;
       --neon-blue: #3742fa;
     }
-
     * {
       -webkit-user-select: none !important;
       -moz-user-select: none !important;
@@ -37,7 +34,6 @@
       padding: 0;
       box-sizing: border-box;
     }
-
     body {
       font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
       background: var(--bg-main);
@@ -46,10 +42,7 @@
       min-height: 100vh;
       overflow-x: hidden;
     }
-
     ::-webkit-scrollbar { width: 0; height: 0; }
-
-    /* App Navigation Tabs (2D First, Movies Second) */
     .app-tabs {
       display: flex;
       background: rgba(20, 20, 20, 0.8);
@@ -59,7 +52,6 @@
       z-index: 100006;
       backdrop-filter: var(--glass);
     }
-
     .tab-btn {
       flex: 1;
       padding: 15px;
@@ -72,22 +64,17 @@
       transition: all 0.3s;
       text-align: center;
     }
-
     .tab-btn.active {
       color: var(--gold);
       border-bottom: 3px solid var(--gold);
       background: rgba(255, 255, 255, 0.03);
     }
-
     .tab-content {
       display: none;
     }
-
     .tab-content.active {
       display: block;
     }
-
-    /* Common Components */
     #devtoolsDetector {
       position: fixed; top: 0; left: 0; width: 100%; height: 100%;
       background: rgba(11,12,16,0.98); z-index: 9999999;
@@ -95,7 +82,6 @@
       flex-direction: column; gap: 20px; color: #ff4444; font-size: 1.2rem; text-align: center;
     }
     #devtoolsDetector.show { display: flex; }
-    
     #customNoti {
       position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-100px);
       background: rgba(31, 40, 51, 0.9); backdrop-filter: var(--glass);
@@ -104,7 +90,6 @@
       box-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     }
     #customNoti.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-    
     .user-banner {
       background: rgba(26, 26, 29, 0.6); backdrop-filter: var(--glass);
       padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
@@ -119,12 +104,9 @@
     }
     .user-status .active { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.5); }
     .user-status .expired { color: #ff4444; }
-
-    /* Movie Section Styles */
     .video-section { width: 100%; background: #000; border-bottom: 2px solid var(--gold); position: relative; }
     .video-container { position: relative; width: 100%; aspect-ratio: 9/16; background: #000; margin: auto; max-height: 72vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
     #youtubePlayer { width: 100%; height: 100%; display: block; border: none; }
-    
     .video-placeholder {
       width: 100%; height: 100%; background: #111; display: flex; justify-content: center;
       align-items: center; flex-direction: column; gap: 12px; text-align: center; color: #ff4444;
@@ -134,12 +116,10 @@
       color: var(--gold); text-decoration: none; font-weight: bold; padding: 8px 20px;
       border: 1px solid var(--gold); border-radius: 20px; margin-top: 5px; display: inline-block; font-size: 0.85rem;
     }
-    
     .status-section { padding: 12px; background: rgba(20,20,20,0.8); text-align: center; position: relative; z-index: 100001; }
     .status-text { color: var(--gold); font-size: 0.85rem; font-weight: bold; }
     .fullscreen-hint { color: var(--cyan); font-size: 0.75rem; font-weight: bold; margin-top: 4px; animation: blink 1.5s infinite; }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-    
     .video-controls {
       display: flex; gap: 10px; padding: 14px; background: rgba(15,15,15,0.95);
       flex-wrap: wrap; justify-content: center; align-items: center;
@@ -158,7 +138,6 @@
       -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--gold); cursor: pointer;
     }
     .time-text { font-family: monospace; font-size: 0.75rem; color: #ccc; }
-
     .top-bar {
       padding: 12px 14px;
       display: flex;
@@ -174,27 +153,23 @@
       border-radius: 20px; padding: 8px 14px; color: #ccc; cursor: pointer; font-size: 0.75rem; font-weight: bold;
     }
     .filter-btn.active { background: var(--gold-gradient); color: #000; border-color: transparent; box-shadow: 0 4px 12px rgba(255,215,0,0.25); }
-    
     .search-input {
       padding: 8px 14px; border-radius: 20px; border: 1px solid var(--border-neon);
       background: rgba(255,255,255,0.05); color: #fff; font-size: 0.75rem; outline: none; width: 100px; transition: all 0.3s;
     }
     .search-input:focus { width: 130px; border-color: var(--gold); background: rgba(255,255,255,0.1); }
-    
     .time-display {
       background: rgba(255, 215, 0, 0.08); padding: 8px 12px; border-radius: 20px;
       font-size: 0.75rem; color: var(--gold); border: 1px solid var(--border-neon); display: flex; align-items: center; gap: 5px;
     }
     .time-bar-small { width: 30px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
     .time-bar-small .fill { height: 100%; background: var(--gold-gradient); transition: width 1s; }
-
     .marquee-container {
       margin: 0 14px 12px 14px; padding: 8px; background: rgba(255,215,0,0.03);
       border: 1px dashed var(--border-neon); border-radius: 12px; overflow: hidden;
     }
     .marquee-text { display: inline-block; white-space: nowrap; font-size: 0.8rem; font-weight: bold; color: var(--text-sub); animation: marquee var(--speed, 18s) linear infinite; padding-left: 100%; }
     @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-
     .movie-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 14px; }
     .movie-card {
       background: var(--bg-card); backdrop-filter: var(--glass); border-radius: 20px;
@@ -204,24 +179,20 @@
     .movie-card:hover { border-color: var(--gold); transform: translateY(-4px); }
     .movie-poster { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 14px; }
     .movie-title { font-size: 0.85rem; font-weight: 700; color: #fff; margin-top: 10px; text-align: center; padding: 0 4px; }
-    
     .favorite-btn {
       position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.6);
       border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 0.8rem;
       cursor: pointer; color: #fff; display: flex; justify-content: center; align-items: center; z-index: 5;
     }
     .favorite-btn.active { color: #ff4466; transform: scale(1.1); }
-    
     .player-section { display: none; }
     .player-section.active { display: block; }
     .grid-section.hide { display: none; }
-    
     .expired-overlay { 
       text-align: center; padding: 50px 16px; color: #ff4444; width: 100%; font-size: 0.95rem;
       display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
     }
     #movieGrid .expired-overlay { grid-column: span 2; }
-    
     .btn-group { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 260px; margin-top: 10px; }
     .admin-btn {
       display: flex; align-items: center; justify-content: center; gap: 8px; color: #000; border: none; font-weight: 900;
@@ -230,23 +201,19 @@
     .admin-btn.viber { background: var(--viber-gradient); color: #fff; box-shadow: 0 4px 15px rgba(123, 81, 161, 0.4); }
     .admin-btn.telegram { background: var(--gold-gradient); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); }
     .admin-btn:active { transform: scale(0.95); }
-
     .video-container.fullscreen {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-height: 100vh; z-index: 100000; background: #000; display: flex; align-items: center; justify-content: center;
     }
     .video-container.fullscreen #youtubePlayer { width: 100vw; height: 100vh; object-fit: contain; }
-
     #exitFsFloatingBtn {
       position: fixed; top: 20px; right: 20px; background: rgba(255, 68, 102, 0.9);
       color: #fff; border: none; border-radius: 30px; padding: 10px 20px; font-weight: 900;
       font-size: 0.85rem; z-index: 100005; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: none;
     }
-
     .subtitle-text {
       position: fixed; bottom: 26%; left: 0; right: 0; text-align: center; z-index: 100002; pointer-events: none; padding: 0 16px; display: none;
     }
     .video-container.fullscreen ~ .subtitle-text { bottom: 24%; }
-    
     .subtitle-text .subtitle-inner {
       display: inline-block; color: var(--gold); font-size: clamp(1.25rem, 5.8vw, 2.35rem); font-weight: 900;
       font-family: system-ui, -apple-system, sans-serif; 
@@ -254,12 +221,9 @@
       text-align: center; word-break: break-word; max-width: 96%;
       text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 4px 8px rgba(0,0,0,0.9);
     }
-    
     .player-section.fs-active .video-controls,
     .player-section.fs-active .status-section,
     .player-section.fs-active > .filter-btn { display: none !important; }
-
-    /* 2D Section Styles */
     .twod-container {
       width: 100%;
       max-width: 650px;
@@ -271,7 +235,6 @@
       margin: 20px auto;
       color: var(--text-2d-main);
     }
-
     .header-area { text-align: center; margin-bottom: 20px; }
     .header-area h2 {
       font-size: 26px; font-weight: 900; letter-spacing: 0.5px;
@@ -325,16 +288,14 @@
     .admin-link { color: var(--neon-blue); text-decoration: none; font-weight: 800; }
     .flex-center { display: flex; justify-content: center; width: 100%; }
     .view-count-num { color: var(--neon-blue); font-weight: 800; }
-    
     .twod-expired {
       background: #fff; border-radius: 20px; padding: 40px 20px; text-align: center;
       box-shadow: 0 4px 15px rgba(0,0,0,0.1); color: #ff4444; font-weight: bold;
     }
+    .loading-text-center { text-align: center; padding: 40px; color: #aaa; font-size: 1rem; grid-column: span 2; }
   </style>
 </head>
 <body>
-
-<!-- Global Device Banner for both views -->
 <div id="userBanner" class="user-banner" style="display:none;">
   <div class="user-id">
     🆔 Premium ID: <span class="id-value" id="accountIdDisplay">Loading...</span>
@@ -344,80 +305,55 @@
     <span class="active" id="statusDot">●</span> <span id="userStatusText">Active</span>
   </div>
 </div>
-
-<!-- App Navigation Tabs (2D First, Movies Second) -->
 <div class="app-tabs">
   <button class="tab-btn active" onclick="switchTab('twod')">📊 2D ခန့်မှန်းချက်</button>
   <button class="tab-btn" onclick="switchTab('movies')">🎬 ဇာတ်ကားများ</button>
 </div>
-
-<!-- 2D App Section (Front) -->
 <div id="twodSection" class="tab-content active">
   <div class="twod-container" id="twodContainerInner">
     <div class="header-area">
-      <h2>Bozaw 2d ခန့်မှန်းချက်</h2>
+      <h2>Bozaw 2D ခန့်မှန်းချက်</h2>
       <div class="sub-status-area">
         <span class="status-icon" id="statusIcon">🔄</span> 
         <span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="viewCountDisplay">0</span> views</span>
       </div>
     </div>
-
     <div class="table-title">📊 AM / PM & အခွေပူး ဇယားကွက်</div>
     <div class="table-wrapper">
       <table>
         <thead>
-          <tr>
-            <th style="width: 23%;">AM ထွက်</th>
-            <th style="width: 23%;">PM ထွက်</th>
-            <th style="width: 26%;">ထိုတန်း၏ အခွေ/ပတ်</th>
-            <th style="width: 28%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th>
-          </tr>
+          <tr><th style="width:23%;">AM ထွက်</th><th style="width:23%;">PM ထွက်</th><th style="width:26%;">ထိုတန်း၏ အခွေ/ပတ်</th><th style="width:28%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th></tr>
         </thead>
-        <tbody id="tableBody">
-          <tr>
-            <td colspan="4" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td>
-          </tr>
+        <tbody id="tableBody"><tr><td colspan="4" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
         </tbody>
       </table>
     </div>
-
     <div class="flex-center">
-      <div class="admin-footer-box">
-        👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a>
-      </div>
+      <div class="admin-footer-box">👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a></div>
     </div>
   </div>
 </div>
-
-<!-- Movie App Section (Back) -->
 <div id="moviesSection" class="tab-content">
-  <div id="devtoolsDetector">
-    <div>🛡️ Security Alert</div>
-    <div style="font-size:0.9rem; color:#aaa; margin-top:5px;">Please close Developer Tools to continue.</div>
-  </div>
-
+  <div id="devtoolsDetector"><div>🛡️ Security Alert</div><div style="font-size:0.9rem;color:#aaa;margin-top:5px;">Please close Developer Tools to continue.</div></div>
   <div id="customNoti">📢 <span id="notiMessage">Notification</span></div>
-
   <button id="exitFsFloatingBtn" onclick="toggleFullscreen()">✕ Exit Small</button>
-
   <div id="appContent">
     <div id="playerSection" class="player-section">
-      <button class="filter-btn" onclick="showGrid()" style="margin: 12px;">← Back Home</button>
+      <button class="filter-btn" onclick="showGrid()" style="margin:12px;">← Back Home</button>
       <div class="video-section">
         <div class="video-container" id="videoContainer">
-          <!-- Swapped with HTML5 Advanced Iframe to safely handle restricted/blocked embeds -->
           <iframe id="youtubePlayer" allow="autoplay; encrypted-media; fullscreen" allowfullscreen></iframe>
           <div class="video-placeholder" id="videoPlaceholder" style="display:none;">
             <div>⛔ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ</div>
-            <div style="font-size:0.8rem; color:#aaa; margin: 4px 0 10px 0;">သက်တမ်းတိုးရန် အောက်ပါအတိုင်း ဆက်သွယ်နိုင်ပါသည်</div>
-            <a href="viber://chat?number=%2B959777966119" class="contact-link" style="border-color:#bf55ec; color:#bf55ec;">💜 Viber: 09777966119</a>
+            <div style="font-size:0.8rem;color:#aaa;margin:4px 0 10px 0;">သက်တမ်းတိုးရန် အောက်ပါအတိုင်း ဆက်သွယ်နိုင်ပါသည်</div>
+            <a href="viber://chat?number=%2B959777966119" class="contact-link" style="border-color:#bf55ec;color:#bf55ec;">💜 Viber: 09777966119</a>
             <a href="https://t.me/mmmovies002" target="_blank" class="contact-link">💙 Telegram Admin ဆီသွားရန်</a>
           </div>
         </div>
       </div>
       <div class="status-section">
         <div id="statusText" class="status-text">⏳ Loading...</div>
-        <div id="fullscreenHint" class="fullscreen-hint" style="display: none;">🎬 စာတန်းထိုးအတွက် Full ကိုနှိပ်ပါ</div>
+        <div id="fullscreenHint" class="fullscreen-hint" style="display:none;">🎬 စာတန်းထိုးအတွက် Full ကိုနှိပ်ပါ</div>
       </div>
       <div class="video-controls">
         <button onclick="seekVideo(-10)">⏪ -10s</button>
@@ -429,9 +365,8 @@
           <div class="time-text" id="timeDisplay">0:00 / 0:00</div>
         </div>
       </div>
-      <div id="expiryWarning" style="padding:10px; text-align:center;"></div>
+      <div id="expiryWarning" style="padding:10px;text-align:center;"></div>
     </div>
-
     <div id="gridSection" class="grid-section">
       <div class="top-bar">
         <div class="nav-controls-group">
@@ -444,35 +379,27 @@
           <div class="time-bar-small"><div id="homeTimeBar" class="fill" style="width:100%;"></div></div>
         </div>
       </div>
-      
       <div class="marquee-container">
         <div class="marquee-text" id="marqueeText">✨ Movie App သက်တမ်းတိုးလိုပါက Admin Viber 09777966119 သို့ ဆက်သွယ်နိုင်ပါသည်။ 🍿</div>
       </div>
-      
-      <div id="movieGrid" class="movie-grid">
-        <div class="loading-text-center">⏳ Loading Movies...</div>
-      </div>
+      <div id="movieGrid" class="movie-grid"><div class="loading-text-center">⏳ Loading Movies...</div></div>
     </div>
   </div>
   <div id="subtitleText" class="subtitle-text"><div id="subtitleInner" class="subtitle-inner"></div></div>
 </div>
-
 <script>
-  // Tabs System Switcher
   function switchTab(tabId) {
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-    
     if (tabId === 'movies') {
       document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
       document.getElementById('moviesSection').classList.add('active');
+      if (allMovies.length === 0) loadMovies();
     } else {
       document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
       document.getElementById('twodSection').classList.add('active');
     }
   }
-
-  // --- Movie & Global Auth Section Scripts ---
   function showNoti(message) {
     const noti = document.getElementById('customNoti');
     document.getElementById('notiMessage').textContent = message;
@@ -481,14 +408,12 @@
     window.notiTimeout = setTimeout(() => noti.classList.remove('show'), 3000);
   }
   window.alert = showNoti;
-
   document.addEventListener('contextmenu', e => e.preventDefault());
   document.addEventListener('keydown', e => {
     if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.key==='I'||e.key==='J'||e.key==='C')) || (e.ctrlKey && e.key==='U')) {
       e.preventDefault();
     }
   });
-
   const firebaseConfig = {
     apiKey: "AIzaSyDqvnEzTl2U7Ntvub4Cuvdmq1eMFFlOelM",
     authDomain: "movie-app-f6a8e.firebaseapp.com",
@@ -501,14 +426,10 @@
   firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
   const API_URL = 'https://script.google.com/macros/s/AKfycbzNn4ZuCu9jOghk9FoLehMvSlBMcd50r5XTTfhioCzaM8B7in5LUTvzRgaUtojaOGXJdg/exec';
-
   let currentUserData = null, isExpired = false, subtitles = [], intervalId = null;
   let isFullscreen = false, isPlaying = true, allMovies = [], currentFilter = 'all', currentUserId = '', favorites = [], expiryCheckInterval = null;
-  
-  // Custom Virtual Time Tracking Elements for Fixed HTML5 Embedded Player
   let currentTimeTracker = 0;
   let videoDurationTracker = 300; 
-
   function generateDeviceFingerprint() {
     const screenInfo = window.screen.width + 'x' + window.screen.height + 'x' + window.screen.colorDepth;
     const navigatorInfo = navigator.hardwareConcurrency + '-' + (navigator.deviceMemory || 'M');
@@ -521,7 +442,6 @@
     }
     return 'DEV-' + Math.abs(hash).toString(36).toUpperCase();
   }
-
   function getAccountId(deviceId) {
     let hash = 0;
     for (let i = 0; i < deviceId.length; i++) {
@@ -530,17 +450,11 @@
     }
     return 'UID-' + Math.abs(hash).toString(36).toUpperCase().padStart(8, '0').substring(0, 8);
   }
-
   function copyAccountId() {
     const id = document.getElementById('accountIdDisplay').textContent;
     navigator.clipboard.writeText(id).then(() => showNoti('✅ Copy ကူးပြီးပါပြီ။'));
   }
-
-  // Global Auth Init Hook
-  window.addEventListener('DOMContentLoaded', () => {
-    autoLogin();
-  });
-
+  window.addEventListener('DOMContentLoaded', () => { autoLogin(); });
   async function autoLogin() {
     let deviceId = localStorage.getItem('deviceId') || generateDeviceFingerprint();
     localStorage.setItem('deviceId', deviceId);
@@ -548,9 +462,7 @@
     currentUserId = accountId;
     document.getElementById('userBanner').style.display = 'flex';
     document.getElementById('accountIdDisplay').textContent = accountId;
-    
     loadMoviesFromCache();
-    
     try {
       let defaultMinutes = 60; 
       const settingsSnap = await database.ref('settings/defaultMinutes').once('value');
@@ -558,7 +470,6 @@
       const userRef = database.ref('devices/' + deviceId);
       const snapshot = await userRef.once('value');
       const data = snapshot.val();
-      
       if (data) {
         currentUserData = data;
         isExpired = Date.now() > data.expiry;
@@ -580,7 +491,6 @@
       showNoti('⚠️ ကွန်ရက်ချိတ်ဆက်မှု နှေးကွေးနေပါသည်။');
     }
   }
-
   function startExpiryChecker() {
     if (expiryCheckInterval) clearInterval(expiryCheckInterval);
     expiryCheckInterval = setInterval(() => {
@@ -588,16 +498,13 @@
       const remaining = currentUserData.expiry - Date.now();
       const wasExpired = isExpired;
       isExpired = remaining <= 0;
-      
       const homeTimeText = document.getElementById('homeTimeText');
       const homeTimeBar = document.getElementById('homeTimeBar');
-      
       if (isExpired) {
         if(homeTimeText) { homeTimeText.textContent = '⛔ Expired'; homeTimeBar.style.width = '0%'; }
         document.getElementById('userStatusText').textContent = 'Expired';
         document.getElementById('userStatusText').className = 'expired';
         document.getElementById('statusDot').className = 'expired';
-        
         updatePlayerState(); 
         renderMovies();
         if (!wasExpired) { renderTable(); } 
@@ -615,7 +522,6 @@
       }
     }, 1000);
   }
-
   function updatePlayerState() {
     const placeholder = document.getElementById('videoPlaceholder');
     const playerEl = document.getElementById('youtubePlayer');
@@ -631,7 +537,6 @@
       controls.forEach(el => el.disabled = false);
     }
   }
-
   function loadMoviesFromCache() {
     try {
       const cachedMovies = localStorage.getItem('cached_movies');
@@ -641,7 +546,6 @@
       }
     } catch(e) {}
   }
-
   async function loadMovies(showLoading = true) {
     let grid = document.getElementById('movieGrid');
     if (showLoading && allMovies.length === 0) {
@@ -652,14 +556,11 @@
         const favSnap = await database.ref('favorites/' + currentUserId).once('value');
         favorites = favSnap.val() || [];
       }
-
       let res = await fetch(API_URL);
       let data = await res.json();
-      
       if (data.success && data.videos && data.videos.length > 0) {
         allMovies = []; 
         localStorage.setItem('cached_movies', JSON.stringify(data.videos));
-        
         for (let i = 0; i < data.videos.length; i++) {
           allMovies.push(data.videos[i]);
           renderIncrementalMovie(data.videos[i], i === 0); 
@@ -667,33 +568,19 @@
       }
     } catch(e) {}
   }
-
   function renderIncrementalMovie(v, isFirst) {
     let grid = document.getElementById('movieGrid');
     if (isExpired) { 
-      grid.innerHTML = `
-        <div class="expired-overlay">
-          <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
-          <div class="btn-group">
-            <a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a>
-            <a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
-          </div>
-        </div>`; 
+      grid.innerHTML = `<div class="expired-overlay"><span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span><div class="btn-group"><a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a><a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a></div></div>`; 
       return; 
     }
-    
     if (isFirst || grid.querySelector('.loading-text-center') || grid.querySelector('.expired-overlay')) {
       grid.innerHTML = ''; 
     }
-    
     let isFav = favorites.includes(v.videoId);
     let card = document.createElement('div');
     card.className = 'movie-card';
-    card.innerHTML = `
-      <button class="favorite-btn ${isFav?'active':''}" onclick="toggleFavorite('${v.videoId}', event)">${isFav?'❤️':'🤍'}</button>
-      <img class="movie-poster" src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg">
-      <div class="movie-title">${v.title || "Premium Video"}</div>
-    `;
+    card.innerHTML = `<button class="favorite-btn ${isFav?'active':''}" onclick="toggleFavorite('${v.videoId}', event)">${isFav?'❤️':'🤍'}</button><img class="movie-poster" src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg"><div class="movie-title">${v.title || "Premium Video"}</div>`;
     card.onclick = () => {
       if (isExpired) return;
       document.getElementById('gridSection').classList.add('hide');
@@ -703,44 +590,28 @@
     };
     grid.appendChild(card);
   }
-
   function renderMovies() {
     let grid = document.getElementById('movieGrid');
     let searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
     let filtered = allMovies;
     if (currentFilter === 'favorites') filtered = filtered.filter(m => favorites.includes(m.videoId));
     if (searchTerm) filtered = filtered.filter(m => (m.title || "").toLowerCase().includes(searchTerm));
-    
     if (isExpired) { 
-      grid.innerHTML = `
-        <div class="expired-overlay">
-          <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
-          <div class="btn-group">
-            <a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a>
-            <a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
-          </div>
-        </div>`; 
+      grid.innerHTML = `<div class="expired-overlay"><span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span><div class="btn-group"><a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a><a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a></div></div>`; 
       return; 
     }
-    
     if (filtered.length === 0) {
       if (allMovies.length === 0) { grid.innerHTML = '<div class="loading-text-center">⏳ Loading Movies...</div>'; }
       else { grid.innerHTML = '<div class="loading-text-center">📭 ဇာတ်ကားများ မရှိသေးပါ။</div>'; }
       return;
     }
-    
     grid.innerHTML = '';
     const fragment = document.createDocumentFragment();
-    
     filtered.forEach(v => {
       let isFav = favorites.includes(v.videoId);
       let card = document.createElement('div');
       card.className = 'movie-card';
-      card.innerHTML = `
-        <button class="favorite-btn ${isFav?'active':''}" onclick="toggleFavorite('${v.videoId}', event)">${isFav?'❤️':'🤍'}</button>
-        <img class="movie-poster" src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg">
-        <div class="movie-title">${v.title || "Premium Video"}</div>
-      `;
+      card.innerHTML = `<button class="favorite-btn ${isFav?'active':''}" onclick="toggleFavorite('${v.videoId}', event)">${isFav?'❤️':'🤍'}</button><img class="movie-poster" src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg"><div class="movie-title">${v.title || "Premium Video"}</div>`;
       card.onclick = () => {
         if (isExpired) return;
         document.getElementById('gridSection').classList.add('hide');
@@ -752,7 +623,6 @@
     });
     grid.appendChild(fragment);
   }
-
   function createPlayer(videoId) {
     if (isExpired) return;
     subtitles = [];
@@ -760,17 +630,13 @@
     isPlaying = true;
     document.getElementById('playPauseBtn').innerHTML = '⏸ Pause';
     document.getElementById('statusText').innerHTML = '⏳ Connecting to Premium Stream...';
-    
-    // Completely bypass Configuration Restrictions using clean embed route
     const secureEmbedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1&enablejsapi=1`;
     const playerFrame = document.getElementById('youtubePlayer');
     playerFrame.src = secureEmbedUrl;
-    
     document.getElementById('statusText').innerHTML = '✅ Connected to Safe Server';
     startPolling();
     loadSRT(videoId);
   }
-
   async function loadSRT(videoId) {
     try {
       let res = await fetch(`${API_URL}?videoId=${videoId}`);
@@ -782,13 +648,11 @@
         if(subtitles.length > 0) {
           document.getElementById('statusText').innerHTML = '✅ Premium Subtitle Loaded';
           document.getElementById('fullscreenHint').style.display = 'block';
-          // Pull total duration roughly out of the last subtitle node if applicable
           videoDurationTracker = subtitles[subtitles.length - 1].end + 30;
         }
       }
     } catch(e){}
   }
-
   function parseSRT(content) {
     if (!content) return [];
     let lines = content.split(/\r?\n/), subs = [], i = 0;
@@ -814,21 +678,16 @@
     }
     return subs;
   }
-  
   function toSeconds(t) {
     let parts = t.replace(',', '.').split(':');
     return parseInt(parts[0])*3600 + parseInt(parts[1])*60 + parseFloat(parts[2]);
   }
-
   function startPolling() {
     if (intervalId) clearInterval(intervalId);
     intervalId = setInterval(() => {
       if (isExpired || !isPlaying) return;
-      
-      // Simulating clean tracking timeline overlay for embedded safe views
       currentTimeTracker += 0.5;
       if (currentTimeTracker > videoDurationTracker) currentTimeTracker = videoDurationTracker;
-      
       try {
         let time = currentTimeTracker;
         let duration = videoDurationTracker;
@@ -840,46 +699,39 @@
         const inner = document.getElementById('subtitleInner');
         if (text) { inner.innerText = text; container.style.display = 'block'; }
         else { container.style.display = 'none'; }
-        
         document.getElementById('progressSlider').value = (time / duration) * 100;
         document.getElementById('timeDisplay').innerText = `${Math.floor(time/60)}:${String(Math.floor(time%60)).padStart(2,'0')} / ${Math.floor(duration/60)}:${String(Math.floor(duration%60)).padStart(2,'0')}`;
       } catch(e){}
     }, 500);
   }
-
   window.togglePlayPause = function() {
     const playerFrame = document.getElementById('youtubePlayer');
     if (isPlaying) { 
-      // Safe internal pause dispatch trigger
-      playerFrame.contentWindow.postMessage('{"event":"command","func":"' + 'pauseVideo' + '","args":""}', '*');
+      playerFrame.contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
       document.getElementById('playPauseBtn').innerHTML = '▶️ Play'; 
       isPlaying = false; 
     } else { 
-      playerFrame.contentWindow.postMessage('{"event":"command","func":"' + 'playVideo' + '","args":""}', '*');
+      playerFrame.contentWindow.postMessage('{"event":"command","func":"playVideo","args":""}', '*');
       document.getElementById('playPauseBtn').innerHTML = '⏸ Pause'; 
       isPlaying = true; 
     }
   };
-  
   window.seekVideo = function(sec) { 
     currentTimeTracker += sec;
     if (currentTimeTracker < 0) currentTimeTracker = 0;
     const playerFrame = document.getElementById('youtubePlayer');
-    playerFrame.contentWindow.postMessage('{"event":"command","func":"' + 'seekTo' + '","args":[' + currentTimeTracker + ', true]}', '*');
+    playerFrame.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[' + currentTimeTracker + ', true]}', '*');
   };
-  
   window.seekToPosition = function() {
     let pct = parseFloat(document.getElementById('progressSlider').value);
     currentTimeTracker = (pct / 100) * videoDurationTracker;
     const playerFrame = document.getElementById('youtubePlayer');
-    playerFrame.contentWindow.postMessage('{"event":"command","func":"' + 'seekTo' + '","args":[' + currentTimeTracker + ', true]}', '*');
+    playerFrame.contentWindow.postMessage('{"event":"command","func":"seekTo","args":[' + currentTimeTracker + ', true]}', '*');
   };
-  
   window.toggleFullscreen = function() {
     let c = document.getElementById('videoContainer');
     let pSection = document.getElementById('playerSection');
     let floatBtn = document.getElementById('exitFsFloatingBtn');
-    
     if (!isFullscreen) { 
       c.classList.add('fullscreen'); 
       pSection.classList.add('fs-active'); 
@@ -892,14 +744,12 @@
       isFullscreen = false; 
     }
   };
-
   function toggleFavorite(videoId, event) {
     event.stopPropagation();
     const index = favorites.indexOf(videoId);
     if (index > -1) favorites.splice(index, 1); else favorites.push(videoId);
     database.ref('favorites/' + currentUserId).set(favorites).then(() => renderMovies());
   }
-  
   function setFilter(f) {
     currentFilter = f;
     document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -907,15 +757,12 @@
     renderMovies();
   }
   function searchMovies() { renderMovies(); }
-  
   function showGrid() {
     if (intervalId) { clearInterval(intervalId); intervalId = null; } 
     subtitles = []; 
     const container = document.getElementById('subtitleText');
     if (container) { container.style.display = 'none'; } 
-    
     document.getElementById('youtubePlayer').src = "";
-    
     document.getElementById('gridSection').classList.remove('hide');
     document.getElementById('playerSection').classList.remove('active');
     document.getElementById('playerSection').classList.remove('fs-active');
@@ -923,19 +770,14 @@
     isFullscreen = false;
     loadMovies(false);
   }
-
-  // --- 2D Section Scripts ---
   const SHEET_ID = '1tNEhMx08S8rz84In1FdWLPcYlGJkzDCIXFMIhy5BrGU';
   const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
-
   let savedResults = [];
   let savedKhwayItems = [];
-
   window.addEventListener('load', function() {
     handleViewCounter();
     fetchDataFromSheets();
   });
-
   function handleViewCounter() {
     const COUNTER_KEY = 'bozaw2d_vercel_app_2026_views';
     fetch(`https://countapi.mileshilliard.com/api/v1/hit/${COUNTER_KEY}`)
@@ -948,7 +790,6 @@
         document.getElementById('viewCountDisplay').innerText = '-';
       });
   }
-
   function fetchDataFromSheets() {
     const noCacheUrl = `${SHEET_URL}&_ts=${Date.now()}`;
     fetch(noCacheUrl, { cache: 'no-store' })
@@ -963,21 +804,16 @@
         document.getElementById('statusIcon').innerText = '❌';
       });
   }
-
   function parseCSVData(csvText) {
     let lines = csvText.split('\n');
     savedResults = [];
     savedKhwayItems = [];
-
     for (let i = 1; i < lines.length; i++) {
       let currentLine = lines[i].trim();
       if (!currentLine) continue;
-
       let matches = currentLine.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || currentLine.split(',');
-      
       if (matches.length >= 1) {
         let res = matches[0].replace(/"/g, '').trim();
-        
         let khw = '';
         if (matches.length > 1) {
           let textParts = [];
@@ -987,13 +823,10 @@
           }
           khw = textParts.join(',').trim();
         }
-
         if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
-
         if (res.length > 0 && res.length < 4) {
           res = res.padStart(4, '0');
         }
-
         if (res.length === 4) {
           savedResults.push(res);
           savedKhwayItems.push(khw || '-');
@@ -1001,11 +834,9 @@
       }
     }
   }
-
   function checkMatchLogic(khwayItem, target2D) {
     let cleanKhway = khwayItem.replace(/[^\d]/g, '').trim();
     if (!cleanKhway) return false;
-
     if (cleanKhway.length === 1) {
       return target2D.includes(cleanKhway);
     }
@@ -1017,48 +848,31 @@
       return (digitsArray.includes(target2D[0]) && digitsArray.includes(target2D[1]));
     }
   }
-
   function renderTable() {
     let container = document.getElementById('twodContainerInner');
-    
-    // Global Shared Expiry Enforcement for 2D Section
     if (isExpired) {
-      container.innerHTML = `
-        <div class="twod-expired">
-          <div style="font-size: 1.2rem; margin-bottom: 15px;">⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</div>
-          <div style="font-size: 0.9rem; color: #666; margin-bottom: 20px;">2D ခန့်မှန်းချက်ဇယားကို ဆက်လက်ကြည့်ရှုရန် သက်တမ်းတိုးပေးပါရန်။</div>
-          <div class="btn-group" style="margin: 0 auto;">
-            <a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a>
-            <a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
-          </div>
-        </div>`;
+      container.innerHTML = `<div class="twod-expired"><div style="font-size:1.2rem;margin-bottom:15px;">⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</div><div style="font-size:0.9rem;color:#666;margin-bottom:20px;">2D ခန့်မှန်းချက်ဇယားကို ဆက်လက်ကြည့်ရှုရန် သက်တမ်းတိုးပေးပါရန်။</div><div class="btn-group" style="margin:0 auto;"><a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a><a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a></div></div>`;
       return;
     }
-
     let tbody = document.getElementById('tableBody');
     if (!tbody) return;
     tbody.innerHTML = '';
-
     if(savedResults.length === 0) {
       tbody.innerHTML = `<tr><td colspan="4" class="empty-status">ဒေတာများ မရှိသေးပါ။ Google Sheet တွင် အရင်ဖြည့်ပါ။</td></tr>`;
       return;
     }
-
     let amHitCounts = new Array(savedResults.length).fill(0);
     let pmHitCounts = new Array(savedResults.length).fill(0);
-
     savedResults.forEach((numStr, index) => {
       let currentKhwayStr = savedKhwayItems[index];
       if (currentKhwayStr && currentKhwayStr !== '-') {
         let subKhways = currentKhwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-
         for (let i = 1; i <= 5; i++) {
           let targetIndex = index + i;
           if (targetIndex < savedResults.length) {
             let targetNumStr = savedResults[targetIndex];
             let targetAm = targetNumStr.slice(0, 2);
             let targetPm = targetNumStr.slice(2, 4);
-
             subKhways.forEach(khway => {
               if (checkMatchLogic(khway, targetAm)) amHitCounts[targetIndex]++;
               if (checkMatchLogic(khway, targetPm)) pmHitCounts[targetIndex]++;
@@ -1067,24 +881,18 @@
         }
       }
     });
-
     savedResults.forEach((numStr, index) => {
       let amNum = numStr.slice(0, 2); 
       let pmNum = numStr.slice(2, 4); 
-      
-      let currentKhwayStr = savedKhwayItems[index] ? savedKhwayItems[index] : '-';
       let hitNumbers = []; 
-
       if (savedKhwayItems[index] && savedKhwayItems[index] !== '-') {
         let subKhways = savedKhwayItems[index].split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-
         for (let i = 1; i <= 5; i++) {
           let targetIndex = index + i;
           if (targetIndex < savedResults.length) {
             let targetNumStr = savedResults[targetIndex];
             let targetAm = targetNumStr.slice(0, 2);
             let targetPm = targetNumStr.slice(2, 4);
-
             subKhways.forEach(khway => {
               if (checkMatchLogic(khway, targetAm) && !hitNumbers.includes(targetAm)) hitNumbers.push(targetAm);
               if (checkMatchLogic(khway, targetPm) && !hitNumbers.includes(targetPm)) hitNumbers.push(targetPm);
@@ -1092,9 +900,7 @@
           }
         }
       }
-
       let tr = document.createElement('tr');
-      
       let khwayDisplayHTML = '-';
       if(savedKhwayItems[index] && savedKhwayItems[index] !== '-') {
         let cleanDisplayParts = savedKhwayItems[index].split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
@@ -1102,14 +908,9 @@
           khwayDisplayHTML = `<span class="khway-style">${cleanDisplayParts.join('<br><hr style="border:0;border-top:1px dashed #b2bec3;margin:4px 0;">')}</span>`;
         }
       }
-
-      let finalHitHTML = hitNumbers.length > 0 
-        ? `<span class="badge-hit">${hitNumbers.join(', ')}</span>` 
-        : (savedKhwayItems[index] && savedKhwayItems[index] !== '-' ? '<span style="color:#747d8c;font-size:12px;font-weight:700;">မပါဝင်ပါ</span>' : '-');
-
+      let finalHitHTML = hitNumbers.length > 0 ? `<span class="badge-hit">${hitNumbers.join(', ')}</span>` : (savedKhwayItems[index] && savedKhwayItems[index] !== '-' ? '<span style="color:#747d8c;font-size:12px;font-weight:700;">မပါဝင်ပါ</span>' : '-');
       let amCountStr = amHitCounts[index] > 0 ? `<span class="count-text">(${amHitCounts[index]})</span>` : '';
       let pmCountStr = pmHitCounts[index] > 0 ? `<span class="count-text">(${pmHitCounts[index]})</span>` : '';
-
       tr.innerHTML = `
         <td class="${amHitCounts[index] > 0 ? 'highlight-am-pm-match' : ''}">
           <div class="num-box-wrapper"><span class="num-box">${amNum}${amCountStr}</span></div>
@@ -1124,6 +925,5 @@
     });
   }
 </script>
-
 </body>
 </html>
