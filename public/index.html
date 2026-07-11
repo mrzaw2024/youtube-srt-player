@@ -72,17 +72,8 @@
             border-bottom: 3px solid var(--gold);
             background: rgba(255, 255, 255, 0.03);
         }
-        .tab-btn.disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
-        .tab-content.disabled {
-            opacity: 0.3;
-            pointer-events: none;
-        }
 
         /* ===== NOTIFICATION ===== */
         #customNoti {
@@ -245,80 +236,53 @@
         
         .loading-text-center { text-align: center; padding: 40px; color: #aaa; font-size: 1rem; grid-column: span 2; }
 
-        /* ===== EXPIRED - Display original content but disabled ===== */
-        .expired-container {
-            position: relative;
-        }
-        .expired-container .expired-overlay-bg {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(4px);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            border-radius: 16px;
-            z-index: 999;
-            padding: 30px 20px;
-            text-align: center;
-            pointer-events: auto;
-        }
-        .expired-container .expired-overlay-bg .expired-icon {
-            font-size: 3rem;
-        }
-        .expired-container .expired-overlay-bg .expired-title {
-            font-size: 1.3rem;
-            font-weight: 900;
-            color: #ff6b6b;
-        }
-        .expired-container .expired-overlay-bg .expired-sub {
+        /* ===== EXPIRED OVERLAY (from original index.html) ===== */
+        .expired-overlay { 
+            text-align: center; 
+            padding: 50px 16px; 
+            color: #ff4444; 
+            grid-column: span 2; 
             font-size: 0.95rem;
-            color: #e0e0e0;
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 14px;
         }
-        .expired-container .expired-overlay-bg .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 100%;
-            max-width: 300px;
-            margin-top: 8px;
+        .btn-group { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 10px; 
+            width: 100%; 
+            max-width: 260px; 
+            margin-top: 10px; 
         }
-        .expired-container .expired-overlay-bg .admin-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            color: #fff;
-            border: none;
-            font-weight: 800;
-            padding: 14px 24px;
-            font-size: 1rem;
-            border-radius: 50px;
-            text-decoration: none;
-            transition: all 0.2s;
-            cursor: pointer;
-            width: 100%;
+        .admin-btn {
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            color: #000; 
+            border: none; 
+            font-weight: 900;
+            padding: 12px 20px; 
+            font-size: 0.85rem; 
+            border-radius: 30px; 
+            text-decoration: none; 
+            transition: transform 0.2s;
             pointer-events: auto !important;
+            cursor: pointer !important;
         }
-        .expired-container .expired-overlay-bg .admin-btn:active { transform: scale(0.96); }
-        .expired-container .expired-overlay-bg .admin-btn.viber {
-            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
-            color: #fff;
+        .admin-btn.viber { 
+            background: linear-gradient(135deg, #7b51a1 0%, #593181 100%); 
+            color: #fff; 
+            box-shadow: 0 4px 15px rgba(123, 81, 161, 0.4); 
         }
-        .expired-container .expired-overlay-bg .admin-btn.telegram {
-            background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
-            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.35);
-            color: #1a1a2e;
+        .admin-btn.telegram { 
+            background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%); 
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); 
         }
-        .expired-container .expired-overlay-bg .admin-btn .btn-icon {
-            font-size: 1.2rem;
-        }
+        .admin-btn:active { transform: scale(0.95); }
 
         /* ===== 2D SECTION (Bozaw 2D) ===== */
         .twod-container {
@@ -331,7 +295,6 @@
             border-radius: 24px;
             margin: 20px auto;
             color: #2c3e50;
-            position: relative;
         }
         .twod-container .header-area { text-align: center; margin-bottom: 20px; }
         .twod-container .header-area h2 {
@@ -393,11 +356,6 @@
         .twod-container .admin-link { color: #3742fa; text-decoration: none; font-weight: 800; }
         .twod-container .flex-center { display: flex; justify-content: center; width: 100%; }
         .twod-container .view-count-num { color: #3742fa; font-weight: 800; }
-
-        /* Movie Grid Expired Wrapper */
-        .movie-grid-wrapper {
-            position: relative;
-        }
     </style>
 </head>
 <body>
@@ -516,9 +474,6 @@
 <script>
     // ==================== TAB SWITCHER ====================
     function switchTab(tabId) {
-        if (isExpired) {
-            // Still allow switching but show disabled state
-        }
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
         if (tabId === 'movies') {
@@ -528,72 +483,6 @@
         } else {
             document.getElementById('tab2d').classList.add('active');
             document.getElementById('twodSection').classList.add('active');
-        }
-        // If expired, show expired overlay on the active tab
-        if (isExpired) {
-            showExpiredOverlay();
-        }
-    }
-
-    // ==================== EXPIRED OVERLAY (Overlay on top of original content) ====================
-    function showExpiredOverlay() {
-        const twodContainer = document.getElementById('twodContainer');
-        const movieGrid = document.getElementById('movieGrid');
-        
-        // Remove any existing expired overlay first
-        removeExpiredOverlay();
-        
-        const expiredHTML = `
-            <div class="expired-overlay-bg">
-                <div class="expired-icon">⛔</div>
-                <div class="expired-title">သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</div>
-                <div class="expired-sub">ဆက်လက်အသုံးပြုရန် သက်တမ်းတိုးပေးပါရန်။</div>
-                <div class="btn-group">
-                    <a href="viber://chat?number=+959777966119" class="admin-btn viber" target="_blank">
-                        <span class="btn-icon">💬</span> Admin Viber: 09777966119
-                    </a>
-                    <a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">
-                        <span class="btn-icon">📲</span> Telegram Admin ဆီသွားရန်
-                    </a>
-                </div>
-            </div>
-        `;
-        
-        // Wrap 2D container with expired overlay
-        if (twodContainer) {
-            twodContainer.classList.add('expired-container');
-            const overlay = document.createElement('div');
-            overlay.innerHTML = expiredHTML;
-            twodContainer.appendChild(overlay.firstElementChild);
-        }
-        
-        // Wrap movie grid with expired overlay
-        if (movieGrid) {
-            const gridWrapper = document.getElementById('gridSection');
-            if (gridWrapper) {
-                gridWrapper.classList.add('expired-container');
-                const overlay = document.createElement('div');
-                overlay.innerHTML = expiredHTML;
-                gridWrapper.appendChild(overlay.firstElementChild);
-            }
-        }
-    }
-
-    function removeExpiredOverlay() {
-        // Remove from 2D container
-        const twodContainer = document.getElementById('twodContainer');
-        if (twodContainer) {
-            twodContainer.classList.remove('expired-container');
-            const overlay = twodContainer.querySelector('.expired-overlay-bg');
-            if (overlay) overlay.remove();
-        }
-        
-        // Remove from movie grid
-        const gridWrapper = document.getElementById('gridSection');
-        if (gridWrapper) {
-            gridWrapper.classList.remove('expired-container');
-            const overlay = gridWrapper.querySelector('.expired-overlay-bg');
-            if (overlay) overlay.remove();
         }
     }
 
@@ -711,6 +600,7 @@
         expiryCheckInterval = setInterval(() => {
             if (!currentUserData) return;
             const remaining = currentUserData.expiry - Date.now();
+            const wasExpired = isExpired;
             isExpired = remaining <= 0;
             const homeTimeText = document.getElementById('homeTimeText');
             const homeTimeBar = document.getElementById('homeTimeBar');
@@ -721,32 +611,71 @@
                 document.getElementById('userStatusText').className = 'expired';
                 document.getElementById('statusDot').className = 'expired';
                 
-                // Disable tabs
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('disabled'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('disabled'));
-                
-                // Show expired overlay on current content
-                showExpiredOverlay();
-                
                 updatePlayerState(); 
+                renderMovies();
+                if (!wasExpired) { 
+                    // Show expired overlay in 2D tab
+                    const twodContainer = document.getElementById('twodContainer');
+                    if (twodContainer) {
+                        twodContainer.innerHTML = `
+                            <div class="expired-overlay">
+                                <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
+                                <div class="btn-group">
+                                    <a href="viber://chat?number=%2B959777966119" class="admin-btn viber" target="_blank">💬 Admin Viber: 09777966119</a>
+                                    <a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
                 if (player) { try{player.destroy()}catch(e){} player = null; }
             } else {
                 document.getElementById('userStatusText').textContent = 'Active';
                 document.getElementById('userStatusText').className = 'active';
                 document.getElementById('statusDot').className = 'active';
-                
-                // Enable tabs
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('disabled'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('disabled'));
-                
-                // Remove expired overlay
-                removeExpiredOverlay();
-                
                 const mins = Math.floor(remaining / 60000);
                 const secs = Math.floor((remaining % 60000) / 1000);
                 if(homeTimeText) {
                     homeTimeText.textContent = `${mins}m ${secs}s`;
                     homeTimeBar.style.width = Math.min(100, (remaining / (60*60*1000)) * 100) + '%';
+                }
+                // Restore 2D content if expired was shown
+                if (wasExpired) {
+                    const twodContainer = document.getElementById('twodContainer');
+                    if (twodContainer) {
+                        twodContainer.innerHTML = `
+                            <div class="header-area">
+                                <h2>Bozaw 2D ခန့်မှန်းချက်</h2>
+                                <div class="sub-status-area">
+                                    <span class="status-icon" id="statusIcon">✅</span> 
+                                    <span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="viewCountDisplay">0</span> views</span>
+                                </div>
+                            </div>
+                            <div class="table-title">📊 AM / PM & အခွေပူး ဇယားကွက်</div>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th style="width: 23%;">AM ထွက်</th>
+                                            <th style="width: 23%;">PM ထွက်</th>
+                                            <th style="width: 26%;">ထိုတန်း၏ အခွေ/ပတ်</th>
+                                            <th style="width: 28%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="tableBody">
+                                        <tr><td colspan="4" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="flex-center">
+                                <div class="admin-footer-box">
+                                    👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a>
+                                </div>
+                            </div>
+                        `;
+                        // Re-fetch 2D data
+                        fetchDataFromSheets();
+                    }
                 }
             }
         }, 1000);
@@ -798,7 +727,18 @@
 
     function renderIncrementalMovie(v, isFirst) {
         let grid = document.getElementById('movieGrid');
-        if (isFirst || grid.querySelector('.loading-text-center') || grid.querySelector('.expired-overlay') || grid.querySelector('.expired-overlay-bg')) {
+        if (isExpired) {
+            grid.innerHTML = `
+                <div class="expired-overlay">
+                    <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
+                    <div class="btn-group">
+                        <a href="viber://chat?number=%2B959777966119" class="admin-btn viber" target="_blank">💬 Admin Viber: 09777966119</a>
+                        <a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
+                    </div>
+                </div>`;
+            return;
+        }
+        if (isFirst || grid.querySelector('.loading-text-center') || grid.querySelector('.expired-overlay')) {
             grid.innerHTML = '';
         }
         let isFav = favorites.includes(v.videoId);
@@ -821,7 +761,17 @@
         let filtered = allMovies;
         if (currentFilter === 'favorites') filtered = filtered.filter(m => favorites.includes(m.videoId));
         if (searchTerm) filtered = filtered.filter(m => (m.title || "").toLowerCase().includes(searchTerm));
-        
+        if (isExpired) {
+            grid.innerHTML = `
+                <div class="expired-overlay">
+                    <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
+                    <div class="btn-group">
+                        <a href="viber://chat?number=%2B959777966119" class="admin-btn viber" target="_blank">💬 Admin Viber: 09777966119</a>
+                        <a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
+                    </div>
+                </div>`;
+            return;
+        }
         if (filtered.length === 0) {
             if (allMovies.length === 0) { grid.innerHTML = '<div class="loading-text-center">⏳ Loading Movies...</div>'; }
             else { grid.innerHTML = '<div class="loading-text-center">📭 ဇာတ်ကားများ မရှိသေးပါ။</div>'; }
@@ -844,11 +794,6 @@
             fragment.appendChild(card);
         });
         grid.appendChild(fragment);
-        
-        // If expired, re-apply overlay
-        if (isExpired) {
-            showExpiredOverlay();
-        }
     }
 
     function createPlayer(videoId) {
@@ -949,7 +894,6 @@
         let c = document.getElementById('videoContainer');
         let pSection = document.getElementById('playerSection');
         let floatBtn = document.getElementById('exitFsFloatingBtn');
-        
         if (!isFullscreen) {
             c.classList.add('fullscreen');
             pSection.classList.add('fs-active');
@@ -1074,6 +1018,7 @@
 
     function renderTable() {
         let tbody = document.getElementById('tableBody');
+        if (!tbody) return;
         tbody.innerHTML = '';
 
         if(savedResults.length === 0) {
