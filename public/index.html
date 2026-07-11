@@ -245,68 +245,85 @@
         
         .loading-text-center { text-align: center; padding: 40px; color: #aaa; font-size: 1rem; grid-column: span 2; }
         
-        /* ===== EXPIRED OVERLAY - Bright, Clickable ===== */
+        /* ===== EXPIRED OVERLAY - BRIGHT & CLICKABLE ===== */
         .expired-overlay-full {
             text-align: center;
-            padding: 50px 20px;
-            background: #1a1a2e;
-            border-radius: 16px;
+            padding: 50px 24px;
+            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
+            border-radius: 20px;
             margin: 20px;
-            border: 2px solid #ff4444;
-            box-shadow: 0 0 40px rgba(255, 68, 68, 0.15);
+            border: 3px solid #ff6b6b;
+            box-shadow: 0 0 60px rgba(255, 68, 68, 0.25);
         }
         .expired-overlay-full .expired-icon {
-            font-size: 3rem;
-            margin-bottom: 10px;
-        }
-        .expired-overlay-full .expired-title {
-            font-size: 1.4rem;
-            font-weight: 900;
-            color: #ff4444;
+            font-size: 4rem;
             margin-bottom: 8px;
         }
+        .expired-overlay-full .expired-title {
+            font-size: 1.6rem;
+            font-weight: 900;
+            color: #ff6b6b;
+            margin-bottom: 8px;
+            text-shadow: 0 0 20px rgba(255, 68, 68, 0.3);
+        }
         .expired-overlay-full .expired-sub {
-            font-size: 0.95rem;
-            color: #ccc;
-            margin-bottom: 20px;
+            font-size: 1rem;
+            color: #e0e0e0;
+            margin-bottom: 24px;
+            font-weight: 500;
         }
         .expired-overlay-full .btn-group {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 14px;
             width: 100%;
-            max-width: 300px;
+            max-width: 340px;
             margin: 0 auto;
         }
         .expired-overlay-full .admin-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 12px;
             color: #fff;
             border: none;
             font-weight: 800;
-            padding: 14px 24px;
-            font-size: 1rem;
+            padding: 16px 28px;
+            font-size: 1.05rem;
             border-radius: 50px;
             text-decoration: none;
             transition: all 0.2s;
             cursor: pointer;
             width: 100%;
+            pointer-events: auto !important;
         }
         .expired-overlay-full .admin-btn:active { transform: scale(0.96); }
         .expired-overlay-full .admin-btn.viber {
-            background: linear-gradient(135deg, #7b51a1 0%, #593181 100%);
-            box-shadow: 0 4px 20px rgba(123, 81, 161, 0.5);
+            background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
+            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5);
             color: #fff;
+            border: 1px solid rgba(255,255,255,0.15);
         }
         .expired-overlay-full .admin-btn.telegram {
             background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
-            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
-            color: #000;
+            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.45);
+            color: #1a1a2e;
+            border: 1px solid rgba(255,215,0,0.3);
         }
         .expired-overlay-full .admin-btn .btn-icon {
-            font-size: 1.2rem;
+            font-size: 1.4rem;
+        }
+        .expired-overlay-full .admin-btn .btn-text {
+            font-size: 1rem;
+        }
+        /* Hover effects */
+        .expired-overlay-full .admin-btn.viber:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(139, 92, 246, 0.6);
+        }
+        .expired-overlay-full .admin-btn.telegram:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 35px rgba(255, 215, 0, 0.55);
         }
 
         /* ===== 2D SECTION (Bozaw 2D) ===== */
@@ -527,10 +544,12 @@
                 <div class="expired-sub">ဆက်လက်အသုံးပြုရန် သက်တမ်းတိုးပေးပါရန်။</div>
                 <div class="btn-group">
                     <a href="viber://chat?number=+959777966119" class="admin-btn viber" target="_blank">
-                        <span class="btn-icon">💬</span> Admin Viber: 09777966119
+                        <span class="btn-icon">💬</span>
+                        <span class="btn-text">Admin Viber: 09777966119</span>
                     </a>
                     <a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">
-                        <span class="btn-icon">📲</span> Telegram Admin ဆီသွားရန်
+                        <span class="btn-icon">📲</span>
+                        <span class="btn-text">Telegram Admin ဆီသွားရန်</span>
                     </a>
                 </div>
             </div>
