@@ -45,11 +45,6 @@
         }
         ::-webkit-scrollbar { width: 0; height: 0; }
 
-        /* ===== HIDE TABS WHEN FULLSCREEN OR EXPIRED ===== */
-        .app-tabs.hidden, .user-banner.hidden {
-            display: none !important;
-        }
-
         /* ===== TABS ===== */
         .app-tabs {
             display: flex;
@@ -249,12 +244,56 @@
         .player-section.fs-active .status-section { display: none !important; }
         
         .loading-text-center { text-align: center; padding: 40px; color: #aaa; font-size: 1rem; grid-column: span 2; }
-        .expired-overlay { text-align: center; padding: 50px 16px; color: #ff4444; grid-column: span 2; font-size: 0.95rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
-        .btn-group { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 260px; margin-top: 10px; }
-        .admin-btn { display: flex; align-items: center; justify-content: center; gap: 8px; color: #000; border: none; font-weight: 900; padding: 12px 20px; font-size: 0.85rem; border-radius: 30px; text-decoration: none; transition: transform 0.2s; }
-        .admin-btn.viber { background: var(--viber-gradient); color: #fff; box-shadow: 0 4px 15px rgba(123, 81, 161, 0.4); }
-        .admin-btn.telegram { background: var(--gold-gradient); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); }
-        .admin-btn:active { transform: scale(0.95); }
+        
+        /* ===== EXPIRED OVERLAY - FIX: Clickable links ===== */
+        .expired-overlay-full {
+            text-align: center;
+            padding: 60px 20px;
+            color: #ff4444;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            min-height: 300px;
+            pointer-events: auto !important;
+        }
+        .expired-overlay-full .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 280px;
+            margin-top: 10px;
+            pointer-events: auto !important;
+        }
+        .expired-overlay-full .admin-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            color: #fff;
+            border: none;
+            font-weight: 900;
+            padding: 12px 20px;
+            font-size: 0.85rem;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: transform 0.2s;
+            pointer-events: auto !important;
+            cursor: pointer !important;
+        }
+        .expired-overlay-full .admin-btn.viber {
+            background: linear-gradient(135deg, #7b51a1 0%, #593181 100%);
+            box-shadow: 0 4px 15px rgba(123, 81, 161, 0.4);
+        }
+        .expired-overlay-full .admin-btn.telegram {
+            background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
+            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            color: #000;
+        }
+        .expired-overlay-full .admin-btn:active { transform: scale(0.95); }
 
         /* ===== 2D SECTION (Bozaw 2D) ===== */
         .twod-container {
@@ -328,28 +367,6 @@
         .twod-container .admin-link { color: #3742fa; text-decoration: none; font-weight: 800; }
         .twod-container .flex-center { display: flex; justify-content: center; width: 100%; }
         .twod-container .view-count-num { color: #3742fa; font-weight: 800; }
-
-        /* ===== EXPIRED OVERLAY FOR BOTH TABS ===== */
-        .expired-overlay-full {
-            text-align: center;
-            padding: 60px 20px;
-            color: #ff4444;
-            font-size: 1.1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            min-height: 300px;
-        }
-        .expired-overlay-full .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 100%;
-            max-width: 280px;
-            margin-top: 10px;
-        }
     </style>
 </head>
 <body>
@@ -494,7 +511,7 @@
                 <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
                 <div style="font-size:0.9rem; color:#666;">ဆက်လက်အသုံးပြုရန် သက်တမ်းတိုးပေးပါရန်။</div>
                 <div class="btn-group">
-                    <a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a>
+                    <a href="viber://chat?number=%2B959777966119" class="admin-btn viber" target="_blank">💬 Admin Viber: 09777966119</a>
                     <a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
                 </div>
             </div>
@@ -637,7 +654,7 @@
                 document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('disabled'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.add('disabled'));
                 
-                // Show expired overlay
+                // Show expired overlay with clickable links
                 showExpiredOverlay();
                 
                 updatePlayerState(); 
@@ -866,11 +883,11 @@
         let moviesSection = document.getElementById('moviesSection');
         
         if (!isFullscreen) {
-            // စာသား ၂ ခုကိုပဲ hide လုပ်ပါ (Video Container ကိုမထိပါ)
-            tabs.classList.add('hidden');
-            banner.classList.add('hidden');
+            // Hide tabs and banner only (video stays visible)
+            tabs.style.display = 'none';
+            banner.style.display = 'none';
             
-            // 2D နဲ့ Movies Section ကို hide လုပ်ပါ (Video Container ကတော့ ရှိနေမယ်)
+            // Hide 2D and Movies sections content (but keep video container visible)
             twodSection.style.display = 'none';
             moviesSection.style.display = 'none';
             
@@ -879,18 +896,21 @@
             floatBtn.style.display = 'block';
             isFullscreen = true;
         } else {
-            // စာသား ၂ ခုကိုပဲ ပြန်ပေါ်လာစေပါ
-            tabs.classList.remove('hidden');
-            banner.classList.remove('hidden');
+            // Show tabs and banner
+            tabs.style.display = '';
+            banner.style.display = '';
             
-            // 2D နဲ့ Movies Section ကို ပြန်ပေါ်လာစေပါ
+            // Show 2D and Movies sections
             twodSection.style.display = '';
             moviesSection.style.display = '';
-            // Active tab ကိုပြန်ပြပါ
+            
+            // Show active tab content only
             if (document.getElementById('tab2d').classList.contains('active')) {
                 twodSection.style.display = 'block';
+                moviesSection.style.display = 'none';
             } else {
                 moviesSection.style.display = 'block';
+                twodSection.style.display = 'none';
             }
             
             c.classList.remove('fullscreen');
@@ -918,15 +938,17 @@
         document.getElementById('exitFsFloatingBtn').style.display = 'none';
         isFullscreen = false;
         // Show tabs and banner when exiting player
-        document.getElementById('appTabs').classList.remove('hidden');
-        document.getElementById('userBanner').classList.remove('hidden');
+        document.getElementById('appTabs').style.display = '';
+        document.getElementById('userBanner').style.display = '';
         document.getElementById('twodSection').style.display = '';
         document.getElementById('moviesSection').style.display = '';
         // Show active tab
         if (document.getElementById('tab2d').classList.contains('active')) {
             document.getElementById('twodSection').style.display = 'block';
+            document.getElementById('moviesSection').style.display = 'none';
         } else {
             document.getElementById('moviesSection').style.display = 'block';
+            document.getElementById('twodSection').style.display = 'none';
         }
         loadMovies(false);
     }
