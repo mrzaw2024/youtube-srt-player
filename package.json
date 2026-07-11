@@ -1,14 +1,12 @@
 {
-  "name": "youtube-srt-player",
+  "name": "premium-movie-2d-app",
   "version": "1.0.0",
-  "description": "YouTube video player with SRT subtitle support",
+  "description": "Premium Movie & 2D Forecast App with Firebase",
   "main": "api/server.js",
   "scripts": {
     "start": "node api/server.js"
   },
   "dependencies": {
-    "express": "^4.18.2",
-    "axios": "^1.6.2",
-    "cors": "^2.8.5"
+    "express": "^4.18.2"
   }
 }

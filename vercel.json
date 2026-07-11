@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "youtube-srt-player",
+  "name": "premium-movie-2d-app",
   "builds": [
     {
       "src": "api/server.js",
@@ -13,12 +13,8 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/server.js"
-    },
-    {
       "src": "/(.*)",
-      "dest": "/public/index.html"
+      "dest": "/api/server.js"
     }
   ]
 }
