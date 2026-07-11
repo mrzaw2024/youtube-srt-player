@@ -244,52 +244,60 @@
         .player-section.fs-active .status-section { display: none !important; }
         
         .loading-text-center { text-align: center; padding: 40px; color: #aaa; font-size: 1rem; grid-column: span 2; }
-        
-        /* ===== EXPIRED OVERLAY - BRIGHT & CLICKABLE ===== */
-        .expired-overlay-full {
-            text-align: center;
-            padding: 50px 24px;
-            background: linear-gradient(145deg, #1a1a2e 0%, #16213e 100%);
-            border-radius: 20px;
-            margin: 20px;
-            border: 3px solid #ff6b6b;
-            box-shadow: 0 0 60px rgba(255, 68, 68, 0.25);
+
+        /* ===== EXPIRED - Display original content but disabled ===== */
+        .expired-container {
+            position: relative;
         }
-        .expired-overlay-full .expired-icon {
-            font-size: 4rem;
-            margin-bottom: 8px;
-        }
-        .expired-overlay-full .expired-title {
-            font-size: 1.6rem;
-            font-weight: 900;
-            color: #ff6b6b;
-            margin-bottom: 8px;
-            text-shadow: 0 0 20px rgba(255, 68, 68, 0.3);
-        }
-        .expired-overlay-full .expired-sub {
-            font-size: 1rem;
-            color: #e0e0e0;
-            margin-bottom: 24px;
-            font-weight: 500;
-        }
-        .expired-overlay-full .btn-group {
+        .expired-container .expired-overlay-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
             display: flex;
             flex-direction: column;
-            gap: 14px;
-            width: 100%;
-            max-width: 340px;
-            margin: 0 auto;
-        }
-        .expired-overlay-full .admin-btn {
-            display: flex;
             align-items: center;
             justify-content: center;
             gap: 12px;
+            border-radius: 16px;
+            z-index: 999;
+            padding: 30px 20px;
+            text-align: center;
+            pointer-events: auto;
+        }
+        .expired-container .expired-overlay-bg .expired-icon {
+            font-size: 3rem;
+        }
+        .expired-container .expired-overlay-bg .expired-title {
+            font-size: 1.3rem;
+            font-weight: 900;
+            color: #ff6b6b;
+        }
+        .expired-container .expired-overlay-bg .expired-sub {
+            font-size: 0.95rem;
+            color: #e0e0e0;
+        }
+        .expired-container .expired-overlay-bg .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 8px;
+        }
+        .expired-container .expired-overlay-bg .admin-btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
             color: #fff;
             border: none;
             font-weight: 800;
-            padding: 16px 28px;
-            font-size: 1.05rem;
+            padding: 14px 24px;
+            font-size: 1rem;
             border-radius: 50px;
             text-decoration: none;
             transition: all 0.2s;
@@ -297,33 +305,19 @@
             width: 100%;
             pointer-events: auto !important;
         }
-        .expired-overlay-full .admin-btn:active { transform: scale(0.96); }
-        .expired-overlay-full .admin-btn.viber {
+        .expired-container .expired-overlay-bg .admin-btn:active { transform: scale(0.96); }
+        .expired-container .expired-overlay-bg .admin-btn.viber {
             background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);
-            box-shadow: 0 6px 25px rgba(139, 92, 246, 0.5);
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
             color: #fff;
-            border: 1px solid rgba(255,255,255,0.15);
         }
-        .expired-overlay-full .admin-btn.telegram {
+        .expired-container .expired-overlay-bg .admin-btn.telegram {
             background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
-            box-shadow: 0 6px 25px rgba(255, 215, 0, 0.45);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.35);
             color: #1a1a2e;
-            border: 1px solid rgba(255,215,0,0.3);
         }
-        .expired-overlay-full .admin-btn .btn-icon {
-            font-size: 1.4rem;
-        }
-        .expired-overlay-full .admin-btn .btn-text {
-            font-size: 1rem;
-        }
-        /* Hover effects */
-        .expired-overlay-full .admin-btn.viber:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 35px rgba(139, 92, 246, 0.6);
-        }
-        .expired-overlay-full .admin-btn.telegram:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 35px rgba(255, 215, 0, 0.55);
+        .expired-container .expired-overlay-bg .admin-btn .btn-icon {
+            font-size: 1.2rem;
         }
 
         /* ===== 2D SECTION (Bozaw 2D) ===== */
@@ -337,6 +331,7 @@
             border-radius: 24px;
             margin: 20px auto;
             color: #2c3e50;
+            position: relative;
         }
         .twod-container .header-area { text-align: center; margin-bottom: 20px; }
         .twod-container .header-area h2 {
@@ -398,6 +393,11 @@
         .twod-container .admin-link { color: #3742fa; text-decoration: none; font-weight: 800; }
         .twod-container .flex-center { display: flex; justify-content: center; width: 100%; }
         .twod-container .view-count-num { color: #3742fa; font-weight: 800; }
+
+        /* Movie Grid Expired Wrapper */
+        .movie-grid-wrapper {
+            position: relative;
+        }
     </style>
 </head>
 <body>
@@ -517,8 +517,7 @@
     // ==================== TAB SWITCHER ====================
     function switchTab(tabId) {
         if (isExpired) {
-            showExpiredOverlay();
-            return;
+            // Still allow switching but show disabled state
         }
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -530,36 +529,71 @@
             document.getElementById('tab2d').classList.add('active');
             document.getElementById('twodSection').classList.add('active');
         }
+        // If expired, show expired overlay on the active tab
+        if (isExpired) {
+            showExpiredOverlay();
+        }
     }
 
-    // ==================== EXPIRED OVERLAY ====================
+    // ==================== EXPIRED OVERLAY (Overlay on top of original content) ====================
     function showExpiredOverlay() {
         const twodContainer = document.getElementById('twodContainer');
         const movieGrid = document.getElementById('movieGrid');
         
+        // Remove any existing expired overlay first
+        removeExpiredOverlay();
+        
         const expiredHTML = `
-            <div class="expired-overlay-full">
+            <div class="expired-overlay-bg">
                 <div class="expired-icon">⛔</div>
                 <div class="expired-title">သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</div>
                 <div class="expired-sub">ဆက်လက်အသုံးပြုရန် သက်တမ်းတိုးပေးပါရန်။</div>
                 <div class="btn-group">
                     <a href="viber://chat?number=+959777966119" class="admin-btn viber" target="_blank">
-                        <span class="btn-icon">💬</span>
-                        <span class="btn-text">Admin Viber: 09777966119</span>
+                        <span class="btn-icon">💬</span> Admin Viber: 09777966119
                     </a>
                     <a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">
-                        <span class="btn-icon">📲</span>
-                        <span class="btn-text">Telegram Admin ဆီသွားရန်</span>
+                        <span class="btn-icon">📲</span> Telegram Admin ဆီသွားရန်
                     </a>
                 </div>
             </div>
         `;
         
+        // Wrap 2D container with expired overlay
         if (twodContainer) {
-            twodContainer.innerHTML = expiredHTML;
+            twodContainer.classList.add('expired-container');
+            const overlay = document.createElement('div');
+            overlay.innerHTML = expiredHTML;
+            twodContainer.appendChild(overlay.firstElementChild);
         }
+        
+        // Wrap movie grid with expired overlay
         if (movieGrid) {
-            movieGrid.innerHTML = expiredHTML;
+            const gridWrapper = document.getElementById('gridSection');
+            if (gridWrapper) {
+                gridWrapper.classList.add('expired-container');
+                const overlay = document.createElement('div');
+                overlay.innerHTML = expiredHTML;
+                gridWrapper.appendChild(overlay.firstElementChild);
+            }
+        }
+    }
+
+    function removeExpiredOverlay() {
+        // Remove from 2D container
+        const twodContainer = document.getElementById('twodContainer');
+        if (twodContainer) {
+            twodContainer.classList.remove('expired-container');
+            const overlay = twodContainer.querySelector('.expired-overlay-bg');
+            if (overlay) overlay.remove();
+        }
+        
+        // Remove from movie grid
+        const gridWrapper = document.getElementById('gridSection');
+        if (gridWrapper) {
+            gridWrapper.classList.remove('expired-container');
+            const overlay = gridWrapper.querySelector('.expired-overlay-bg');
+            if (overlay) overlay.remove();
         }
     }
 
@@ -677,7 +711,6 @@
         expiryCheckInterval = setInterval(() => {
             if (!currentUserData) return;
             const remaining = currentUserData.expiry - Date.now();
-            const wasExpired = isExpired;
             isExpired = remaining <= 0;
             const homeTimeText = document.getElementById('homeTimeText');
             const homeTimeBar = document.getElementById('homeTimeBar');
@@ -688,11 +721,11 @@
                 document.getElementById('userStatusText').className = 'expired';
                 document.getElementById('statusDot').className = 'expired';
                 
-                // Disable both tabs
+                // Disable tabs
                 document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('disabled'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.add('disabled'));
                 
-                // Show expired overlay
+                // Show expired overlay on current content
                 showExpiredOverlay();
                 
                 updatePlayerState(); 
@@ -705,6 +738,9 @@
                 // Enable tabs
                 document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('disabled'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('disabled'));
+                
+                // Remove expired overlay
+                removeExpiredOverlay();
                 
                 const mins = Math.floor(remaining / 60000);
                 const secs = Math.floor((remaining % 60000) / 1000);
@@ -762,11 +798,7 @@
 
     function renderIncrementalMovie(v, isFirst) {
         let grid = document.getElementById('movieGrid');
-        if (isExpired) {
-            showExpiredOverlay();
-            return;
-        }
-        if (isFirst || grid.querySelector('.loading-text-center') || grid.querySelector('.expired-overlay') || grid.querySelector('.expired-overlay-full')) {
+        if (isFirst || grid.querySelector('.loading-text-center') || grid.querySelector('.expired-overlay') || grid.querySelector('.expired-overlay-bg')) {
             grid.innerHTML = '';
         }
         let isFav = favorites.includes(v.videoId);
@@ -789,10 +821,7 @@
         let filtered = allMovies;
         if (currentFilter === 'favorites') filtered = filtered.filter(m => favorites.includes(m.videoId));
         if (searchTerm) filtered = filtered.filter(m => (m.title || "").toLowerCase().includes(searchTerm));
-        if (isExpired) {
-            showExpiredOverlay();
-            return;
-        }
+        
         if (filtered.length === 0) {
             if (allMovies.length === 0) { grid.innerHTML = '<div class="loading-text-center">⏳ Loading Movies...</div>'; }
             else { grid.innerHTML = '<div class="loading-text-center">📭 ဇာတ်ကားများ မရှိသေးပါ။</div>'; }
@@ -815,6 +844,11 @@
             fragment.appendChild(card);
         });
         grid.appendChild(fragment);
+        
+        // If expired, re-apply overlay
+        if (isExpired) {
+            showExpiredOverlay();
+        }
     }
 
     function createPlayer(videoId) {
