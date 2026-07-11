@@ -230,7 +230,7 @@
         .admin-btn.telegram { background: var(--gold-gradient); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); }
         .admin-btn:active { transform: scale(0.95); }
 
-        /* ===== 2D ANALYTICS DASHBOARD STYLES ===== */
+        /* ===== 2D SECTION (Bozaw 2D) ===== */
         .twod-container {
             width: 100%;
             max-width: 650px;
@@ -244,53 +244,21 @@
         }
         .twod-container .header-area { text-align: center; margin-bottom: 20px; }
         .twod-container .header-area h2 {
-            font-size: 24px; font-weight: 900; letter-spacing: 0.5px;
+            font-size: 26px; font-weight: 900; letter-spacing: 0.5px;
             background: linear-gradient(135deg, #3742fa 0%, #9c88ff 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
         }
-        .twod-container .header-area p { font-size: 11px; color: #57606f; font-weight: 700; letter-spacing: 0.5px; margin-top: 3px; }
-        
-        .twod-container textarea {
-            width: 100%; height: 75px; padding: 12px; background: rgba(255,255,255,0.9);
-            border: 1px solid #dcdde1; border-bottom: 3px solid #b2bec3; border-radius: 14px;
-            color: #2c3e50; font-size: 15px; resize: none; transition: all 0.3s ease; margin-bottom: 12px; font-weight: 600;
+        .twod-container .sub-status-area {
+            font-size: 13px; color: #57606f; font-weight: 700; margin-top: 6px;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
         }
-        .twod-container textarea:focus { outline: none; border-color: #3742fa; box-shadow: 0 0 10px rgba(55,66,250,0.15); }
-        
-        .twod-container .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
-        .twod-container button {
-            padding: 12px; border: none; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; color: white; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        .twod-container .table-title {
+            font-size: 15px; font-weight: 800; margin-bottom: 12px; color: #2c3e50;
+            border-left: 4px solid #3742fa; padding-left: 8px;
         }
-        .twod-container button:active { transform: translateY(1px); }
-        .btn-save { background: linear-gradient(135deg, #2ed573 0%, #1ebd60 100%); border-bottom: 3px solid #26af5f; }
-        .btn-check { background: linear-gradient(135deg, #3742fa 0%, #2f3542 100%); border-bottom: 3px solid #2830c2; }
-        .btn-reset {
-            width: 100%; background: #ffeaa7; color: #d63031; padding: 8px; font-size: 12px; font-weight: 700;
-            border: 1px solid #ffd32a; margin-bottom: 20px; border-radius: 12px;
-        }
-        .btn-reset:hover { background: #ffdf7a; }
-
-        .editor-box-container {
-            background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(245,246,250,0.9) 100%);
-            border: 1px solid #dcdde1; border-radius: 16px; padding: 14px; margin-bottom: 20px;
-        }
-        .control-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-        .btn-edit-action { background: linear-gradient(135deg, #ffa502 0%, #ff7f50 100%); border-bottom: 3px solid #e19302; padding: 10px; color: #fff; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; }
-        .btn-save-action { background: linear-gradient(135deg, #70a1ff 0%, #1e90ff 100%); border-bottom: 3px solid #5482cc; padding: 10px; color: #fff; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; }
-        .edit-title { font-size: 11px; font-weight: 800; color: #747d8c; margin-bottom: 4px; text-transform: uppercase; }
-        .data-viewer-text {
-            padding: 10px 12px; background: #ffffff; border-left: 4px solid #3742fa;
-            border-radius: 4px 10px 10px 4px; font-size: 13px; color: #2f3542; margin-bottom: 10px;
-            word-break: break-all; font-weight: 600; border: 1px solid #f1f2f6;
-        }
-        .edit-input {
-            width: 100%; padding: 10px 12px; background: #ffffff; border: 2px solid #ffa502;
-            border-radius: 10px; color: #2c3e50; font-size: 13px; font-weight: 600; margin-bottom: 10px; display: none;
-        }
-
-        .twod-container .table-title { font-size: 14px; font-weight: 800; margin-bottom: 10px; color: #2c3e50; text-transform: uppercase; }
         .twod-container .table-wrapper {
-            width: 100%; overflow-x: auto; border-radius: 16px; border: 1px solid #dcdde1; background: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            width: 100%; overflow-x: auto; border-radius: 16px; border: 1px solid #dcdde1;
+            background: #ffffff; margin-bottom: 20px;
         }
         .twod-container table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px; text-align: center; }
         .twod-container th {
@@ -303,28 +271,37 @@
         }
         .twod-container td:last-child { border-right: none; }
         .twod-container tr:nth-child(even) td { background-color: #f9fbfd; }
-
-        .num-box-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; }
-        .num-box {
+        .twod-container .num-box-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; }
+        .twod-container .num-box {
             display: inline-block; width: 90%; max-width: 85px; font-weight: 800; font-size: 16px;
-            color: #2c3e50; background: linear-gradient(135deg, #fff3cd 0%, #ffe066 100%);
-            padding: 8px 0; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.06);
-            border: 1px solid #ffe066; text-align: center;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe066 100%);
+            padding: 8px 0; border-radius: 10px; border: 1px solid #ffe066; text-align: center;
         }
-        .count-text { font-size: 11px; font-weight: 900; color: #e74c3c; margin-left: 2px; vertical-align: super; }
-        .highlight-am-pm-match { background: linear-gradient(135deg, #a8e6cf 0%, #2ecc71 100%) !important; }
-        .highlight-am-pm-match .num-box { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; border-color: #10b981; box-shadow: 0 3px 6px rgba(16,185,129,0.2); }
-        .highlight-am-pm-match .count-text { color: #fff200; }
-        .badge-hit {
+        .twod-container .count-text { font-size: 11px; font-weight: 900; color: #e74c3c; margin-left: 2px; vertical-align: super; }
+        .twod-container .highlight-am-pm-match { background: linear-gradient(135deg, #a8e6cf 0%, #2ecc71 100%) !important; }
+        .twod-container .highlight-am-pm-match .num-box {
+            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+            color: white; border-color: #10b981;
+        }
+        .twod-container .highlight-am-pm-match .count-text { color: #fff200; }
+        .twod-container .badge-hit {
             color: #fff; font-weight: 800; font-size: 13px;
             background: linear-gradient(135deg, #2ed573 0%, #1ebd60 100%);
             padding: 5px 12px; border-radius: 10px; display: inline-block;
         }
-        .khway-style {
+        .twod-container .khway-style {
             color: #2f3542; font-weight: 700; font-size: 13px; background: #e8f0fe;
             padding: 6px 8px; border-radius: 8px; display: inline-block; border: 1px solid #d2e3fc; word-break: break-all;
         }
-        .empty-status { color: #57606f; padding: 30px !important; font-weight: 700; }
+        .twod-container .empty-status { color: #57606f; padding: 30px !important; font-weight: 700; }
+        .twod-container .admin-footer-box {
+            text-align: center; font-size: 13px; font-weight: bold; color: #57606f;
+            background: rgba(255, 255, 255, 0.6); padding: 10px 16px; border-radius: 14px; border: 1px solid rgba(0,0,0,0.05);
+            display: inline-block;
+        }
+        .twod-container .admin-link { color: #3742fa; text-decoration: none; font-weight: 800; }
+        .twod-container .flex-center { display: flex; justify-content: center; width: 100%; }
+        .twod-container .view-count-num { color: #3742fa; font-weight: 800; }
     </style>
 </head>
 <body>
@@ -345,42 +322,22 @@
 
 <!-- ===== TABS ===== -->
 <div class="app-tabs">
-    <button class="tab-btn active" onclick="switchTab('twod')">📊 2D Analytics</button>
+    <button class="tab-btn active" onclick="switchTab('twod')">📊 2D ခန့်မှန်းချက်</button>
     <button class="tab-btn" onclick="switchTab('movies')">🎬 ဇာတ်ကားများ</button>
 </div>
 
-<!-- ===== 2D TAB ===== -->
+<!-- ===== 2D TAB (Bozaw 2D) ===== -->
 <div id="twodSection" class="tab-content active">
     <div class="twod-container">
         <div class="header-area">
-            <h2>📊 2D ANALYTICS DASHBOARD</h2>
-            <p>Pro Colorful Light System & Auto-Save</p>
-        </div>
-
-        <textarea id="mainInput" placeholder="ဂဏန်းများ သို့မဟုတ် ပတ်ဂဏန်း (ဥပမာ- 7ပတ်) များကို ကော်မာခြားထည့်ပါ..."></textarea>
-
-        <div class="btn-grid">
-            <button class="btn-save" onclick="saveData()">📥 ထွက်ဂဏန်းထည့်မည်</button>
-            <button class="btn-check" onclick="checkData()">🔍 အခွေ/ပတ်စစ်ဆေးမည်</button>
-        </div>
-        <button class="btn-reset" onclick="resetAll()">🗑️ ဒေတာအားလုံးကို အစကပြန်ရှင်းလင်းမည်</button>
-
-        <div class="editor-box-container">
-            <div class="control-btn-grid">
-                <button class="btn-edit-action" onclick="enableEditMode()">✏️ ဒေတာ ပြင်ဆင်မည်</button>
-                <button class="btn-save-action" onclick="saveEditChanges()">💾 ဒေတာ သိမ်းဆည်းမည်</button>
+            <h2>Bozaw 2D ခန့်မှန်းချက်</h2>
+            <div class="sub-status-area">
+                <span class="status-icon" id="statusIcon">🔄</span> 
+                <span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="viewCountDisplay">0</span> views</span>
             </div>
-
-            <div class="edit-title">✏️ ထွက်ဂဏန်းစာရင်း</div>
-            <div class="data-viewer-text" id="viewResultsText">မရှိသေးပါ။</div>
-            <input type="text" class="edit-input" id="editResultsInput" placeholder="ထွက်ဂဏန်းစာရင်း ပြင်ရန်...">
-            
-            <div class="edit-title" style="margin-top: 10px;">✏️ အခွေပူး/ပတ်ဂဏန်းစာရင်း</div>
-            <div class="data-viewer-text" id="viewKhwayText">မရှိသေးပါ။</div>
-            <input type="text" class="edit-input" id="editKhwayInput" placeholder="အခွေပူးစာရင်း ပြင်ရန်...">
         </div>
 
-        <div class="table-title">📊 RANGES AM / PM & အခွေပူး ဇယားကွက်</div>
+        <div class="table-title">📊 AM / PM & အခွေပူး ဇယားကွက်</div>
         <div class="table-wrapper">
             <table>
                 <thead>
@@ -392,9 +349,15 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr><td colspan="4" class="empty-status">ဒေတာများ ထည့်သွင်းပေးပါ။</td></tr>
+                    <tr><td colspan="4" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
                 </tbody>
             </table>
+        </div>
+
+        <div class="flex-center">
+            <div class="admin-footer-box">
+                👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a>
+            </div>
         </div>
     </div>
 </div>
@@ -829,164 +792,176 @@
         loadMovies(false);
     }
 
-    // ==================== 2D ANALYTICS DASHBOARD ====================
-    let savedResults = JSON.parse(localStorage.getItem('cyber2d_results')) || [];
-    let savedKhwayItems = JSON.parse(localStorage.getItem('cyber2d_khways')) || [];
+    // ==================== 2D SECTION (Bozaw 2D) ====================
+    const SHEET_ID = '1tNEhMx08S8rz84In1FdWLPcYlGJkzDCIXFMIhy5BrGU';
+    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
 
-    function saveToLocalStorage() {
-        localStorage.setItem('cyber2d_results', JSON.stringify(savedResults));
-        localStorage.setItem('cyber2d_khways', JSON.stringify(savedKhwayItems));
+    let savedResults = [];
+    let savedKhwayItems = [];
+
+    function handleViewCounter() {
+        const COUNTER_KEY = 'bozaw2d_vercel_app_2026_views';
+        fetch(`https://countapi.mileshilliard.com/api/v1/hit/${COUNTER_KEY}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('viewCountDisplay').innerText = Number(data.value).toLocaleString();
+            })
+            .catch(error => {
+                console.error('View counter error:', error);
+                document.getElementById('viewCountDisplay').innerText = '-';
+            });
     }
 
-    function parsePatDigit(str) {
-        if (str && str.includes('ပတ်')) {
-            let match = str.match(/(\d)ပတ်/);
-            return match ? match[1] : null;
+    function fetchDataFromSheets() {
+        const noCacheUrl = `${SHEET_URL}&_ts=${Date.now()}`;
+        fetch(noCacheUrl, { cache: 'no-store' })
+            .then(response => response.text())
+            .then(data => {
+                parseCSVData(data);
+                document.getElementById('statusIcon').innerText = '✅';
+                renderTable();
+            })
+            .catch(error => {
+                console.error('Error fetching sheet data:', error);
+                document.getElementById('statusIcon').innerText = '❌';
+            });
+    }
+
+    function parseCSVData(csvText) {
+        let lines = csvText.split('\n');
+        savedResults = [];
+        savedKhwayItems = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            let currentLine = lines[i].trim();
+            if (!currentLine) continue;
+
+            let matches = currentLine.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || currentLine.split(',');
+            
+            if (matches.length >= 1) {
+                let res = matches[0].replace(/"/g, '').trim();
+                
+                let khw = '';
+                if (matches.length > 1) {
+                    let textParts = [];
+                    for(let j=1; j<matches.length; j++) {
+                        let part = matches[j].replace(/"/g, '').trim();
+                        if(part) textParts.push(part);
+                    }
+                    khw = textParts.join(',').trim();
+                }
+
+                if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
+
+                if (res.length > 0 && res.length < 4) {
+                    res = res.padStart(4, '0');
+                }
+
+                if (res.length === 4) {
+                    savedResults.push(res);
+                    savedKhwayItems.push(khw || '-');
+                }
+            }
         }
-        return null;
     }
 
-    function updateViewers() {
-        document.getElementById('viewResultsText').innerText = savedResults.length > 0 ? savedResults.join(', ') : 'မရှိသေးပါ။';
-        document.getElementById('viewKhwayText').innerText = savedKhwayItems.length > 0 ? savedKhwayItems.join(', ') : 'မရှိသေးပါ။';
-        document.getElementById('editResultsInput').value = savedResults.join(',');
-        document.getElementById('editKhwayInput').value = savedKhwayItems.join(',');
-    }
+    function checkMatchLogic(khwayItem, target2D) {
+        let cleanKhway = khwayItem.replace(/[^\d]/g, '').trim();
+        if (!cleanKhway) return false;
 
-    function enableEditMode() {
-        document.getElementById('viewResultsText').style.display = 'none';
-        document.getElementById('viewKhwayText').style.display = 'none';
-        document.getElementById('editResultsInput').style.display = 'block';
-        document.getElementById('editKhwayInput').style.display = 'block';
-        document.getElementById('editResultsInput').focus();
-    }
-
-    function saveEditChanges() {
-        let resInput = document.getElementById('editResultsInput').value.trim();
-        let khwInput = document.getElementById('editKhwayInput').value.trim();
-        savedResults = resInput ? resInput.split(',').map(s => s.trim()).filter(s => s.length === 4) : [];
-        savedKhwayItems = khwInput ? khwInput.split(',').map(s => s.trim()).filter(s => s.length > 0) : [];
-        saveToLocalStorage();
-        updateViewers();
-        document.getElementById('editResultsInput').style.display = 'none';
-        document.getElementById('editKhwayInput').style.display = 'none';
-        document.getElementById('viewResultsText').style.display = 'block';
-        document.getElementById('viewKhwayText').style.display = 'block';
-        renderTable();
-        alert('ပြင်ဆင်မှုများကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။');
-    }
-
-    function saveData() {
-        let input = document.getElementById('mainInput').value.trim();
-        if (!input) return;
-        let items = input.split(/[\s,]+/);
-        let filteredItems = items.filter(item => item.length === 4);
-        if(filteredItems.length === 0) {
-            alert('ဂဏန်း ၄ လုံးစီပါဝင်သော ပုံစံမျိုးသာ ထည့်ပေးပါ!');
-            return;
+        if (cleanKhway.length === 1) {
+            return target2D.includes(cleanKhway);
         }
-        savedResults = savedResults.concat(filteredItems);
-        saveToLocalStorage();
-        updateViewers();
-        document.getElementById('mainInput').value = '';
-        renderTable();
-    }
-
-    function checkData() {
-        let input = document.getElementById('mainInput').value.trim();
-        if (!input) return;
-        let khwayItems = input.split(/[\s,]+/).filter(item => item.length > 0);
-        savedKhwayItems = savedKhwayItems.concat(khwayItems);
-        saveToLocalStorage();
-        updateViewers();
-        document.getElementById('mainInput').value = '';
-        renderTable();
-    }
-
-    function resetAll() {
-        if(confirm('ဒေတာအားလုံးကို ဖျက်ပစ်ရန် သေချာပါသလား?')) {
-            savedResults = [];
-            savedKhwayItems = [];
-            localStorage.removeItem('cyber2d_results');
-            localStorage.removeItem('cyber2d_khways');
-            updateViewers();
-            document.getElementById('mainInput').value = '';
-            renderTable();
+        else if (cleanKhway.length === 2) {
+            return (cleanKhway === target2D);
+        }
+        else {
+            let digitsArray = cleanKhway.split('');
+            return (digitsArray.includes(target2D[0]) && digitsArray.includes(target2D[1]));
         }
     }
 
     function renderTable() {
         let tbody = document.getElementById('tableBody');
         tbody.innerHTML = '';
+
         if(savedResults.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" class="empty-status">ဒေတာများ ထည့်သွင်းပေးပါ။</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="4" class="empty-status">ဒေတာများ မရှိသေးပါ။ Google Sheet တွင် အရင်ဖြည့်ပါ။</td></tr>`;
             return;
         }
+
         let amHitCounts = new Array(savedResults.length).fill(0);
         let pmHitCounts = new Array(savedResults.length).fill(0);
+
         savedResults.forEach((numStr, index) => {
             let currentKhwayStr = savedKhwayItems[index];
-            if (currentKhwayStr) {
-                let subKhways = currentKhwayStr.split('/');
+            if (currentKhwayStr && currentKhwayStr !== '-') {
+                let subKhways = currentKhwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+
                 for (let i = 1; i <= 5; i++) {
                     let targetIndex = index + i;
                     if (targetIndex < savedResults.length) {
                         let targetNumStr = savedResults[targetIndex];
                         let targetAm = targetNumStr.slice(0, 2);
                         let targetPm = targetNumStr.slice(2, 4);
+
                         subKhways.forEach(khway => {
-                            let patDigit = parsePatDigit(khway);
-                            if (patDigit) {
-                                if (targetAm.includes(patDigit)) amHitCounts[targetIndex]++;
-                                if (targetPm.includes(patDigit)) pmHitCounts[targetIndex]++;
-                            } else {
-                                let khwayDigits = khway.split('');
-                                if (khwayDigits.includes(targetAm[0]) && khwayDigits.includes(targetAm[1])) amHitCounts[targetIndex]++;
-                                if (khwayDigits.includes(targetPm[0]) && khwayDigits.includes(targetPm[1])) pmHitCounts[targetIndex]++;
-                            }
+                            if (checkMatchLogic(khway, targetAm)) amHitCounts[targetIndex]++;
+                            if (checkMatchLogic(khway, targetPm)) pmHitCounts[targetIndex]++;
                         });
                     }
                 }
             }
         });
+
         savedResults.forEach((numStr, index) => {
-            let amNum = numStr.slice(0, 2);
-            let pmNum = numStr.slice(2, 4);
+            let amNum = numStr.slice(0, 2); 
+            let pmNum = numStr.slice(2, 4); 
+            
             let currentKhwayStr = savedKhwayItems[index] ? savedKhwayItems[index] : '-';
-            let hitNumbers = [];
-            if (savedKhwayItems[index]) {
-                let subKhways = savedKhwayItems[index].split('/');
+            let hitNumbers = []; 
+
+            if (savedKhwayItems[index] && savedKhwayItems[index] !== '-') {
+                let subKhways = savedKhwayItems[index].split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+
                 for (let i = 1; i <= 5; i++) {
                     let targetIndex = index + i;
                     if (targetIndex < savedResults.length) {
                         let targetNumStr = savedResults[targetIndex];
                         let targetAm = targetNumStr.slice(0, 2);
                         let targetPm = targetNumStr.slice(2, 4);
+
                         subKhways.forEach(khway => {
-                            let patDigit = parsePatDigit(khway);
-                            if (patDigit) {
-                                if (targetAm.includes(patDigit) && !hitNumbers.includes(targetAm)) hitNumbers.push(targetAm);
-                                if (targetPm.includes(patDigit) && !hitNumbers.includes(targetPm)) hitNumbers.push(targetPm);
-                            } else {
-                                let khwayDigits = khway.split('');
-                                if (khwayDigits.includes(targetAm[0]) && khwayDigits.includes(targetAm[1]) && !hitNumbers.includes(targetAm)) hitNumbers.push(targetAm);
-                                if (khwayDigits.includes(targetPm[0]) && khwayDigits.includes(targetPm[1]) && !hitNumbers.includes(targetPm)) hitNumbers.push(targetPm);
-                            }
+                            if (checkMatchLogic(khway, targetAm) && !hitNumbers.includes(targetAm)) hitNumbers.push(targetAm);
+                            if (checkMatchLogic(khway, targetPm) && !hitNumbers.includes(targetPm)) hitNumbers.push(targetPm);
                         });
                     }
                 }
             }
+
             let tr = document.createElement('tr');
-            let khwayDisplayHTML = savedKhwayItems[index] ? `<span class="khway-style">${currentKhwayStr.replace(/\//g, '<br><hr style="border:0;border-top:1px dashed #b2bec3;margin:4px 0;">')}</span>` : '-';
-            let finalHitHTML = hitNumbers.length > 0 ? `<span class="badge-hit">${hitNumbers.join(', ')}</span>` : (savedKhwayItems[index] ? '<span style="color:#747d8c;font-size:12px;font-weight:700;">မပါဝင်ပါ</span>' : '-');
+            
+            let khwayDisplayHTML = '-';
+            if(savedKhwayItems[index] && savedKhwayItems[index] !== '-') {
+                let cleanDisplayParts = savedKhwayItems[index].split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+                if(cleanDisplayParts.length > 0) {
+                    khwayDisplayHTML = `<span class="khway-style">${cleanDisplayParts.join('<br><hr style="border:0;border-top:1px dashed #b2bec3;margin:4px 0;">')}</span>`;
+                }
+            }
+
+            let finalHitHTML = hitNumbers.length > 0 
+                ? `<span class="badge-hit">${hitNumbers.join(', ')}</span>` 
+                : (savedKhwayItems[index] && savedKhwayItems[index] !== '-' ? '<span style="color:#747d8c;font-size:12px;font-weight:700;">မပါဝင်ပါ</span>' : '-');
+
             let amCountStr = amHitCounts[index] > 0 ? `<span class="count-text">(${amHitCounts[index]})</span>` : '';
             let pmCountStr = pmHitCounts[index] > 0 ? `<span class="count-text">(${pmHitCounts[index]})</span>` : '';
+
             tr.innerHTML = `
                 <td class="${amHitCounts[index] > 0 ? 'highlight-am-pm-match' : ''}">
                     <div class="num-box-wrapper"><span class="num-box">${amNum}${amCountStr}</span></div>
                 </td>
                 <td class="${pmHitCounts[index] > 0 ? 'highlight-am-pm-match' : ''}">
-                    <div class="num-box-wrapper"><span class="num-box">${pmNum}${pmCountStr}</span></div>
+                    <div class="num-wrapper"><span class="num-box">${pmNum}${pmCountStr}</span></div>
                 </td>
                 <td>${khwayDisplayHTML}</td>
                 <td>${finalHitHTML}</td>
@@ -997,8 +972,8 @@
 
     // ==================== INIT ====================
     window.onload = function() {
-        updateViewers();
-        renderTable();
+        handleViewCounter();
+        fetchDataFromSheets();
         if (typeof YT !== 'undefined' && YT.loaded) { autoLogin(); }
     };
 
