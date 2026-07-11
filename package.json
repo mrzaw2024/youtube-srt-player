@@ -1,7 +1,7 @@
 {
   "name": "premium-movie-2d-app",
   "version": "1.0.0",
-  "description": "Premium Movie & 2D Forecast App with Firebase",
+  "description": "Premium Movie & 2D Forecast App",
   "main": "api/server.js",
   "scripts": {
     "start": "node api/server.js"
