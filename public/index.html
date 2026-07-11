@@ -45,6 +45,11 @@
         }
         ::-webkit-scrollbar { width: 0; height: 0; }
 
+        /* ===== HIDE TABS WHEN EXPIRED OR FULLSCREEN ===== */
+        .app-tabs.hidden, .user-banner.hidden {
+            display: none !important;
+        }
+
         /* ===== TABS ===== */
         .app-tabs {
             display: flex;
@@ -72,8 +77,17 @@
             border-bottom: 3px solid var(--gold);
             background: rgba(255, 255, 255, 0.03);
         }
+        .tab-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .tab-content.disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
 
         /* ===== NOTIFICATION ===== */
         #customNoti {
@@ -207,16 +221,29 @@
         #exitFsFloatingBtn:hover { background: rgba(255, 68, 102, 1); transform: translateX(-50%) scale(1.05); }
         #exitFsFloatingBtn:active { transform: translateX(-50%) scale(0.95); }
 
+        /* ===== SUBTITLE - Yellow with Black Stroke ONLY ===== */
         .subtitle-text {
             position: fixed; bottom: 26%; left: 0; right: 0; text-align: center; z-index: 100002; pointer-events: none; padding: 0 16px; display: none;
         }
         .video-container.fullscreen ~ .subtitle-text { bottom: 24%; }
         .subtitle-text .subtitle-inner {
-            display: inline-block; color: #FFD700; font-size: clamp(1.25rem, 5.8vw, 2.35rem); font-weight: 900;
-            font-family: system-ui, -apple-system, sans-serif; line-height: 1.25 !important;
-            text-align: center; word-break: break-word; max-width: 96%;
-            padding: 8px 16px; background: rgba(0,0,0,0.5); border-radius: 10px; backdrop-filter: blur(2px);
-            text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 4px 8px rgba(0,0,0,0.9);
+            display: inline-block;
+            color: #FFD700;
+            font-size: clamp(1.25rem, 5.8vw, 2.35rem);
+            font-weight: 900;
+            font-family: system-ui, -apple-system, sans-serif;
+            line-height: 1.25 !important;
+            text-align: center;
+            word-break: break-word;
+            max-width: 96%;
+            /* Yellow text with ONLY Black stroke - NO background */
+            text-shadow:
+                -3px -3px 0 #000000,
+                3px -3px 0 #000000,
+                -3px 3px 0 #000000,
+                3px 3px 0 #000000,
+                0 0 8px rgba(0,0,0,0.8),
+                0 0 16px rgba(0,0,0,0.6);
         }
         
         .player-section.fs-active .video-controls,
@@ -321,9 +348,9 @@
 </div>
 
 <!-- ===== TABS ===== -->
-<div class="app-tabs">
-    <button class="tab-btn active" onclick="switchTab('twod')">📊 2D ခန့်မှန်းချက်</button>
-    <button class="tab-btn" onclick="switchTab('movies')">🎬 ဇာတ်ကားများ</button>
+<div class="app-tabs" id="appTabs">
+    <button class="tab-btn active" id="tab2d" onclick="switchTab('twod')">📊 2D ခန့်မှန်းချက်</button>
+    <button class="tab-btn" id="tabMovies" onclick="switchTab('movies')">🎬 ဇာတ်ကားများ</button>
 </div>
 
 <!-- ===== 2D TAB (Bozaw 2D) ===== -->
@@ -420,14 +447,15 @@
 <script>
     // ==================== TAB SWITCHER ====================
     function switchTab(tabId) {
+        if (isExpired) return;
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
         if (tabId === 'movies') {
-            document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+            document.getElementById('tabMovies').classList.add('active');
             document.getElementById('moviesSection').classList.add('active');
             if (allMovies.length === 0) loadMovies();
         } else {
-            document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+            document.getElementById('tab2d').classList.add('active');
             document.getElementById('twodSection').classList.add('active');
         }
     }
@@ -546,20 +574,32 @@
         expiryCheckInterval = setInterval(() => {
             if (!currentUserData) return;
             const remaining = currentUserData.expiry - Date.now();
+            const wasExpired = isExpired;
             isExpired = remaining <= 0;
             const homeTimeText = document.getElementById('homeTimeText');
             const homeTimeBar = document.getElementById('homeTimeBar');
+            
             if (isExpired) {
                 if(homeTimeText) { homeTimeText.textContent = '⛔ Expired'; homeTimeBar.style.width = '0%'; }
                 document.getElementById('userStatusText').textContent = 'Expired';
                 document.getElementById('userStatusText').className = 'expired';
                 document.getElementById('statusDot').className = 'expired';
+                
+                // Disable both tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('disabled'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('disabled'));
+                
                 updatePlayerState(); renderMovies();
                 if (player) { try{player.destroy()}catch(e){} player = null; }
             } else {
                 document.getElementById('userStatusText').textContent = 'Active';
                 document.getElementById('userStatusText').className = 'active';
                 document.getElementById('statusDot').className = 'active';
+                
+                // Enable tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('disabled'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('disabled'));
+                
                 const mins = Math.floor(remaining / 60000);
                 const secs = Math.floor((remaining % 60000) / 1000);
                 if(homeTimeText) {
@@ -764,12 +804,45 @@
     };
     window.seekVideo = function(sec) { if(!player) return; try { player.seekTo(player.getCurrentTime()+sec, true); } catch(e) {} };
     window.seekToPosition = function() { if(!player) return; try { let pct = parseFloat(document.getElementById('progressSlider').value); player.seekTo((pct/100)*player.getDuration(), true); } catch(e) {} };
+    
     window.toggleFullscreen = function() {
         let c = document.getElementById('videoContainer');
         let pSection = document.getElementById('playerSection');
         let floatBtn = document.getElementById('exitFsFloatingBtn');
-        if (!isFullscreen) { c.classList.add('fullscreen'); pSection.classList.add('fs-active'); floatBtn.style.display = 'block'; isFullscreen = true; }
-        else { c.classList.remove('fullscreen'); pSection.classList.remove('fs-active'); floatBtn.style.display = 'none'; isFullscreen = false; }
+        let tabs = document.getElementById('appTabs');
+        let banner = document.getElementById('userBanner');
+        let twodSection = document.getElementById('twodSection');
+        let moviesSection = document.getElementById('moviesSection');
+        
+        if (!isFullscreen) {
+            // Hide tabs and banner
+            tabs.classList.add('hidden');
+            banner.classList.add('hidden');
+            twodSection.style.display = 'none';
+            moviesSection.style.display = 'none';
+            
+            c.classList.add('fullscreen');
+            pSection.classList.add('fs-active');
+            floatBtn.style.display = 'block';
+            isFullscreen = true;
+        } else {
+            // Show tabs and banner
+            tabs.classList.remove('hidden');
+            banner.classList.remove('hidden');
+            twodSection.style.display = '';
+            moviesSection.style.display = '';
+            // Show active tab
+            if (document.getElementById('tab2d').classList.contains('active')) {
+                twodSection.style.display = 'block';
+            } else {
+                moviesSection.style.display = 'block';
+            }
+            
+            c.classList.remove('fullscreen');
+            pSection.classList.remove('fs-active');
+            floatBtn.style.display = 'none';
+            isFullscreen = false;
+        }
     };
 
     function toggleFavorite(videoId, event) {
@@ -789,6 +862,9 @@
         document.getElementById('playerSection').classList.remove('fs-active');
         document.getElementById('exitFsFloatingBtn').style.display = 'none';
         isFullscreen = false;
+        // Show tabs and banner when exiting player
+        document.getElementById('appTabs').classList.remove('hidden');
+        document.getElementById('userBanner').classList.remove('hidden');
         loadMovies(false);
     }
 
