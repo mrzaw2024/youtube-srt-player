@@ -45,7 +45,7 @@
         }
         ::-webkit-scrollbar { width: 0; height: 0; }
 
-        /* ===== HIDE TABS WHEN EXPIRED OR FULLSCREEN ===== */
+        /* ===== HIDE TABS WHEN FULLSCREEN OR EXPIRED ===== */
         .app-tabs.hidden, .user-banner.hidden {
             display: none !important;
         }
@@ -236,7 +236,6 @@
             text-align: center;
             word-break: break-word;
             max-width: 96%;
-            /* Yellow text with ONLY Black stroke - NO background */
             text-shadow:
                 -3px -3px 0 #000000,
                 3px -3px 0 #000000,
@@ -329,6 +328,28 @@
         .twod-container .admin-link { color: #3742fa; text-decoration: none; font-weight: 800; }
         .twod-container .flex-center { display: flex; justify-content: center; width: 100%; }
         .twod-container .view-count-num { color: #3742fa; font-weight: 800; }
+
+        /* ===== EXPIRED OVERLAY FOR BOTH TABS ===== */
+        .expired-overlay-full {
+            text-align: center;
+            padding: 60px 20px;
+            color: #ff4444;
+            font-size: 1.1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            min-height: 300px;
+        }
+        .expired-overlay-full .btn-group {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 100%;
+            max-width: 280px;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
@@ -355,7 +376,7 @@
 
 <!-- ===== 2D TAB (Bozaw 2D) ===== -->
 <div id="twodSection" class="tab-content active">
-    <div class="twod-container">
+    <div class="twod-container" id="twodContainer">
         <div class="header-area">
             <h2>Bozaw 2D ခန့်မှန်းချက်</h2>
             <div class="sub-status-area">
@@ -447,7 +468,10 @@
 <script>
     // ==================== TAB SWITCHER ====================
     function switchTab(tabId) {
-        if (isExpired) return;
+        if (isExpired) {
+            showExpiredOverlay();
+            return;
+        }
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
         if (tabId === 'movies') {
@@ -457,6 +481,30 @@
         } else {
             document.getElementById('tab2d').classList.add('active');
             document.getElementById('twodSection').classList.add('active');
+        }
+    }
+
+    // ==================== EXPIRED OVERLAY ====================
+    function showExpiredOverlay() {
+        const twodContainer = document.getElementById('twodContainer');
+        const movieGrid = document.getElementById('movieGrid');
+        
+        const expiredHTML = `
+            <div class="expired-overlay-full">
+                <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
+                <div style="font-size:0.9rem; color:#666;">ဆက်လက်အသုံးပြုရန် သက်တမ်းတိုးပေးပါရန်။</div>
+                <div class="btn-group">
+                    <a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a>
+                    <a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
+                </div>
+            </div>
+        `;
+        
+        if (twodContainer) {
+            twodContainer.innerHTML = expiredHTML;
+        }
+        if (movieGrid) {
+            movieGrid.innerHTML = expiredHTML;
         }
     }
 
@@ -589,7 +637,10 @@
                 document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('disabled'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.add('disabled'));
                 
-                updatePlayerState(); renderMovies();
+                // Show expired overlay
+                showExpiredOverlay();
+                
+                updatePlayerState(); 
                 if (player) { try{player.destroy()}catch(e){} player = null; }
             } else {
                 document.getElementById('userStatusText').textContent = 'Active';
@@ -657,10 +708,10 @@
     function renderIncrementalMovie(v, isFirst) {
         let grid = document.getElementById('movieGrid');
         if (isExpired) {
-            grid.innerHTML = `<div class="expired-overlay"><span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span><div class="btn-group"><a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a><a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a></div></div>`;
+            showExpiredOverlay();
             return;
         }
-        if (isFirst || grid.querySelector('.loading-text-center') || grid.querySelector('.expired-overlay')) {
+        if (isFirst || grid.querySelector('.loading-text-center') || grid.querySelector('.expired-overlay') || grid.querySelector('.expired-overlay-full')) {
             grid.innerHTML = '';
         }
         let isFav = favorites.includes(v.videoId);
@@ -684,7 +735,7 @@
         if (currentFilter === 'favorites') filtered = filtered.filter(m => favorites.includes(m.videoId));
         if (searchTerm) filtered = filtered.filter(m => (m.title || "").toLowerCase().includes(searchTerm));
         if (isExpired) {
-            grid.innerHTML = `<div class="expired-overlay"><span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span><div class="btn-group"><a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a><a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a></div></div>`;
+            showExpiredOverlay();
             return;
         }
         if (filtered.length === 0) {
@@ -815,9 +866,11 @@
         let moviesSection = document.getElementById('moviesSection');
         
         if (!isFullscreen) {
-            // Hide tabs and banner
+            // စာသား ၂ ခုကိုပဲ hide လုပ်ပါ (Video Container ကိုမထိပါ)
             tabs.classList.add('hidden');
             banner.classList.add('hidden');
+            
+            // 2D နဲ့ Movies Section ကို hide လုပ်ပါ (Video Container ကတော့ ရှိနေမယ်)
             twodSection.style.display = 'none';
             moviesSection.style.display = 'none';
             
@@ -826,12 +879,14 @@
             floatBtn.style.display = 'block';
             isFullscreen = true;
         } else {
-            // Show tabs and banner
+            // စာသား ၂ ခုကိုပဲ ပြန်ပေါ်လာစေပါ
             tabs.classList.remove('hidden');
             banner.classList.remove('hidden');
+            
+            // 2D နဲ့ Movies Section ကို ပြန်ပေါ်လာစေပါ
             twodSection.style.display = '';
             moviesSection.style.display = '';
-            // Show active tab
+            // Active tab ကိုပြန်ပြပါ
             if (document.getElementById('tab2d').classList.contains('active')) {
                 twodSection.style.display = 'block';
             } else {
@@ -865,6 +920,14 @@
         // Show tabs and banner when exiting player
         document.getElementById('appTabs').classList.remove('hidden');
         document.getElementById('userBanner').classList.remove('hidden');
+        document.getElementById('twodSection').style.display = '';
+        document.getElementById('moviesSection').style.display = '';
+        // Show active tab
+        if (document.getElementById('tab2d').classList.contains('active')) {
+            document.getElementById('twodSection').style.display = 'block';
+        } else {
+            document.getElementById('moviesSection').style.display = 'block';
+        }
         loadMovies(false);
     }
 
