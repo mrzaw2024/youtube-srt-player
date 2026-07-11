@@ -3,12 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Premium Movie App</title>
+    <title>Premium Movie & 2D App</title>
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <!-- YouTube IFrame API -->
     <script src="https://www.youtube.com/iframe_api"></script>
     <style>
+        /* ===== GLOBAL ===== */
         :root {
             --bg-main: #0b0c10;
             --bg-card: rgba(31, 40, 51, 0.45);
@@ -41,28 +44,52 @@
             overflow-x: hidden;
         }
         ::-webkit-scrollbar { width: 0; height: 0; }
-        
-        #devtoolsDetector {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(11,12,16,0.98); z-index: 9999999;
-            display: none; justify-content: center; align-items: center;
-            flex-direction: column; gap: 20px; color: #ff4444; font-size: 1.2rem; text-align: center;
+
+        /* ===== TABS ===== */
+        .app-tabs {
+            display: flex;
+            background: rgba(20, 20, 20, 0.8);
+            border-bottom: 2px solid var(--border-neon);
+            position: sticky;
+            top: 0;
+            z-index: 100006;
+            backdrop-filter: var(--glass);
         }
-        #devtoolsDetector.show { display: flex; }
-        
+        .tab-btn {
+            flex: 1;
+            padding: 15px;
+            background: transparent;
+            border: none;
+            color: #aaa;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        .tab-btn.active {
+            color: var(--gold);
+            border-bottom: 3px solid var(--gold);
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        /* ===== NOTIFICATION ===== */
         #customNoti {
-            position: fixed; top: 20px; left: 50%; transform: translateX(-50%) translateY(-100px);
+            position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-100px);
             background: rgba(31, 40, 51, 0.9); backdrop-filter: var(--glass);
             border: 1px solid var(--gold); border-radius: 16px; padding: 14px 28px;
             color: var(--text-main); font-size: 0.95rem; font-weight: 600; z-index: 9999998;
             box-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         #customNoti.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-        
+
+        /* ===== USER BANNER ===== */
         .user-banner {
             background: rgba(26, 26, 29, 0.6); backdrop-filter: var(--glass);
             padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border-neon); box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-neon);
             position: relative; z-index: 10;
         }
         .user-id { font-size: 0.75rem; color: #aaa; display: flex; align-items: center; gap: 8px; }
@@ -74,10 +101,10 @@
         .user-status .active { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.5); }
         .user-status .expired { color: #ff4444; }
 
+        /* ===== MOVIE PLAYER (YouTube IFrame) ===== */
         .video-section { width: 100%; background: #000; border-bottom: 2px solid var(--gold); position: relative; }
         .video-container { position: relative; width: 100%; aspect-ratio: 9/16; background: #000; margin: auto; max-height: 72vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
         #youtubePlayer { width: 100%; height: 100%; pointer-events: none !important; display: block; object-fit: contain; }
-        .youtube-blocker { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; background: transparent; }
         
         .video-placeholder {
             width: 100%; height: 100%; background: #111; display: flex; justify-content: center;
@@ -89,7 +116,7 @@
             border: 1px solid var(--gold); border-radius: 20px; margin-top: 5px; display: inline-block; font-size: 0.85rem;
         }
         
-        .status-section { padding: 12px; background: rgba(20,20,20,0.8); text-align: center; position: relative; z-index: 100001; }
+        .status-section { padding: 12px; background: rgba(20,20,20,0.8); text-align: center; }
         .status-text { color: var(--gold); font-size: 0.85rem; font-weight: bold; }
         .fullscreen-hint { color: var(--cyan); font-size: 0.75rem; font-weight: bold; margin-top: 4px; animation: blink 1.5s infinite; }
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
@@ -97,7 +124,6 @@
         .video-controls {
             display: flex; gap: 10px; padding: 14px; background: rgba(15,15,15,0.95);
             flex-wrap: wrap; justify-content: center; align-items: center;
-            position: relative; z-index: 100001;
         }
         .video-controls button {
             background: rgba(255,255,255,0.07); color: #fff; font-size: 0.8rem; padding: 10px 16px;
@@ -113,80 +139,30 @@
         }
         .time-text { font-family: monospace; font-size: 0.75rem; color: #ccc; }
 
+        /* ===== MOVIE GRID ===== */
         .top-bar {
             padding: 12px 14px;
-            display: flex;
-            flex-direction: row;
-            align-items: center;
-            justify-content: space-between;
-            gap: 8px;
-            width: 100%;
-            flex-wrap: nowrap;
+            display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; width: 100%; flex-wrap: nowrap;
         }
-        .nav-controls-group { 
-            display: flex; 
-            align-items: center; 
-            gap: 4px; 
-            flex-shrink: 0; 
-        }
+        .nav-controls-group { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
         .filter-btn {
-            background: rgba(255,255,255,0.04); 
-            border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px; 
-            padding: 6px 10px; 
-            color: #ccc; 
-            cursor: pointer; 
-            font-size: 0.75rem; 
-            font-weight: bold;
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 6px 10px; color: #ccc; cursor: pointer; font-size: 0.75rem; font-weight: bold;
         }
-        .filter-btn.active { 
-            background: var(--gold-gradient); 
-            color: #000; 
-            border-color: transparent; 
-            box-shadow: 0 4px 12px rgba(255,215,0,0.25); 
-        }
+        .filter-btn.active { background: var(--gold-gradient); color: #000; border-color: transparent; box-shadow: 0 4px 12px rgba(255,215,0,0.25); }
         
         .search-input {
-            padding: 6px 10px; 
-            border-radius: 20px; 
-            border: 1px solid var(--border-neon);
-            background: rgba(255,255,255,0.05); 
-            color: #fff; 
-            font-size: 0.75rem; 
-            outline: none; 
-            flex: 1;
-            min-width: 70px; 
-            transition: all 0.3s;
+            padding: 6px 10px; border-radius: 20px; border: 1px solid var(--border-neon);
+            background: rgba(255,255,255,0.05); color: #fff; font-size: 0.75rem; outline: none; flex: 1; min-width: 70px;
         }
-        .search-input:focus { 
-            border-color: var(--gold); 
-            background: rgba(255,255,255,0.1); 
-        }
+        .search-input:focus { border-color: var(--gold); background: rgba(255,255,255,0.1); }
         
         .time-display {
-            background: rgba(255, 215, 0, 0.08); 
-            padding: 6px 10px; 
-            border-radius: 20px;
-            font-size: 0.7rem; 
-            color: var(--gold); 
-            border: 1px solid var(--border-neon); 
-            display: flex; 
-            align-items: center; 
-            gap: 5px;
-            flex-shrink: 0; 
+            background: rgba(255, 215, 0, 0.08); padding: 6px 10px; border-radius: 20px;
+            font-size: 0.7rem; color: var(--gold); border: 1px solid var(--border-neon); display: flex; align-items: center; gap: 5px; flex-shrink: 0;
         }
-        .time-bar-small { 
-            width: 25px; 
-            height: 4px; 
-            background: rgba(255,255,255,0.1); 
-            border-radius: 10px; 
-            overflow: hidden; 
-        }
-        .time-bar-small .fill { 
-            height: 100%; 
-            background: var(--gold-gradient); 
-            transition: width 1s; 
-        }
+        .time-bar-small { width: 25px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+        .time-bar-small .fill { height: 100%; background: var(--gold-gradient); transition: width 1s; }
 
         .marquee-container {
             margin: 0 14px 12px 14px; padding: 8px; background: rgba(255,215,0,0.03);
@@ -216,158 +192,284 @@
         .player-section.active { display: block; }
         .grid-section.hide { display: none; }
         
-        .expired-overlay { 
-            text-align: center; padding: 50px 16px; color: #ff4444; grid-column: span 2; font-size: 0.95rem;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
-        }
-        .btn-group { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 260px; margin-top: 10px; }
-        .admin-btn {
-            display: flex; align-items: center; justify-content: center; gap: 8px; color: #000; border: none; font-weight: 900;
-            padding: 12px 20px; font-size: 0.85rem; border-radius: 30px; text-decoration: none; transition: transform 0.2s;
-        }
-        .admin-btn.viber { background: var(--viber-gradient); color: #fff; box-shadow: 0 4px 15px rgba(123, 81, 161, 0.4); }
-        .admin-btn.telegram { background: var(--gold-gradient); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); }
-        .admin-btn:active { transform: scale(0.95); }
-
         .video-container.fullscreen {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-height: 100vh; z-index: 100000; background: #000; display: flex; align-items: center; justify-content: center;
         }
         .video-container.fullscreen #youtubePlayer { width: 100vw; height: 100vh; object-fit: contain; }
-        .video-container.fullscreen .youtube-blocker { width: 100vw; height: 100vh; }
 
         #exitFsFloatingBtn {
-            position: fixed; bottom: 30px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 68, 102, 0.92);
-            color: #fff;
-            border: none;
-            border-radius: 30px;
-            padding: 12px 28px;
-            font-weight: 900;
-            font-size: 0.9rem;
-            z-index: 100005;
-            cursor: pointer;
-            box-shadow: 0 4px 20px rgba(255, 68, 102, 0.4);
-            display: none;
-            transition: all 0.3s;
-            letter-spacing: 0.5px;
+            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
+            background: rgba(255, 68, 102, 0.92); color: #fff; border: none; border-radius: 30px;
+            padding: 12px 28px; font-weight: 900; font-size: 0.9rem; z-index: 100005;
+            cursor: pointer; box-shadow: 0 4px 20px rgba(255, 68, 102, 0.4); display: none;
+            transition: all 0.3s; letter-spacing: 0.5px;
         }
-        #exitFsFloatingBtn:hover {
-            background: rgba(255, 68, 102, 1);
-            transform: translateX(-50%) scale(1.05);
-        }
-        #exitFsFloatingBtn:active {
-            transform: translateX(-50%) scale(0.95);
-        }
+        #exitFsFloatingBtn:hover { background: rgba(255, 68, 102, 1); transform: translateX(-50%) scale(1.05); }
+        #exitFsFloatingBtn:active { transform: translateX(-50%) scale(0.95); }
 
         .subtitle-text {
             position: fixed; bottom: 26%; left: 0; right: 0; text-align: center; z-index: 100002; pointer-events: none; padding: 0 16px; display: none;
         }
         .video-container.fullscreen ~ .subtitle-text { bottom: 24%; }
-        
         .subtitle-text .subtitle-inner {
-            display: inline-block; 
-            color: #FFD700; 
-            font-size: clamp(1.25rem, 5.8vw, 2.35rem); 
-            font-weight: 900;
-            font-family: system-ui, -apple-system, sans-serif; 
-            line-height: 1.25 !important;
-            text-align: center; 
-            word-break: break-word; 
-            max-width: 96%;
-            padding: 8px 16px;
-            background: rgba(0, 0, 0, 0.5);
-            border-radius: 10px;
-            backdrop-filter: blur(2px);
+            display: inline-block; color: #FFD700; font-size: clamp(1.25rem, 5.8vw, 2.35rem); font-weight: 900;
+            font-family: system-ui, -apple-system, sans-serif; line-height: 1.25 !important;
+            text-align: center; word-break: break-word; max-width: 96%;
+            padding: 8px 16px; background: rgba(0,0,0,0.5); border-radius: 10px; backdrop-filter: blur(2px);
             text-shadow: -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000, 2px 2px 0 #000, 0 4px 8px rgba(0,0,0,0.9);
         }
         
         .player-section.fs-active .video-controls,
-        .player-section.fs-active .status-section,
-        .player-section.fs-active > .filter-btn { display: none !important; }
+        .player-section.fs-active .status-section { display: none !important; }
         
         .loading-text-center { text-align: center; padding: 40px; color: #aaa; font-size: 1rem; grid-column: span 2; }
+        .expired-overlay { text-align: center; padding: 50px 16px; color: #ff4444; grid-column: span 2; font-size: 0.95rem; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+        .btn-group { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 260px; margin-top: 10px; }
+        .admin-btn { display: flex; align-items: center; justify-content: center; gap: 8px; color: #000; border: none; font-weight: 900; padding: 12px 20px; font-size: 0.85rem; border-radius: 30px; text-decoration: none; transition: transform 0.2s; }
+        .admin-btn.viber { background: var(--viber-gradient); color: #fff; box-shadow: 0 4px 15px rgba(123, 81, 161, 0.4); }
+        .admin-btn.telegram { background: var(--gold-gradient); box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); }
+        .admin-btn:active { transform: scale(0.95); }
+
+        /* ===== 2D ANALYTICS DASHBOARD STYLES ===== */
+        .twod-container {
+            width: 100%;
+            max-width: 650px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 24px;
+            margin: 20px auto;
+            color: #2c3e50;
+        }
+        .twod-container .header-area { text-align: center; margin-bottom: 20px; }
+        .twod-container .header-area h2 {
+            font-size: 24px; font-weight: 900; letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #3742fa 0%, #9c88ff 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .twod-container .header-area p { font-size: 11px; color: #57606f; font-weight: 700; letter-spacing: 0.5px; margin-top: 3px; }
+        
+        .twod-container textarea {
+            width: 100%; height: 75px; padding: 12px; background: rgba(255,255,255,0.9);
+            border: 1px solid #dcdde1; border-bottom: 3px solid #b2bec3; border-radius: 14px;
+            color: #2c3e50; font-size: 15px; resize: none; transition: all 0.3s ease; margin-bottom: 12px; font-weight: 600;
+        }
+        .twod-container textarea:focus { outline: none; border-color: #3742fa; box-shadow: 0 0 10px rgba(55,66,250,0.15); }
+        
+        .twod-container .btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 10px; }
+        .twod-container button {
+            padding: 12px; border: none; border-radius: 12px; font-size: 14px; font-weight: 800; cursor: pointer; color: white; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+        .twod-container button:active { transform: translateY(1px); }
+        .btn-save { background: linear-gradient(135deg, #2ed573 0%, #1ebd60 100%); border-bottom: 3px solid #26af5f; }
+        .btn-check { background: linear-gradient(135deg, #3742fa 0%, #2f3542 100%); border-bottom: 3px solid #2830c2; }
+        .btn-reset {
+            width: 100%; background: #ffeaa7; color: #d63031; padding: 8px; font-size: 12px; font-weight: 700;
+            border: 1px solid #ffd32a; margin-bottom: 20px; border-radius: 12px;
+        }
+        .btn-reset:hover { background: #ffdf7a; }
+
+        .editor-box-container {
+            background: linear-gradient(180deg, rgba(255,255,255,0.9) 0%, rgba(245,246,250,0.9) 100%);
+            border: 1px solid #dcdde1; border-radius: 16px; padding: 14px; margin-bottom: 20px;
+        }
+        .control-btn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+        .btn-edit-action { background: linear-gradient(135deg, #ffa502 0%, #ff7f50 100%); border-bottom: 3px solid #e19302; padding: 10px; color: #fff; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; }
+        .btn-save-action { background: linear-gradient(135deg, #70a1ff 0%, #1e90ff 100%); border-bottom: 3px solid #5482cc; padding: 10px; color: #fff; border: none; border-radius: 12px; font-weight: 800; cursor: pointer; }
+        .edit-title { font-size: 11px; font-weight: 800; color: #747d8c; margin-bottom: 4px; text-transform: uppercase; }
+        .data-viewer-text {
+            padding: 10px 12px; background: #ffffff; border-left: 4px solid #3742fa;
+            border-radius: 4px 10px 10px 4px; font-size: 13px; color: #2f3542; margin-bottom: 10px;
+            word-break: break-all; font-weight: 600; border: 1px solid #f1f2f6;
+        }
+        .edit-input {
+            width: 100%; padding: 10px 12px; background: #ffffff; border: 2px solid #ffa502;
+            border-radius: 10px; color: #2c3e50; font-size: 13px; font-weight: 600; margin-bottom: 10px; display: none;
+        }
+
+        .twod-container .table-title { font-size: 14px; font-weight: 800; margin-bottom: 10px; color: #2c3e50; text-transform: uppercase; }
+        .twod-container .table-wrapper {
+            width: 100%; overflow-x: auto; border-radius: 16px; border: 1px solid #dcdde1; background: #ffffff; box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+        }
+        .twod-container table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px; text-align: center; }
+        .twod-container th {
+            background: linear-gradient(180deg, #747d8c 0%, #2f3542 100%);
+            color: #ffffff; font-weight: 700; padding: 14px 4px; font-size: 12px;
+        }
+        .twod-container td {
+            border-bottom: 1px solid #dee2e6; border-right: 1px solid #eef0f2;
+            padding: 12px 6px; color: #2f3542; font-weight: 600; vertical-align: middle;
+        }
+        .twod-container td:last-child { border-right: none; }
+        .twod-container tr:nth-child(even) td { background-color: #f9fbfd; }
+
+        .num-box-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; }
+        .num-box {
+            display: inline-block; width: 90%; max-width: 85px; font-weight: 800; font-size: 16px;
+            color: #2c3e50; background: linear-gradient(135deg, #fff3cd 0%, #ffe066 100%);
+            padding: 8px 0; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.06);
+            border: 1px solid #ffe066; text-align: center;
+        }
+        .count-text { font-size: 11px; font-weight: 900; color: #e74c3c; margin-left: 2px; vertical-align: super; }
+        .highlight-am-pm-match { background: linear-gradient(135deg, #a8e6cf 0%, #2ecc71 100%) !important; }
+        .highlight-am-pm-match .num-box { background: linear-gradient(135deg, #059669 0%, #10b981 100%); color: white; border-color: #10b981; box-shadow: 0 3px 6px rgba(16,185,129,0.2); }
+        .highlight-am-pm-match .count-text { color: #fff200; }
+        .badge-hit {
+            color: #fff; font-weight: 800; font-size: 13px;
+            background: linear-gradient(135deg, #2ed573 0%, #1ebd60 100%);
+            padding: 5px 12px; border-radius: 10px; display: inline-block;
+        }
+        .khway-style {
+            color: #2f3542; font-weight: 700; font-size: 13px; background: #e8f0fe;
+            padding: 6px 8px; border-radius: 8px; display: inline-block; border: 1px solid #d2e3fc; word-break: break-all;
+        }
+        .empty-status { color: #57606f; padding: 30px !important; font-weight: 700; }
     </style>
 </head>
 <body>
 
-<div id="devtoolsDetector">
-    <div>🛡️ Security Alert</div>
-    <div style="font-size:0.9rem; color:#aaa; margin-top:5px;">Please close Developer Tools to continue.</div>
-</div>
-
 <div id="customNoti">📢 <span id="notiMessage">Notification</span></div>
-
 <button id="exitFsFloatingBtn" onclick="toggleFullscreen()">✕ Exit Fullscreen</button>
 
-<div id="appContent">
-    <div id="userBanner" class="user-banner" style="display:none;">
-        <div class="user-id">
-            🆔 Premium ID: <span class="id-value" id="accountIdDisplay">Loading...</span>
-            <button class="copy-btn" onclick="copyAccountId()">📋 Copy</button>
+<!-- ===== USER BANNER ===== -->
+<div id="userBanner" class="user-banner" style="display:none;">
+    <div class="user-id">
+        🆔 Premium ID: <span class="id-value" id="accountIdDisplay">Loading...</span>
+        <button class="copy-btn" onclick="copyAccountId()">📋 Copy</button>
+    </div>
+    <div class="user-status">
+        <span class="active" id="statusDot">●</span> <span id="userStatusText">Active</span>
+    </div>
+</div>
+
+<!-- ===== TABS ===== -->
+<div class="app-tabs">
+    <button class="tab-btn active" onclick="switchTab('twod')">📊 2D Analytics</button>
+    <button class="tab-btn" onclick="switchTab('movies')">🎬 ဇာတ်ကားများ</button>
+</div>
+
+<!-- ===== 2D TAB ===== -->
+<div id="twodSection" class="tab-content active">
+    <div class="twod-container">
+        <div class="header-area">
+            <h2>📊 2D ANALYTICS DASHBOARD</h2>
+            <p>Pro Colorful Light System & Auto-Save</p>
         </div>
-        <div class="user-status">
-            <span class="active" id="statusDot">●</span> <span id="userStatusText">Active</span>
+
+        <textarea id="mainInput" placeholder="ဂဏန်းများ သို့မဟုတ် ပတ်ဂဏန်း (ဥပမာ- 7ပတ်) များကို ကော်မာခြားထည့်ပါ..."></textarea>
+
+        <div class="btn-grid">
+            <button class="btn-save" onclick="saveData()">📥 ထွက်ဂဏန်းထည့်မည်</button>
+            <button class="btn-check" onclick="checkData()">🔍 အခွေ/ပတ်စစ်ဆေးမည်</button>
+        </div>
+        <button class="btn-reset" onclick="resetAll()">🗑️ ဒေတာအားလုံးကို အစကပြန်ရှင်းလင်းမည်</button>
+
+        <div class="editor-box-container">
+            <div class="control-btn-grid">
+                <button class="btn-edit-action" onclick="enableEditMode()">✏️ ဒေတာ ပြင်ဆင်မည်</button>
+                <button class="btn-save-action" onclick="saveEditChanges()">💾 ဒေတာ သိမ်းဆည်းမည်</button>
+            </div>
+
+            <div class="edit-title">✏️ ထွက်ဂဏန်းစာရင်း</div>
+            <div class="data-viewer-text" id="viewResultsText">မရှိသေးပါ။</div>
+            <input type="text" class="edit-input" id="editResultsInput" placeholder="ထွက်ဂဏန်းစာရင်း ပြင်ရန်...">
+            
+            <div class="edit-title" style="margin-top: 10px;">✏️ အခွေပူး/ပတ်ဂဏန်းစာရင်း</div>
+            <div class="data-viewer-text" id="viewKhwayText">မရှိသေးပါ။</div>
+            <input type="text" class="edit-input" id="editKhwayInput" placeholder="အခွေပူးစာရင်း ပြင်ရန်...">
+        </div>
+
+        <div class="table-title">📊 RANGES AM / PM & အခွေပူး ဇယားကွက်</div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 23%;">AM ထွက်</th>
+                        <th style="width: 23%;">PM ထွက်</th>
+                        <th style="width: 26%;">ထိုတန်း၏ အခွေ/ပတ်</th>
+                        <th style="width: 28%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody">
+                    <tr><td colspan="4" class="empty-status">ဒေတာများ ထည့်သွင်းပေးပါ။</td></tr>
+                </tbody>
+            </table>
         </div>
     </div>
+</div>
 
-    <div id="playerSection" class="player-section">
-        <button class="filter-btn" onclick="showGrid()" style="margin: 12px;">← Back Home</button>
-        <div class="video-section">
-            <div class="video-container" id="videoContainer">
-                <div id="youtubePlayer"></div>
-                <div class="video-placeholder" id="videoPlaceholder" style="display:none;">
-                    <div>⛔ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ</div>
-                    <div style="font-size:0.8rem; color:#aaa; margin: 4px 0 10px 0;">သက်တမ်းတိုးရန် အောက်ပါအတိုင်း ဆက်သွယ်နိုင်ပါသည်</div>
-                    <a href="viber://chat?number=%2B959777966119" class="contact-link" style="border-color:#bf55ec; color:#bf55ec;">💜 Viber: 09777966119</a>
-                    <a href="https://t.me/mmmovies002" target="_blank" class="contact-link">💙 Telegram Admin ဆီသွားရန်</a>
+<!-- ===== MOVIE TAB ===== -->
+<div id="moviesSection" class="tab-content">
+    <div id="appContent">
+        <div id="playerSection" class="player-section">
+            <button class="filter-btn" onclick="showGrid()" style="margin: 12px;">← Back Home</button>
+            <div class="video-section">
+                <div class="video-container" id="videoContainer">
+                    <div id="youtubePlayer"></div>
+                    <div class="video-placeholder" id="videoPlaceholder" style="display:none;">
+                        <div>⛔ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ</div>
+                        <div style="font-size:0.8rem; color:#aaa; margin: 4px 0 10px 0;">သက်တမ်းတိုးရန် အောက်ပါအတိုင်း ဆက်သွယ်နိုင်ပါသည်</div>
+                        <a href="viber://chat?number=%2B959777966119" class="contact-link" style="border-color:#bf55ec; color:#bf55ec;">💜 Viber: 09777966119</a>
+                        <a href="https://t.me/mmmovies002" target="_blank" class="contact-link">💙 Telegram Admin ဆီသွားရန်</a>
+                    </div>
+                </div>
+            </div>
+            <div class="status-section">
+                <div id="statusText" class="status-text">⏳ Loading...</div>
+                <div id="fullscreenHint" class="fullscreen-hint" style="display: none;">🎬 စာတန်းထိုးအတွက် Full ကိုနှိပ်ပါ</div>
+            </div>
+            <div class="video-controls">
+                <button onclick="seekVideo(-10)">⏪ -10s</button>
+                <button class="primary" id="playPauseBtn" onclick="togglePlayPause()">⏸ Pause</button>
+                <button onclick="seekVideo(10)">⏩ +10s</button>
+                <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Full</button>
+                <div class="progress-container">
+                    <input type="range" id="progressSlider" class="progress-slider" min="0" max="100" value="0" onchange="seekToPosition()">
+                    <div class="time-text" id="timeDisplay">0:00 / 0:00</div>
                 </div>
             </div>
         </div>
-        <div class="status-section">
-            <div id="statusText" class="status-text">⏳ Loading...</div>
-            <div id="fullscreenHint" class="fullscreen-hint" style="display: none;">🎬 စာတန်းထိုးအတွက် Full ကိုနှိပ်ပါ</div>
-        </div>
-        <div class="video-controls">
-            <button onclick="seekVideo(-10)">⏪ -10s</button>
-            <button class="primary" id="playPauseBtn" onclick="togglePlayPause()">⏸ Pause</button>
-            <button onclick="seekVideo(10)">⏩ +10s</button>
-            <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Full</button>
-            <div class="progress-container">
-                <input type="range" id="progressSlider" class="progress-slider" min="0" max="100" value="0" onchange="seekToPosition()">
-                <div class="time-text" id="timeDisplay">0:00 / 0:00</div>
-            </div>
-        </div>
-        <div id="expiryWarning" style="padding:10px; text-align:center;"></div>
-    </div>
 
-    <div id="gridSection" class="grid-section">
-        <div class="top-bar">
-            <div class="nav-controls-group">
-                <button class="filter-btn active" id="allBtn" onclick="setFilter('all')">All</button>
-                <button class="filter-btn" id="favBtn" onclick="setFilter('favorites')">Favorites</button>
+        <div id="gridSection" class="grid-section">
+            <div class="top-bar">
+                <div class="nav-controls-group">
+                    <button class="filter-btn active" id="allBtn" onclick="setFilter('all')">All</button>
+                    <button class="filter-btn" id="favBtn" onclick="setFilter('favorites')">Favorites</button>
+                </div>
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 ရှာရန်..." onkeyup="searchMovies()">
+                <div class="time-display">
+                    <span id="homeTimeText">Loading...</span>
+                    <div class="time-bar-small"><div id="homeTimeBar" class="fill" style="width:100%;"></div></div>
+                </div>
             </div>
-            <input type="text" id="searchInput" class="search-input" placeholder="🔍 ရှာရန်..." onkeyup="searchMovies()">
-            <div class="time-display">
-                <span id="homeTimeText">Loading...</span>
-                <div class="time-bar-small"><div id="homeTimeBar" class="fill" style="width:100%;"></div></div>
+            <div class="marquee-container">
+                <div class="marquee-text" id="marqueeText">✨ Movie App သက်တမ်းတိုးလိုပါက Admin Viber 09777966119 သို့ ဆက်သွယ်နိုင်ပါသည်။ 🍿</div>
             </div>
-        </div>
-        
-        <div class="marquee-container">
-            <div class="marquee-text" id="marqueeText">✨ Movie App သက်တမ်းတိုးလိုပါက Admin Viber 09777966119 သို့ ဆက်သွယ်နိုင်ပါသည်။ 🍿</div>
-        </div>
-        
-        <div id="movieGrid" class="movie-grid">
-            <div class="loading-text-center">⏳ Loading Movies...</div>
+            <div id="movieGrid" class="movie-grid">
+                <div class="loading-text-center">⏳ Loading Movies...</div>
+            </div>
         </div>
     </div>
+    <div id="subtitleText" class="subtitle-text"><div id="subtitleInner" class="subtitle-inner"></div></div>
 </div>
 
-<div id="subtitleText" class="subtitle-text"><div id="subtitleInner" class="subtitle-inner"></div></div>
-
 <script>
+    // ==================== TAB SWITCHER ====================
+    function switchTab(tabId) {
+        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+        if (tabId === 'movies') {
+            document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
+            document.getElementById('moviesSection').classList.add('active');
+            if (allMovies.length === 0) loadMovies();
+        } else {
+            document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+            document.getElementById('twodSection').classList.add('active');
+        }
+    }
+
+    // ==================== NOTIFICATION ====================
     function showNoti(message) {
         const noti = document.getElementById('customNoti');
         document.getElementById('notiMessage').textContent = message;
@@ -377,6 +479,7 @@
     }
     window.alert = showNoti;
 
+    // ==================== SECURITY ====================
     document.addEventListener('contextmenu', e => e.preventDefault());
     document.addEventListener('keydown', e => {
         if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.key==='I'||e.key==='J'||e.key==='C')) || (e.ctrlKey && e.key==='U')) {
@@ -384,6 +487,7 @@
         }
     });
 
+    // ==================== FIREBASE ====================
     const firebaseConfig = {
         apiKey: "AIzaSyDqvnEzTl2U7Ntvub4Cuvdmq1eMFFlOelM",
         authDomain: "movie-app-f6a8e.firebaseapp.com",
@@ -396,9 +500,12 @@
     firebase.initializeApp(firebaseConfig);
     const database = firebase.database();
 
+    // ==================== MOVIE APP VARIABLES ====================
     let currentUserData = null, isExpired = false, player = null, subtitles = [], intervalId = null;
-    let isFullscreen = false, isPlaying = true, isSeeking = false, allMovies = [], currentFilter = 'all', currentUserId = '', favorites = [], ytReady = false, expiryCheckInterval = null;
+    let isFullscreen = false, isPlaying = true, allMovies = [], currentFilter = 'all', currentUserId = '', favorites = [], expiryCheckInterval = null;
+    let ytReady = false;
 
+    // ==================== DEVICE ID ====================
     function generateDeviceFingerprint() {
         const screenInfo = window.screen.width + 'x' + window.screen.height + 'x' + window.screen.colorDepth;
         const navigatorInfo = navigator.hardwareConcurrency + '-' + (navigator.deviceMemory || 'M');
@@ -426,6 +533,7 @@
         navigator.clipboard.writeText(id).then(() => showNoti('✅ Copy ကူးပြီးပါပြီ။'));
     }
 
+    // ==================== AUTO LOGIN ====================
     let autoLoginDone = false;
     async function autoLogin() {
         if (autoLoginDone) return;
@@ -436,14 +544,11 @@
         currentUserId = accountId;
         document.getElementById('userBanner').style.display = 'flex';
         document.getElementById('accountIdDisplay').textContent = accountId;
-        
         loadMoviesFromCache();
-        
         try {
             const userRef = database.ref('devices/' + deviceId);
             const snapshot = await userRef.once('value');
             const data = snapshot.val();
-            
             if (data) {
                 currentUserData = data;
                 isExpired = Date.now() > data.expiry;
@@ -453,19 +558,16 @@
                 let freeDays = 1;
                 const freeDaysSnap = await database.ref('settings/defaultFreeDays').once('value');
                 if (freeDaysSnap.exists() && typeof freeDaysSnap.val() === 'number') { freeDays = freeDaysSnap.val(); }
-                
-                const expiry = Date.now() + (freeDays * 24 * 60 * 60 * 1000); 
+                const expiry = Date.now() + (freeDays * 24 * 60 * 60 * 1000);
                 const newUserData = { deviceId, accountId, expiry, createdAt: Date.now(), isAdmin: false };
                 await database.ref('devices/' + deviceId).set(newUserData);
                 currentUserData = newUserData;
                 isExpired = freeDays <= 0;
-                
                 if (freeDays > 0) {
                     showNoti(`🎉 အကောင့်အသစ် ဖွင့်လှစ်ပြီးပါပြီ။ (${freeDays} ရက် အခမဲ့ စမ်းသုံးခွင့်ရရှိပါသည်)`);
                 } else {
                     showNoti('⚠️ ဤအက်ပ်ကို အသုံးပြုရန် သက်တမ်းတိုးရပါမည်။');
                 }
-                
                 startExpiryChecker();
                 await loadMovies(false);
             }
@@ -484,14 +586,12 @@
             isExpired = remaining <= 0;
             const homeTimeText = document.getElementById('homeTimeText');
             const homeTimeBar = document.getElementById('homeTimeBar');
-            
             if (isExpired) {
                 if(homeTimeText) { homeTimeText.textContent = '⛔ Expired'; homeTimeBar.style.width = '0%'; }
                 document.getElementById('userStatusText').textContent = 'Expired';
                 document.getElementById('userStatusText').className = 'expired';
                 document.getElementById('statusDot').className = 'expired';
-                updatePlayerState(); 
-                renderMovies();
+                updatePlayerState(); renderMovies();
                 if (player) { try{player.destroy()}catch(e){} player = null; }
             } else {
                 document.getElementById('userStatusText').textContent = 'Active';
@@ -509,27 +609,22 @@
 
     function updatePlayerState() {
         const placeholder = document.getElementById('videoPlaceholder');
-        const playerEl = document.getElementById('youtubePlayer');
         const controls = document.querySelectorAll('.video-controls button, .video-controls input');
         if (isExpired) {
-            if (playerEl) playerEl.style.display = 'none';
             if (placeholder) placeholder.style.display = 'flex';
             controls.forEach(el => el.disabled = true);
             document.getElementById('statusText').innerHTML = '⛔ သက်တမ်းကုန်ဆုံးနေပါသည်။';
         } else {
-            if (playerEl) playerEl.style.display = 'block';
             if (placeholder) placeholder.style.display = 'none';
             controls.forEach(el => el.disabled = false);
         }
     }
 
+    // ==================== MOVIE LOADING ====================
     function loadMoviesFromCache() {
         try {
             const cachedMovies = localStorage.getItem('cached_movies');
-            if (cachedMovies) { 
-                allMovies = JSON.parse(cachedMovies); 
-                renderMovies(); 
-            }
+            if (cachedMovies) { allMovies = JSON.parse(cachedMovies); renderMovies(); }
         } catch(e) {}
     }
 
@@ -543,50 +638,32 @@
                 const favSnap = await database.ref('favorites/' + currentUserId).once('value');
                 favorites = favSnap.val() || [];
             }
-
             let res = await fetch('/api/videos');
             let data = await res.json();
-            
             if (data.success && data.videos && data.videos.length > 0) {
-                allMovies = []; 
+                allMovies = [];
                 localStorage.setItem('cached_movies', JSON.stringify(data.videos));
-                
                 for (let i = 0; i < data.videos.length; i++) {
                     allMovies.push(data.videos[i]);
-                    renderIncrementalMovie(data.videos[i], i === 0); 
+                    renderIncrementalMovie(data.videos[i], i === 0);
                 }
             }
-        } catch(e) {
-            console.error('Error loading movies:', e);
-        }
+        } catch(e) { console.error('Error loading movies:', e); }
     }
 
     function renderIncrementalMovie(v, isFirst) {
         let grid = document.getElementById('movieGrid');
-        if (isExpired) { 
-            grid.innerHTML = `
-                <div class="expired-overlay">
-                    <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
-                    <div class="btn-group">
-                        <a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a>
-                        <a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
-                    </div>
-                </div>`; 
-            return; 
+        if (isExpired) {
+            grid.innerHTML = `<div class="expired-overlay"><span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span><div class="btn-group"><a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a><a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a></div></div>`;
+            return;
         }
-        
         if (isFirst || grid.querySelector('.loading-text-center') || grid.querySelector('.expired-overlay')) {
-            grid.innerHTML = ''; 
+            grid.innerHTML = '';
         }
-        
         let isFav = favorites.includes(v.videoId);
         let card = document.createElement('div');
         card.className = 'movie-card';
-        card.innerHTML = `
-            <button class="favorite-btn ${isFav?'active':''}" onclick="toggleFavorite('${v.videoId}', event)">${isFav?'❤️':'🤍'}</button>
-            <img class="movie-poster" src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg">
-            <div class="movie-title">${v.title || "Premium Video"}</div>
-        `;
+        card.innerHTML = `<button class="favorite-btn ${isFav?'active':''}" onclick="toggleFavorite('${v.videoId}', event)">${isFav?'❤️':'🤍'}</button><img class="movie-poster" src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg"><div class="movie-title">${v.title || "Premium Video"}</div>`;
         card.onclick = () => {
             if (isExpired) return;
             document.getElementById('gridSection').classList.add('hide');
@@ -603,37 +680,22 @@
         let filtered = allMovies;
         if (currentFilter === 'favorites') filtered = filtered.filter(m => favorites.includes(m.videoId));
         if (searchTerm) filtered = filtered.filter(m => (m.title || "").toLowerCase().includes(searchTerm));
-        
-        if (isExpired) { 
-            grid.innerHTML = `
-                <div class="expired-overlay">
-                    <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
-                    <div class="btn-group">
-                        <a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a>
-                        <a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
-                    </div>
-                </div>`; 
-            return; 
+        if (isExpired) {
+            grid.innerHTML = `<div class="expired-overlay"><span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span><div class="btn-group"><a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a><a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a></div></div>`;
+            return;
         }
-        
         if (filtered.length === 0) {
             if (allMovies.length === 0) { grid.innerHTML = '<div class="loading-text-center">⏳ Loading Movies...</div>'; }
             else { grid.innerHTML = '<div class="loading-text-center">📭 ဇာတ်ကားများ မရှိသေးပါ။</div>'; }
             return;
         }
-        
         grid.innerHTML = '';
         const fragment = document.createDocumentFragment();
-        
         filtered.forEach(v => {
             let isFav = favorites.includes(v.videoId);
             let card = document.createElement('div');
             card.className = 'movie-card';
-            card.innerHTML = `
-                <button class="favorite-btn ${isFav?'active':''}" onclick="toggleFavorite('${v.videoId}', event)">${isFav?'❤️':'🤍'}</button>
-                <img class="movie-poster" src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg">
-                <div class="movie-title">${v.title || "Premium Video"}</div>
-            `;
+            card.innerHTML = `<button class="favorite-btn ${isFav?'active':''}" onclick="toggleFavorite('${v.videoId}', event)">${isFav?'❤️':'🤍'}</button><img class="movie-poster" src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg"><div class="movie-title">${v.title || "Premium Video"}</div>`;
             card.onclick = () => {
                 if (isExpired) return;
                 document.getElementById('gridSection').classList.add('hide');
@@ -653,7 +715,6 @@
         document.getElementById('statusText').innerHTML = '⏳ Loading stream...';
         document.getElementById('subtitleInner').textContent = '';
         document.getElementById('subtitleText').style.display = 'none';
-        
         player = new YT.Player('youtubePlayer', {
             videoId: videoId,
             playerVars: { controls: 0, rel: 0, modestbranding: 1, autoplay: 1, disablekb: 1, origin: window.location.origin },
@@ -678,9 +739,7 @@
                     document.getElementById('fullscreenHint').style.display = 'block';
                 }
             }
-        } catch(e){
-            console.log('No subtitles found');
-        }
+        } catch(e) { console.log('No subtitles found'); }
     }
 
     function parseSRT(content) {
@@ -708,7 +767,7 @@
         }
         return subs;
     }
-    
+
     function toSeconds(t) {
         let parts = t.replace(',', '.').split(':');
         return parseInt(parts[0])*3600 + parseInt(parts[1])*60 + parseFloat(parts[2]);
@@ -729,7 +788,6 @@
                 const inner = document.getElementById('subtitleInner');
                 if (text) { inner.innerText = text; container.style.display = 'block'; }
                 else { container.style.display = 'none'; }
-                
                 document.getElementById('progressSlider').value = (time / duration) * 100;
                 document.getElementById('timeDisplay').innerText = `${Math.floor(time/60)}:${String(Math.floor(time%60)).padStart(2,'0')} / ${Math.floor(duration/60)}:${String(Math.floor(duration%60)).padStart(2,'0')}`;
             } catch(e){}
@@ -741,36 +799,14 @@
         if (isPlaying) { player.pauseVideo(); document.getElementById('playPauseBtn').innerHTML = '▶️ Play'; isPlaying = false; }
         else { player.playVideo(); document.getElementById('playPauseBtn').innerHTML = '⏸ Pause'; isPlaying = true; }
     };
-    
-    window.seekVideo = function(sec) { 
-        if(!player) return;
-        try { player.seekTo(player.getCurrentTime()+sec, true); } catch(e) {}
-    };
-    
-    window.seekToPosition = function() {
-        if(!player) return;
-        try {
-            let pct = parseFloat(document.getElementById('progressSlider').value);
-            player.seekTo((pct/100)*player.getDuration(), true);
-        } catch(e) {}
-    };
-    
+    window.seekVideo = function(sec) { if(!player) return; try { player.seekTo(player.getCurrentTime()+sec, true); } catch(e) {} };
+    window.seekToPosition = function() { if(!player) return; try { let pct = parseFloat(document.getElementById('progressSlider').value); player.seekTo((pct/100)*player.getDuration(), true); } catch(e) {} };
     window.toggleFullscreen = function() {
         let c = document.getElementById('videoContainer');
         let pSection = document.getElementById('playerSection');
         let floatBtn = document.getElementById('exitFsFloatingBtn');
-        
-        if (!isFullscreen) { 
-            c.classList.add('fullscreen'); 
-            pSection.classList.add('fs-active'); 
-            floatBtn.style.display = 'block'; 
-            isFullscreen = true; 
-        } else { 
-            c.classList.remove('fullscreen'); 
-            pSection.classList.remove('fs-active');
-            floatBtn.style.display = 'none';
-            isFullscreen = false; 
-        }
+        if (!isFullscreen) { c.classList.add('fullscreen'); pSection.classList.add('fs-active'); floatBtn.style.display = 'block'; isFullscreen = true; }
+        else { c.classList.remove('fullscreen'); pSection.classList.remove('fs-active'); floatBtn.style.display = 'none'; isFullscreen = false; }
     };
 
     function toggleFavorite(videoId, event) {
@@ -779,24 +815,12 @@
         if (index > -1) favorites.splice(index, 1); else favorites.push(videoId);
         database.ref('favorites/' + currentUserId).set(favorites).then(() => renderMovies());
     }
-    
-    function setFilter(f) {
-        currentFilter = f;
-        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-        document.getElementById(f==='all'?'allBtn':'favBtn').classList.add('active');
-        renderMovies();
-    }
-    
+    function setFilter(f) { currentFilter = f; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); document.getElementById(f==='all'?'allBtn':'favBtn').classList.add('active'); renderMovies(); }
     function searchMovies() { renderMovies(); }
-    
     function showGrid() {
-        if (intervalId) { clearInterval(intervalId); intervalId = null; } 
-        subtitles = []; 
-        const container = document.getElementById('subtitleText');
-        if (container) { container.style.display = 'none'; } 
-        
+        if (intervalId) { clearInterval(intervalId); intervalId = null; }
+        subtitles = [];
         if (player) { try{player.destroy()}catch(e){} player = null; }
-        
         document.getElementById('gridSection').classList.remove('hide');
         document.getElementById('playerSection').classList.remove('active');
         document.getElementById('playerSection').classList.remove('fs-active');
@@ -805,19 +829,186 @@
         loadMovies(false);
     }
 
+    // ==================== 2D ANALYTICS DASHBOARD ====================
+    let savedResults = JSON.parse(localStorage.getItem('cyber2d_results')) || [];
+    let savedKhwayItems = JSON.parse(localStorage.getItem('cyber2d_khways')) || [];
+
+    function saveToLocalStorage() {
+        localStorage.setItem('cyber2d_results', JSON.stringify(savedResults));
+        localStorage.setItem('cyber2d_khways', JSON.stringify(savedKhwayItems));
+    }
+
+    function parsePatDigit(str) {
+        if (str && str.includes('ပတ်')) {
+            let match = str.match(/(\d)ပတ်/);
+            return match ? match[1] : null;
+        }
+        return null;
+    }
+
+    function updateViewers() {
+        document.getElementById('viewResultsText').innerText = savedResults.length > 0 ? savedResults.join(', ') : 'မရှိသေးပါ။';
+        document.getElementById('viewKhwayText').innerText = savedKhwayItems.length > 0 ? savedKhwayItems.join(', ') : 'မရှိသေးပါ။';
+        document.getElementById('editResultsInput').value = savedResults.join(',');
+        document.getElementById('editKhwayInput').value = savedKhwayItems.join(',');
+    }
+
+    function enableEditMode() {
+        document.getElementById('viewResultsText').style.display = 'none';
+        document.getElementById('viewKhwayText').style.display = 'none';
+        document.getElementById('editResultsInput').style.display = 'block';
+        document.getElementById('editKhwayInput').style.display = 'block';
+        document.getElementById('editResultsInput').focus();
+    }
+
+    function saveEditChanges() {
+        let resInput = document.getElementById('editResultsInput').value.trim();
+        let khwInput = document.getElementById('editKhwayInput').value.trim();
+        savedResults = resInput ? resInput.split(',').map(s => s.trim()).filter(s => s.length === 4) : [];
+        savedKhwayItems = khwInput ? khwInput.split(',').map(s => s.trim()).filter(s => s.length > 0) : [];
+        saveToLocalStorage();
+        updateViewers();
+        document.getElementById('editResultsInput').style.display = 'none';
+        document.getElementById('editKhwayInput').style.display = 'none';
+        document.getElementById('viewResultsText').style.display = 'block';
+        document.getElementById('viewKhwayText').style.display = 'block';
+        renderTable();
+        alert('ပြင်ဆင်မှုများကို အောင်မြင်စွာ သိမ်းဆည်းပြီးပါပြီ။');
+    }
+
+    function saveData() {
+        let input = document.getElementById('mainInput').value.trim();
+        if (!input) return;
+        let items = input.split(/[\s,]+/);
+        let filteredItems = items.filter(item => item.length === 4);
+        if(filteredItems.length === 0) {
+            alert('ဂဏန်း ၄ လုံးစီပါဝင်သော ပုံစံမျိုးသာ ထည့်ပေးပါ!');
+            return;
+        }
+        savedResults = savedResults.concat(filteredItems);
+        saveToLocalStorage();
+        updateViewers();
+        document.getElementById('mainInput').value = '';
+        renderTable();
+    }
+
+    function checkData() {
+        let input = document.getElementById('mainInput').value.trim();
+        if (!input) return;
+        let khwayItems = input.split(/[\s,]+/).filter(item => item.length > 0);
+        savedKhwayItems = savedKhwayItems.concat(khwayItems);
+        saveToLocalStorage();
+        updateViewers();
+        document.getElementById('mainInput').value = '';
+        renderTable();
+    }
+
+    function resetAll() {
+        if(confirm('ဒေတာအားလုံးကို ဖျက်ပစ်ရန် သေချာပါသလား?')) {
+            savedResults = [];
+            savedKhwayItems = [];
+            localStorage.removeItem('cyber2d_results');
+            localStorage.removeItem('cyber2d_khways');
+            updateViewers();
+            document.getElementById('mainInput').value = '';
+            renderTable();
+        }
+    }
+
+    function renderTable() {
+        let tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '';
+        if(savedResults.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="empty-status">ဒေတာများ ထည့်သွင်းပေးပါ။</td></tr>`;
+            return;
+        }
+        let amHitCounts = new Array(savedResults.length).fill(0);
+        let pmHitCounts = new Array(savedResults.length).fill(0);
+        savedResults.forEach((numStr, index) => {
+            let currentKhwayStr = savedKhwayItems[index];
+            if (currentKhwayStr) {
+                let subKhways = currentKhwayStr.split('/');
+                for (let i = 1; i <= 5; i++) {
+                    let targetIndex = index + i;
+                    if (targetIndex < savedResults.length) {
+                        let targetNumStr = savedResults[targetIndex];
+                        let targetAm = targetNumStr.slice(0, 2);
+                        let targetPm = targetNumStr.slice(2, 4);
+                        subKhways.forEach(khway => {
+                            let patDigit = parsePatDigit(khway);
+                            if (patDigit) {
+                                if (targetAm.includes(patDigit)) amHitCounts[targetIndex]++;
+                                if (targetPm.includes(patDigit)) pmHitCounts[targetIndex]++;
+                            } else {
+                                let khwayDigits = khway.split('');
+                                if (khwayDigits.includes(targetAm[0]) && khwayDigits.includes(targetAm[1])) amHitCounts[targetIndex]++;
+                                if (khwayDigits.includes(targetPm[0]) && khwayDigits.includes(targetPm[1])) pmHitCounts[targetIndex]++;
+                            }
+                        });
+                    }
+                }
+            }
+        });
+        savedResults.forEach((numStr, index) => {
+            let amNum = numStr.slice(0, 2);
+            let pmNum = numStr.slice(2, 4);
+            let currentKhwayStr = savedKhwayItems[index] ? savedKhwayItems[index] : '-';
+            let hitNumbers = [];
+            if (savedKhwayItems[index]) {
+                let subKhways = savedKhwayItems[index].split('/');
+                for (let i = 1; i <= 5; i++) {
+                    let targetIndex = index + i;
+                    if (targetIndex < savedResults.length) {
+                        let targetNumStr = savedResults[targetIndex];
+                        let targetAm = targetNumStr.slice(0, 2);
+                        let targetPm = targetNumStr.slice(2, 4);
+                        subKhways.forEach(khway => {
+                            let patDigit = parsePatDigit(khway);
+                            if (patDigit) {
+                                if (targetAm.includes(patDigit) && !hitNumbers.includes(targetAm)) hitNumbers.push(targetAm);
+                                if (targetPm.includes(patDigit) && !hitNumbers.includes(targetPm)) hitNumbers.push(targetPm);
+                            } else {
+                                let khwayDigits = khway.split('');
+                                if (khwayDigits.includes(targetAm[0]) && khwayDigits.includes(targetAm[1]) && !hitNumbers.includes(targetAm)) hitNumbers.push(targetAm);
+                                if (khwayDigits.includes(targetPm[0]) && khwayDigits.includes(targetPm[1]) && !hitNumbers.includes(targetPm)) hitNumbers.push(targetPm);
+                            }
+                        });
+                    }
+                }
+            }
+            let tr = document.createElement('tr');
+            let khwayDisplayHTML = savedKhwayItems[index] ? `<span class="khway-style">${currentKhwayStr.replace(/\//g, '<br><hr style="border:0;border-top:1px dashed #b2bec3;margin:4px 0;">')}</span>` : '-';
+            let finalHitHTML = hitNumbers.length > 0 ? `<span class="badge-hit">${hitNumbers.join(', ')}</span>` : (savedKhwayItems[index] ? '<span style="color:#747d8c;font-size:12px;font-weight:700;">မပါဝင်ပါ</span>' : '-');
+            let amCountStr = amHitCounts[index] > 0 ? `<span class="count-text">(${amHitCounts[index]})</span>` : '';
+            let pmCountStr = pmHitCounts[index] > 0 ? `<span class="count-text">(${pmHitCounts[index]})</span>` : '';
+            tr.innerHTML = `
+                <td class="${amHitCounts[index] > 0 ? 'highlight-am-pm-match' : ''}">
+                    <div class="num-box-wrapper"><span class="num-box">${amNum}${amCountStr}</span></div>
+                </td>
+                <td class="${pmHitCounts[index] > 0 ? 'highlight-am-pm-match' : ''}">
+                    <div class="num-box-wrapper"><span class="num-box">${pmNum}${pmCountStr}</span></div>
+                </td>
+                <td>${khwayDisplayHTML}</td>
+                <td>${finalHitHTML}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // ==================== INIT ====================
+    window.onload = function() {
+        updateViewers();
+        renderTable();
+        if (typeof YT !== 'undefined' && YT.loaded) { autoLogin(); }
+    };
+
     // Firebase Realtime listeners
     database.ref('settings/marqueeSpeed').on('value', snap => {
         if(snap.val()) document.getElementById('marqueeText').style.setProperty('--speed', snap.val()+'s');
     });
-    
     database.ref('devices/' + generateDeviceFingerprint()).on('value', snap => {
         if (snap.val()) { currentUserData = snap.val(); startExpiryChecker(); }
     });
-    
-    // Auto login when iframe API is ready
-    if (typeof YT !== 'undefined' && YT.loaded) {
-        autoLogin();
-    }
 </script>
 </body>
 </html>
