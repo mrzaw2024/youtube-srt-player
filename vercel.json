@@ -1,6 +1,6 @@
 {
   "version": 2,
-  "name": "premium-movie-2d-app",
+  "name": "premium-movie-app",
   "builds": [
     {
       "src": "api/server.js",

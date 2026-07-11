@@ -1,7 +1,7 @@
 {
-  "name": "premium-movie-2d-app",
+  "name": "premium-movie-app",
   "version": "1.0.0",
-  "description": "Premium Movie & 2D Forecast App",
+  "description": "Premium Movie App with YouTube IFrame API",
   "main": "api/server.js",
   "scripts": {
     "start": "node api/server.js"
