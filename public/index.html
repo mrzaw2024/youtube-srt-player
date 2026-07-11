@@ -245,55 +245,69 @@
         
         .loading-text-center { text-align: center; padding: 40px; color: #aaa; font-size: 1rem; grid-column: span 2; }
         
-        /* ===== EXPIRED OVERLAY - FIX: Clickable links ===== */
+        /* ===== EXPIRED OVERLAY - Bright, Clickable ===== */
         .expired-overlay-full {
             text-align: center;
-            padding: 60px 20px;
+            padding: 50px 20px;
+            background: #1a1a2e;
+            border-radius: 16px;
+            margin: 20px;
+            border: 2px solid #ff4444;
+            box-shadow: 0 0 40px rgba(255, 68, 68, 0.15);
+        }
+        .expired-overlay-full .expired-icon {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        .expired-overlay-full .expired-title {
+            font-size: 1.4rem;
+            font-weight: 900;
             color: #ff4444;
-            font-size: 1.1rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 16px;
-            min-height: 300px;
-            pointer-events: auto !important;
+            margin-bottom: 8px;
+        }
+        .expired-overlay-full .expired-sub {
+            font-size: 0.95rem;
+            color: #ccc;
+            margin-bottom: 20px;
         }
         .expired-overlay-full .btn-group {
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
             width: 100%;
-            max-width: 280px;
-            margin-top: 10px;
-            pointer-events: auto !important;
+            max-width: 300px;
+            margin: 0 auto;
         }
         .expired-overlay-full .admin-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             color: #fff;
             border: none;
-            font-weight: 900;
-            padding: 12px 20px;
-            font-size: 0.85rem;
-            border-radius: 30px;
+            font-weight: 800;
+            padding: 14px 24px;
+            font-size: 1rem;
+            border-radius: 50px;
             text-decoration: none;
-            transition: transform 0.2s;
-            pointer-events: auto !important;
-            cursor: pointer !important;
+            transition: all 0.2s;
+            cursor: pointer;
+            width: 100%;
         }
+        .expired-overlay-full .admin-btn:active { transform: scale(0.96); }
         .expired-overlay-full .admin-btn.viber {
             background: linear-gradient(135deg, #7b51a1 0%, #593181 100%);
-            box-shadow: 0 4px 15px rgba(123, 81, 161, 0.4);
+            box-shadow: 0 4px 20px rgba(123, 81, 161, 0.5);
+            color: #fff;
         }
         .expired-overlay-full .admin-btn.telegram {
             background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+            box-shadow: 0 4px 20px rgba(255, 215, 0, 0.4);
             color: #000;
         }
-        .expired-overlay-full .admin-btn:active { transform: scale(0.95); }
+        .expired-overlay-full .admin-btn .btn-icon {
+            font-size: 1.2rem;
+        }
 
         /* ===== 2D SECTION (Bozaw 2D) ===== */
         .twod-container {
@@ -508,11 +522,16 @@
         
         const expiredHTML = `
             <div class="expired-overlay-full">
-                <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
-                <div style="font-size:0.9rem; color:#666;">ဆက်လက်အသုံးပြုရန် သက်တမ်းတိုးပေးပါရန်။</div>
+                <div class="expired-icon">⛔</div>
+                <div class="expired-title">သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</div>
+                <div class="expired-sub">ဆက်လက်အသုံးပြုရန် သက်တမ်းတိုးပေးပါရန်။</div>
                 <div class="btn-group">
-                    <a href="viber://chat?number=%2B959777966119" class="admin-btn viber" target="_blank">💬 Admin Viber: 09777966119</a>
-                    <a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
+                    <a href="viber://chat?number=+959777966119" class="admin-btn viber" target="_blank">
+                        <span class="btn-icon">💬</span> Admin Viber: 09777966119
+                    </a>
+                    <a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">
+                        <span class="btn-icon">📲</span> Telegram Admin ဆီသွားရန်
+                    </a>
                 </div>
             </div>
         `;
@@ -654,7 +673,7 @@
                 document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('disabled'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.add('disabled'));
                 
-                // Show expired overlay with clickable links
+                // Show expired overlay
                 showExpiredOverlay();
                 
                 updatePlayerState(); 
@@ -877,42 +896,13 @@
         let c = document.getElementById('videoContainer');
         let pSection = document.getElementById('playerSection');
         let floatBtn = document.getElementById('exitFsFloatingBtn');
-        let tabs = document.getElementById('appTabs');
-        let banner = document.getElementById('userBanner');
-        let twodSection = document.getElementById('twodSection');
-        let moviesSection = document.getElementById('moviesSection');
         
         if (!isFullscreen) {
-            // Hide tabs and banner only (video stays visible)
-            tabs.style.display = 'none';
-            banner.style.display = 'none';
-            
-            // Hide 2D and Movies sections content (but keep video container visible)
-            twodSection.style.display = 'none';
-            moviesSection.style.display = 'none';
-            
             c.classList.add('fullscreen');
             pSection.classList.add('fs-active');
             floatBtn.style.display = 'block';
             isFullscreen = true;
         } else {
-            // Show tabs and banner
-            tabs.style.display = '';
-            banner.style.display = '';
-            
-            // Show 2D and Movies sections
-            twodSection.style.display = '';
-            moviesSection.style.display = '';
-            
-            // Show active tab content only
-            if (document.getElementById('tab2d').classList.contains('active')) {
-                twodSection.style.display = 'block';
-                moviesSection.style.display = 'none';
-            } else {
-                moviesSection.style.display = 'block';
-                twodSection.style.display = 'none';
-            }
-            
             c.classList.remove('fullscreen');
             pSection.classList.remove('fs-active');
             floatBtn.style.display = 'none';
@@ -937,19 +927,6 @@
         document.getElementById('playerSection').classList.remove('fs-active');
         document.getElementById('exitFsFloatingBtn').style.display = 'none';
         isFullscreen = false;
-        // Show tabs and banner when exiting player
-        document.getElementById('appTabs').style.display = '';
-        document.getElementById('userBanner').style.display = '';
-        document.getElementById('twodSection').style.display = '';
-        document.getElementById('moviesSection').style.display = '';
-        // Show active tab
-        if (document.getElementById('tab2d').classList.contains('active')) {
-            document.getElementById('twodSection').style.display = 'block';
-            document.getElementById('moviesSection').style.display = 'none';
-        } else {
-            document.getElementById('moviesSection').style.display = 'block';
-            document.getElementById('twodSection').style.display = 'none';
-        }
         loadMovies(false);
     }
 
