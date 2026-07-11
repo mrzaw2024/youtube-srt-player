@@ -107,6 +107,9 @@
       width: 100%; height: 100%; display: block; background: #000; 
       object-fit: contain;
     }
+    .youtube-iframe {
+      width: 100%; height: 100%; border: none;
+    }
     
     .video-placeholder {
       width: 100%; height: 100%; background: #111; display: flex; justify-content: center;
@@ -210,6 +213,7 @@
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-height: 100vh; z-index: 100000; background: #000; display: flex; align-items: center; justify-content: center;
     }
     .video-container.fullscreen #customVideo { width: 100vw; height: 100vh; object-fit: contain; }
+    .video-container.fullscreen .youtube-iframe { width: 100vw; height: 100vh; }
 
     #exitFsFloatingBtn {
       position: fixed; top: 20px; right: 20px; background: rgba(255, 68, 102, 0.9);
@@ -452,13 +456,11 @@
   };
   firebase.initializeApp(firebaseConfig);
   const database = firebase.database();
-  const API_URL = 'https://script.google.com/macros/s/AKfycbzNn4ZuCu9jOghk9FoLehMvSlBMcd50r5XTTfhioCzaM8B7in5LUTvzRgaUtojaOGXJdg/exec';
 
   let currentUserData = null, isExpired = false, subtitles = [], intervalId = null;
   let isFullscreen = false, isPlaying = true, allMovies = [], currentFilter = 'all', currentUserId = '', favorites = [], expiryCheckInterval = null;
   let video = null;
   let currentTimeTracker = 0;
-  let videoDurationTracker = 0;
 
   function generateDeviceFingerprint() {
     const screenInfo = window.screen.width + 'x' + window.screen.height + 'x' + window.screen.colorDepth;
@@ -574,39 +576,14 @@
         const favSnap = await database.ref('favorites/' + currentUserId).once('value');
         favorites = favSnap.val() || [];
       }
-      let res = await fetch(API_URL);
+      let res = await fetch('/api/videos');
       let data = await res.json();
       if (data.success && data.videos && data.videos.length > 0) {
-        allMovies = [];
+        allMovies = data.videos;
         localStorage.setItem('cached_movies', JSON.stringify(data.videos));
-        for (let i = 0; i < data.videos.length; i++) {
-          allMovies.push(data.videos[i]);
-          renderIncrementalMovie(data.videos[i], i === 0);
-        }
+        renderMovies();
       }
     } catch(e) {}
-  }
-
-  function renderIncrementalMovie(v, isFirst) {
-    let grid = document.getElementById('movieGrid');
-    if (isExpired) {
-      grid.innerHTML = `<div class="expired-overlay"><span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span><div class="btn-group"><a href="viber://chat?number=%2B959777966119" class="admin-btn viber">💬 Admin Viber: 09777966119</a><a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a></div></div>`;
-      return;
-    }
-    if (isFirst || grid.querySelector('.loading-text-center') || grid.querySelector('.expired-overlay')) {
-      grid.innerHTML = '';
-    }
-    let isFav = favorites.includes(v.videoId);
-    let card = document.createElement('div');
-    card.className = 'movie-card';
-    card.innerHTML = `<button class="favorite-btn ${isFav?'active':''}" onclick="toggleFavorite('${v.videoId}', event)">${isFav?'❤️':'🤍'}</button><img class="movie-poster" src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg"><div class="movie-title">${v.title || "Premium Video"}</div>`;
-    card.onclick = () => {
-      if (isExpired) return;
-      document.getElementById('gridSection').classList.add('hide');
-      document.getElementById('playerSection').classList.add('active');
-      createPlayer(v.videoId);
-    };
-    grid.appendChild(card);
   }
 
   function renderMovies() {
@@ -642,7 +619,40 @@
     grid.appendChild(fragment);
   }
 
-  // ============ CUSTOM VIDEO PLAYER (No YouTube) ============
+  function toggleFavorite(videoId, event) {
+    event.stopPropagation();
+    const index = favorites.indexOf(videoId);
+    if (index > -1) favorites.splice(index, 1); else favorites.push(videoId);
+    database.ref('favorites/' + currentUserId).set(favorites).then(() => renderMovies());
+  }
+
+  function setFilter(f) {
+    currentFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById(f==='all'?'allBtn':'favBtn').classList.add('active');
+    renderMovies();
+  }
+
+  function searchMovies() { renderMovies(); }
+
+  function showGrid() {
+    if (intervalId) { clearInterval(intervalId); intervalId = null; }
+    subtitles = [];
+    if (video) { video.pause(); video.src = ''; }
+    // Remove YouTube iframe if exists
+    const iframe = document.querySelector('.youtube-iframe');
+    if (iframe) iframe.remove();
+    document.getElementById('customVideo').style.display = 'block';
+    document.getElementById('subtitleDisplay').textContent = '';
+    document.getElementById('gridSection').classList.remove('hide');
+    document.getElementById('playerSection').classList.remove('active');
+    document.getElementById('playerSection').classList.remove('fs-active');
+    document.getElementById('exitFsFloatingBtn').style.display = 'none';
+    isFullscreen = false;
+    loadMovies(false);
+  }
+
+  // ============ CUSTOM VIDEO PLAYER ============
   function createPlayer(videoId) {
     if (isExpired) return;
     subtitles = [];
@@ -650,73 +660,102 @@
     isPlaying = true;
     video = document.getElementById('customVideo');
     
-    // Get video URL from API
-    fetchVideoUrl(videoId);
-    
     document.getElementById('playPauseBtn').innerHTML = '⏸ Pause';
     document.getElementById('statusText').innerHTML = '⏳ Loading video...';
     document.getElementById('subtitleDisplay').textContent = '';
     
-    // Load SRT subtitles
-    loadSRT(videoId);
+    fetchVideoData(videoId);
   }
 
-  async function fetchVideoUrl(videoId) {
+  async function fetchVideoData(videoId) {
     try {
-      // You can replace this with your actual video URL source
-      // For now, we use YouTube video as source (but without YouTube controls)
-      // Or you can use direct video URL from your server
-      const videoUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&rel=0&showinfo=0&modestbranding=1&enablejsapi=1`;
+      const response = await fetch(`/api/video/${videoId}`);
+      const data = await response.json();
       
-      // For actual video file, use this format:
-      // const videoUrl = `https://your-server.com/videos/${videoId}.mp4`;
-      
-      // For demo, we'll use a placeholder - you need to replace with actual video source
-      // Since we can't directly play YouTube videos without controls, 
-      // we'll use a workaround - load as iframe but hide controls
-      // Actually better: Use a direct video URL
-      
-      // For now, we'll show a message
-      document.getElementById('statusText').innerHTML = '✅ Video ready - Subtitle loaded';
-      document.getElementById('fullscreenHint').style.display = 'block';
-      
-      // If you have direct video URL, use this:
-      // video.src = videoUrl;
-      // video.load();
-      // video.play();
-      
-      // For demo, show placeholder with video ID
-      document.getElementById('statusText').innerHTML = `🎬 Video ID: ${videoId} (Replace with actual video URL)`;
-      
-      // Start subtitle polling
-      if (intervalId) clearInterval(intervalId);
-      intervalId = setInterval(pollSubtitles, 500);
-      
-      // Simulate video duration
-      videoDurationTracker = 300; // 5 minutes
-      
-    } catch(e) {
-      document.getElementById('statusText').innerHTML = '❌ Failed to load video';
-    }
-  }
-
-  async function loadSRT(videoId) {
-    try {
-      let res = await fetch(`${API_URL}?videoId=${videoId}`);
-      let data = await res.json();
-      if (data.success && data.srtUrl) {
-        let srtRes = await fetch(data.srtUrl);
-        let srtText = await srtRes.text();
-        subtitles = parseSRT(srtText);
-        if(subtitles.length > 0) {
-          document.getElementById('statusText').innerHTML = '✅ Subtitle Loaded';
-          document.getElementById('fullscreenHint').style.display = 'block';
-          videoDurationTracker = subtitles[subtitles.length - 1].end + 30;
+      if (data.success && data.video) {
+        const videoData = data.video;
+        
+        // Check if it's a YouTube URL
+        if (videoData.videoUrl && videoData.videoUrl.includes('youtube.com')) {
+          loadYouTubeVideo(videoData.videoUrl, videoData);
+        } else if (videoData.videoUrl && videoData.videoUrl.endsWith('.mp4')) {
+          // Direct video file
+          video.src = videoData.videoUrl;
+          video.load();
+          video.play();
+          document.getElementById('statusText').innerHTML = '✅ Video loaded';
+        } else {
+          document.getElementById('statusText').innerHTML = '❌ No valid video URL found';
+          return;
         }
+        
+        // Load subtitles
+        if (data.subtitles) {
+          subtitles = parseSRT(data.subtitles);
+          if (subtitles.length > 0) {
+            document.getElementById('statusText').innerHTML = '✅ Video + Subtitle loaded';
+            document.getElementById('fullscreenHint').style.display = 'block';
+          }
+        }
+        
+        // Video event listeners for direct video
+        if (!videoData.videoUrl.includes('youtube.com')) {
+          video.addEventListener('loadedmetadata', function() {
+            document.getElementById('timeDisplay').innerText = `0:00 / ${formatTime(video.duration)}`;
+          });
+          video.addEventListener('timeupdate', function() {
+            updateProgress();
+            updateSubtitle(video.currentTime);
+          });
+        }
+        
+        if (intervalId) clearInterval(intervalId);
+        intervalId = setInterval(pollSubtitles, 500);
+        
+      } else {
+        document.getElementById('statusText').innerHTML = '❌ Video not found';
       }
     } catch(e) {
-      console.log('No subtitles available');
+      document.getElementById('statusText').innerHTML = '❌ Failed to load video';
+      console.error(e);
     }
+  }
+
+  function loadYouTubeVideo(url, videoData) {
+    const container = document.getElementById('videoContainer');
+    const videoEl = document.getElementById('customVideo');
+    
+    // Hide video element
+    videoEl.style.display = 'none';
+    
+    // Remove existing iframe
+    const existingIframe = document.querySelector('.youtube-iframe');
+    if (existingIframe) existingIframe.remove();
+    
+    // Extract video ID
+    let videoId = videoData.videoId;
+    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&rel=0&showinfo=0&modestbranding=1&playsinline=1`;
+    
+    // Create iframe
+    const iframe = document.createElement('iframe');
+    iframe.className = 'youtube-iframe';
+    iframe.src = embedUrl;
+    iframe.allow = 'autoplay; encrypted-media; fullscreen';
+    iframe.allowFullscreen = true;
+    
+    container.appendChild(iframe);
+    
+    document.getElementById('statusText').innerHTML = '✅ YouTube video loaded (controls hidden)';
+    
+    // For YouTube, simulate time tracking
+    if (intervalId) clearInterval(intervalId);
+    intervalId = setInterval(() => {
+      if (isPlaying) {
+        currentTimeTracker += 0.5;
+        updateSubtitle(currentTimeTracker);
+        updateProgress();
+      }
+    }, 500);
   }
 
   function parseSRT(content) {
@@ -750,48 +789,74 @@
     return parseInt(parts[0])*3600 + parseInt(parts[1])*60 + parseFloat(parts[2]);
   }
 
+  function formatTime(seconds) {
+    if (!seconds || isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
+
+  function updateSubtitle(time) {
+    let text = "";
+    for (let s of subtitles) {
+      if (time >= s.start && time <= s.end) {
+        text = s.text;
+        break;
+      }
+    }
+    document.getElementById('subtitleDisplay').textContent = text;
+  }
+
+  function updateProgress() {
+    if (!video) return;
+    const currentTime = video.currentTime || currentTimeTracker;
+    const duration = video.duration || 300;
+    const progress = (currentTime / duration) * 100;
+    document.getElementById('progressSlider').value = progress || 0;
+    document.getElementById('timeDisplay').innerText = `${formatTime(currentTime)} / ${formatTime(duration)}`;
+  }
+
   function pollSubtitles() {
     if (isExpired) return;
-    
-    // Simulate time tracking
-    if (isPlaying) {
-      currentTimeTracker += 0.5;
-    }
-    if (currentTimeTracker > videoDurationTracker) currentTimeTracker = videoDurationTracker;
-    
-    try {
-      let time = currentTimeTracker;
-      let duration = videoDurationTracker;
-      let text = "";
-      for (let s of subtitles) {
-        if (time >= s.start && time <= s.end) { text = s.text; break; }
-      }
-      document.getElementById('subtitleDisplay').textContent = text;
-      
-      document.getElementById('progressSlider').value = (time / duration) * 100;
-      document.getElementById('timeDisplay').innerText = `${Math.floor(time/60)}:${String(Math.floor(time%60)).padStart(2,'0')} / ${Math.floor(duration/60)}:${String(Math.floor(duration%60)).padStart(2,'0')}`;
-    } catch(e){}
+    const time = video ? video.currentTime : currentTimeTracker;
+    updateSubtitle(time);
+    updateProgress();
   }
 
   window.togglePlayPause = function() {
-    isPlaying = !isPlaying;
-    document.getElementById('playPauseBtn').innerHTML = isPlaying ? '⏸ Pause' : '▶️ Play';
-    if (video) {
-      if (isPlaying) { video.play(); } else { video.pause(); }
+    if (video && video.src) {
+      if (video.paused) {
+        video.play();
+        document.getElementById('playPauseBtn').innerHTML = '⏸ Pause';
+        isPlaying = true;
+      } else {
+        video.pause();
+        document.getElementById('playPauseBtn').innerHTML = '▶️ Play';
+        isPlaying = false;
+      }
+    } else {
+      isPlaying = !isPlaying;
+      document.getElementById('playPauseBtn').innerHTML = isPlaying ? '⏸ Pause' : '▶️ Play';
     }
   };
 
   window.seekVideo = function(sec) {
-    currentTimeTracker += sec;
-    if (currentTimeTracker < 0) currentTimeTracker = 0;
-    if (currentTimeTracker > videoDurationTracker) currentTimeTracker = videoDurationTracker;
-    if (video) { video.currentTime = currentTimeTracker; }
+    if (video && video.src) {
+      video.currentTime += sec;
+    } else {
+      currentTimeTracker += sec;
+      if (currentTimeTracker < 0) currentTimeTracker = 0;
+    }
   };
 
   window.seekToPosition = function() {
-    let pct = parseFloat(document.getElementById('progressSlider').value);
-    currentTimeTracker = (pct / 100) * videoDurationTracker;
-    if (video) { video.currentTime = currentTimeTracker; }
+    const pct = parseFloat(document.getElementById('progressSlider').value);
+    if (video && video.src && video.duration) {
+      video.currentTime = (pct / 100) * video.duration;
+    } else {
+      const duration = video ? video.duration : 300;
+      currentTimeTracker = (pct / 100) * duration;
+    }
   };
 
   window.toggleFullscreen = function() {
@@ -810,35 +875,6 @@
       isFullscreen = false;
     }
   };
-
-  function toggleFavorite(videoId, event) {
-    event.stopPropagation();
-    const index = favorites.indexOf(videoId);
-    if (index > -1) favorites.splice(index, 1); else favorites.push(videoId);
-    database.ref('favorites/' + currentUserId).set(favorites).then(() => renderMovies());
-  }
-
-  function setFilter(f) {
-    currentFilter = f;
-    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-    document.getElementById(f==='all'?'allBtn':'favBtn').classList.add('active');
-    renderMovies();
-  }
-
-  function searchMovies() { renderMovies(); }
-
-  function showGrid() {
-    if (intervalId) { clearInterval(intervalId); intervalId = null; }
-    subtitles = [];
-    if (video) { video.pause(); video.src = ''; }
-    document.getElementById('subtitleDisplay').textContent = '';
-    document.getElementById('gridSection').classList.remove('hide');
-    document.getElementById('playerSection').classList.remove('active');
-    document.getElementById('playerSection').classList.remove('fs-active');
-    document.getElementById('exitFsFloatingBtn').style.display = 'none';
-    isFullscreen = false;
-    loadMovies(false);
-  }
 
   // ============ 2D SECTION ============
   const SHEET_ID = '1tNEhMx08S8rz84In1FdWLPcYlGJkzDCIXFMIhy5BrGU';
