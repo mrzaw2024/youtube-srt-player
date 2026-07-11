@@ -96,7 +96,7 @@
     .user-status .active { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.5); }
     .user-status .expired { color: #ff4444; }
 
-    /* Custom Video Player - No YouTube Controls */
+    /* Video Player */
     .video-section { width: 100%; background: #000; position: relative; border-radius: 12px 12px 0 0; overflow: hidden; }
     .video-container { 
       position: relative; width: 100%; aspect-ratio: 9/16; background: #000; 
@@ -108,7 +108,13 @@
       object-fit: contain;
     }
     .youtube-iframe {
-      width: 100%; height: 100%; border: none;
+      width: 100%;
+      height: 100%;
+      border: none;
+      pointer-events: none !important; /* Disable all clicks on YouTube controls */
+    }
+    .video-container.fullscreen .youtube-iframe {
+      pointer-events: none !important;
     }
     
     .video-placeholder {
@@ -138,7 +144,6 @@
     }
     .video-controls button:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
     .video-controls button.primary { background: var(--gold-gradient); color: #000; border: none; font-weight: 900; }
-    .video-controls button.danger { background: #ff4444; color: #fff; border: none; }
     .progress-container { flex: 2; display: flex; align-items: center; gap: 6px; min-width: 120px; }
     .progress-slider { flex: 1; height: 4px; -webkit-appearance: none; background: #333; border-radius: 10px; outline: none; }
     .progress-slider::-webkit-slider-thumb {
@@ -146,16 +151,42 @@
     }
     .time-text { font-family: monospace; font-size: 0.65rem; color: #ccc; }
 
-    /* Subtitle Overlay */
+    /* Subtitle Overlay - Yellow text with Black stroke */
     .subtitle-overlay {
-      position: absolute; bottom: 80px; left: 0; right: 0; text-align: center;
-      padding: 0 20px; pointer-events: none; z-index: 10001;
+      position: absolute;
+      bottom: 80px;
+      left: 0;
+      right: 0;
+      text-align: center;
+      padding: 0 20px;
+      pointer-events: none;
+      z-index: 10001;
     }
     .subtitle-overlay .subtitle-text {
-      display: inline-block; background: rgba(0,0,0,0.7); padding: 10px 20px;
-      border-radius: 8px; font-size: clamp(18px, 4vw, 32px); font-weight: 700;
-      color: #FFD700; text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-      line-height: 1.4; max-width: 90%;
+      display: inline-block;
+      padding: 8px 16px;
+      font-size: clamp(18px, 4.5vw, 34px);
+      font-weight: 900;
+      font-family: system-ui, -apple-system, sans-serif;
+      line-height: 1.4;
+      max-width: 94%;
+      text-align: center;
+      word-break: break-word;
+      
+      /* Yellow text with black stroke/shadow */
+      color: #FFD700;
+      text-shadow:
+        -3px -3px 0 #000000,
+        3px -3px 0 #000000,
+        -3px 3px 0 #000000,
+        3px 3px 0 #000000,
+        0 0 8px rgba(0,0,0,0.9),
+        0 0 16px rgba(0,0,0,0.8);
+      
+      /* Background for better readability */
+      background: rgba(0, 0, 0, 0.5);
+      border-radius: 10px;
+      backdrop-filter: blur(2px);
     }
 
     /* Movie Grid */
@@ -215,10 +246,32 @@
     .video-container.fullscreen #customVideo { width: 100vw; height: 100vh; object-fit: contain; }
     .video-container.fullscreen .youtube-iframe { width: 100vw; height: 100vh; }
 
+    /* Exit Fullscreen Button - Bottom Center */
     #exitFsFloatingBtn {
-      position: fixed; top: 20px; right: 20px; background: rgba(255, 68, 102, 0.9);
-      color: #fff; border: none; border-radius: 30px; padding: 10px 20px; font-weight: 900;
-      font-size: 0.85rem; z-index: 100005; cursor: pointer; box-shadow: 0 4px 15px rgba(0,0,0,0.5); display: none;
+      position: fixed;
+      bottom: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 68, 102, 0.92);
+      color: #fff;
+      border: none;
+      border-radius: 30px;
+      padding: 12px 28px;
+      font-weight: 900;
+      font-size: 0.9rem;
+      z-index: 100005;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(255, 68, 102, 0.4);
+      display: none;
+      transition: all 0.3s;
+      letter-spacing: 0.5px;
+    }
+    #exitFsFloatingBtn:hover {
+      background: rgba(255, 68, 102, 1);
+      transform: translateX(-50%) scale(1.05);
+    }
+    #exitFsFloatingBtn:active {
+      transform: translateX(-50%) scale(0.95);
     }
 
     .player-section.fs-active .video-controls,
@@ -368,7 +421,7 @@
               <a href="viber://chat?number=%2B959777966119" class="contact-link" style="border-color:#bf55ec;color:#bf55ec;">💜 Viber: 09777966119</a>
               <a href="https://t.me/mmmovies002" target="_blank" class="contact-link">💙 Telegram Admin</a>
             </div>
-            <!-- Subtitle Overlay -->
+            <!-- Subtitle Overlay - Yellow text with Black stroke -->
             <div class="subtitle-overlay">
               <div id="subtitleDisplay" class="subtitle-text"></div>
             </div>
@@ -461,6 +514,7 @@
   let isFullscreen = false, isPlaying = true, allMovies = [], currentFilter = 'all', currentUserId = '', favorites = [], expiryCheckInterval = null;
   let video = null;
   let currentTimeTracker = 0;
+  let videoDuration = 0;
 
   function generateDeviceFingerprint() {
     const screenInfo = window.screen.width + 'x' + window.screen.height + 'x' + window.screen.colorDepth;
@@ -639,7 +693,6 @@
     if (intervalId) { clearInterval(intervalId); intervalId = null; }
     subtitles = [];
     if (video) { video.pause(); video.src = ''; }
-    // Remove YouTube iframe if exists
     const iframe = document.querySelector('.youtube-iframe');
     if (iframe) iframe.remove();
     document.getElementById('customVideo').style.display = 'block';
@@ -675,11 +728,9 @@
       if (data.success && data.video) {
         const videoData = data.video;
         
-        // Check if it's a YouTube URL
         if (videoData.videoUrl && videoData.videoUrl.includes('youtube.com')) {
           loadYouTubeVideo(videoData.videoUrl, videoData);
         } else if (videoData.videoUrl && videoData.videoUrl.endsWith('.mp4')) {
-          // Direct video file
           video.src = videoData.videoUrl;
           video.load();
           video.play();
@@ -689,7 +740,6 @@
           return;
         }
         
-        // Load subtitles
         if (data.subtitles) {
           subtitles = parseSRT(data.subtitles);
           if (subtitles.length > 0) {
@@ -698,9 +748,9 @@
           }
         }
         
-        // Video event listeners for direct video
         if (!videoData.videoUrl.includes('youtube.com')) {
           video.addEventListener('loadedmetadata', function() {
+            videoDuration = video.duration;
             document.getElementById('timeDisplay').innerText = `0:00 / ${formatTime(video.duration)}`;
           });
           video.addEventListener('timeupdate', function() {
@@ -725,18 +775,14 @@
     const container = document.getElementById('videoContainer');
     const videoEl = document.getElementById('customVideo');
     
-    // Hide video element
     videoEl.style.display = 'none';
     
-    // Remove existing iframe
     const existingIframe = document.querySelector('.youtube-iframe');
     if (existingIframe) existingIframe.remove();
     
-    // Extract video ID
     let videoId = videoData.videoId;
     const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&rel=0&showinfo=0&modestbranding=1&playsinline=1`;
     
-    // Create iframe
     const iframe = document.createElement('iframe');
     iframe.className = 'youtube-iframe';
     iframe.src = embedUrl;
@@ -747,7 +793,6 @@
     
     document.getElementById('statusText').innerHTML = '✅ YouTube video loaded (controls hidden)';
     
-    // For YouTube, simulate time tracking
     if (intervalId) clearInterval(intervalId);
     intervalId = setInterval(() => {
       if (isPlaying) {
@@ -808,9 +853,8 @@
   }
 
   function updateProgress() {
-    if (!video) return;
-    const currentTime = video.currentTime || currentTimeTracker;
-    const duration = video.duration || 300;
+    const currentTime = video ? video.currentTime : currentTimeTracker;
+    const duration = video ? video.duration : 300;
     const progress = (currentTime / duration) * 100;
     document.getElementById('progressSlider').value = progress || 0;
     document.getElementById('timeDisplay').innerText = `${formatTime(currentTime)} / ${formatTime(duration)}`;
@@ -877,8 +921,8 @@
   };
 
   // ============ 2D SECTION ============
-  const SHEET_ID = '1tNEhMx08S8rz84In1FdWLPcYlGJkzDCIXFMIhy5BrGU';
-  const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+  const SHEET_ID_2D = '1tNEhMx08S8rz84In1FdWLPcYlGJkzDCIXFMIhy5BrGU';
+  const SHEET_URL_2D = `https://docs.google.com/spreadsheets/d/${SHEET_ID_2D}/gviz/tq?tqx=out:csv`;
   let savedResults = [];
   let savedKhwayItems = [];
 
@@ -900,7 +944,7 @@
   }
 
   function fetchDataFromSheets() {
-    const noCacheUrl = `${SHEET_URL}&_ts=${Date.now()}`;
+    const noCacheUrl = `${SHEET_URL_2D}&_ts=${Date.now()}`;
     fetch(noCacheUrl, { cache: 'no-store' })
       .then(response => response.text())
       .then(data => {

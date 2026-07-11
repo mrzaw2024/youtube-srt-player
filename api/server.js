@@ -9,11 +9,10 @@ app.use((req, res, next) => {
   next();
 });
 
+// Serve static files from public directory
 app.use(express.static(path.join(__dirname, '../public')));
 
-// ခင်ဗျားရဲ့ Google Sheet ID
 const SHEET_ID = '1EaSe24pRjpDa5JgVT44N0wM9n3o3Jc4X5-CYx-HiOsY';
-// CSV format နဲ့ ဆွဲယူမယ်
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
 
 // Get all videos from Google Sheet
@@ -24,16 +23,12 @@ app.get('/api/videos', async (req, res) => {
     const csvData = response.data;
     const lines = csvData.split('\n');
     
-    console.log('Total lines:', lines.length);
-    
     const videos = [];
     
-    // Skip header row (row 0)
     for (let i = 1; i < lines.length; i++) {
       const line = lines[i].trim();
       if (!line) continue;
       
-      // Parse CSV
       const columns = [];
       let current = '';
       let inQuotes = false;
@@ -50,16 +45,11 @@ app.get('/api/videos', async (req, res) => {
       }
       columns.push(current.trim());
       
-      // Columns: Video_Url, Srt_Link, Title_Text
       const videoUrl = columns[0] || '';
       const srtUrl = columns[1] || '';
       const title = columns[2] || 'Untitled';
       
-      console.log(`Row ${i}:`, { videoUrl, srtUrl, title });
-      
-      // Only add if videoUrl is not empty
       if (videoUrl) {
-        // Extract video ID
         let videoId = `video_${i}`;
         if (videoUrl.includes('youtube.com/watch')) {
           const match = videoUrl.match(/[?&]v=([^&]+)/);
@@ -78,15 +68,12 @@ app.get('/api/videos', async (req, res) => {
       }
     }
     
-    console.log('Total videos found:', videos.length);
-    
     res.json({
       success: true,
       videos: videos
     });
     
   } catch (error) {
-    console.error('Error fetching videos:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch videos',
@@ -148,12 +135,29 @@ app.get('/api/video/:videoId', async (req, res) => {
           srtUrl: srtUrl
         };
         
-        if (srtUrl && srtUrl.startsWith('http')) {
+        // Try to fetch SRT
+        if (srtUrl) {
           try {
-            const srtRes = await axios.get(srtUrl);
-            subtitles = srtRes.data;
+            // Check if it's a full URL or just a filename
+            let fullSrtUrl = srtUrl;
+            if (!srtUrl.startsWith('http')) {
+              // If it's just a filename, use the local server
+              fullSrtUrl = `/srt/${srtUrl}`;
+            }
+            
+            if (fullSrtUrl.startsWith('http')) {
+              const srtRes = await axios.get(fullSrtUrl);
+              subtitles = srtRes.data;
+            } else {
+              // Local file - read from public directory
+              const fs = require('fs');
+              const srtPath = path.join(__dirname, '../public', fullSrtUrl);
+              if (fs.existsSync(srtPath)) {
+                subtitles = fs.readFileSync(srtPath, 'utf8');
+              }
+            }
           } catch(e) {
-            console.log('No SRT file found');
+            console.log('No SRT file found for:', videoId);
           }
         }
         break;
