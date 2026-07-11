@@ -103,19 +103,24 @@ app.get('/api/video/:videoId', async (req, res) => {
       if (vid === videoId) {
         videoData = { videoId: vid, title, videoUrl, srtUrl };
         
-        // Try to load SRT from local file or URL
+        // Try to load SRT
         if (srtUrl) {
           try {
-            if (srtUrl.startsWith('http')) {
-              const srtRes = await axios.get(srtUrl);
-              subtitles = srtRes.data;
-            } else {
+            let fullSrtUrl = srtUrl;
+            // If it's just a filename (e.g., "0002.srt"), use local path
+            if (!srtUrl.startsWith('http')) {
               const srtPath = path.join(__dirname, '../public/srt', srtUrl);
               if (fs.existsSync(srtPath)) {
                 subtitles = fs.readFileSync(srtPath, 'utf8');
               }
+            } else {
+              // If it's a full URL, fetch it
+              const srtRes = await axios.get(srtUrl);
+              subtitles = srtRes.data;
             }
-          } catch(e) { console.log('SRT not found'); }
+          } catch(e) { 
+            console.log('SRT not found for:', videoId);
+          }
         }
         break;
       }
