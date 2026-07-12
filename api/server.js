@@ -11,7 +11,7 @@ app.use((req, res, next) => {
 
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Google Sheet ID - ခင်ဗျားရဲ့ Sheet ID
+// Google Sheet ID
 const SHEET_ID = '1EaSe24pRjpDa5JgVT44N0wM9n3o3Jc4X5-CYx-HiOsY';
 const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
 
@@ -59,17 +59,6 @@ app.get('/api/videos', async (req, res) => {
         } else if (videoUrl.includes('youtu.be')) {
           const match = videoUrl.match(/youtu\.be\/([^?]+)/);
           if (match) videoId = match[1];
-        } 
-        // Google Drive URL
-        else if (videoUrl.includes('drive.google.com')) {
-          const match = videoUrl.match(/[?&]id=([^&]+)/);
-          if (match) videoId = match[1];
-        } 
-        // Direct URL (mp4, etc)
-        else {
-          const urlParts = videoUrl.split('/');
-          const filename = urlParts[urlParts.length - 1];
-          videoId = filename.replace(/\.[^/.]+$/, '') || `video_${i}`;
         }
         
         videos.push({
@@ -142,13 +131,6 @@ app.get('/api/video/:videoId', async (req, res) => {
       } else if (videoUrl.includes('youtu.be')) {
         const match = videoUrl.match(/youtu\.be\/([^?]+)/);
         if (match) vid = match[1];
-      } else if (videoUrl.includes('drive.google.com')) {
-        const match = videoUrl.match(/[?&]id=([^&]+)/);
-        if (match) vid = match[1];
-      } else {
-        const urlParts = videoUrl.split('/');
-        const filename = urlParts[urlParts.length - 1];
-        vid = filename.replace(/\.[^/.]+$/, '') || `video_${i}`;
       }
       
       if (vid === videoId) {
