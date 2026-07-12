@@ -70,8 +70,17 @@
             border-bottom: 3px solid var(--gold);
             background: rgba(255, 255, 255, 0.03);
         }
+        .tab-btn.disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            pointer-events: none;
+        }
         .tab-content { display: none; }
         .tab-content.active { display: block; }
+        .tab-content.disabled {
+            opacity: 0.3;
+            pointer-events: none;
+        }
 
         /* ===== NOTIFICATION ===== */
         #customNoti {
@@ -195,12 +204,25 @@
         }
         .video-container.fullscreen #youtubePlayer { width: 100vw; height: 100vh; object-fit: contain; }
 
+        /* ===== EXIT FULLSCREEN BUTTON - Bottom Center ===== */
         #exitFsFloatingBtn {
-            position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 68, 102, 0.92); color: #fff; border: none; border-radius: 30px;
-            padding: 12px 28px; font-weight: 900; font-size: 0.9rem; z-index: 100005;
-            cursor: pointer; box-shadow: 0 4px 20px rgba(255, 68, 102, 0.4); display: none;
-            transition: all 0.3s; letter-spacing: 0.5px;
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(255, 68, 102, 0.92);
+            color: #fff;
+            border: none;
+            border-radius: 30px;
+            padding: 12px 28px;
+            font-weight: 900;
+            font-size: 0.9rem;
+            z-index: 100005;
+            cursor: pointer;
+            box-shadow: 0 4px 20px rgba(255, 68, 102, 0.4);
+            display: none;
+            transition: all 0.3s;
+            letter-spacing: 0.5px;
         }
         #exitFsFloatingBtn:hover { background: rgba(255, 68, 102, 1); transform: translateX(-50%) scale(1.05); }
         #exitFsFloatingBtn:active { transform: translateX(-50%) scale(0.95); }
@@ -234,7 +256,7 @@
         
         .loading-text-center { text-align: center; padding: 40px; color: #aaa; font-size: 1rem; grid-column: span 2; }
 
-        /* ===== EXPIRED OVERLAY ===== */
+        /* ===== EXPIRED OVERLAY - For both tabs ===== */
         .expired-overlay { 
             text-align: center; 
             padding: 50px 16px; 
@@ -247,7 +269,7 @@
             justify-content: center; 
             gap: 14px;
         }
-        .btn-group { 
+        .expired-overlay .btn-group { 
             display: flex; 
             flex-direction: column; 
             gap: 10px; 
@@ -255,7 +277,7 @@
             max-width: 260px; 
             margin-top: 10px; 
         }
-        .admin-btn {
+        .expired-overlay .admin-btn {
             display: flex; 
             align-items: center; 
             justify-content: center; 
@@ -269,16 +291,16 @@
             text-decoration: none; 
             transition: transform 0.2s;
         }
-        .admin-btn.viber { 
+        .expired-overlay .admin-btn.viber { 
             background: linear-gradient(135deg, #7b51a1 0%, #593181 100%); 
             color: #fff; 
             box-shadow: 0 4px 15px rgba(123, 81, 161, 0.4); 
         }
-        .admin-btn.telegram { 
+        .expired-overlay .admin-btn.telegram { 
             background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%); 
             box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); 
         }
-        .admin-btn:active { transform: scale(0.95); }
+        .expired-overlay .admin-btn:active { transform: scale(0.95); }
 
         /* ===== 2D SECTION (Bozaw 2D) ===== */
         .twod-container {
@@ -607,33 +629,50 @@
                 document.getElementById('userStatusText').className = 'expired';
                 document.getElementById('statusDot').className = 'expired';
                 
-                updatePlayerState(); 
-                renderMovies();
-                if (!wasExpired) { 
-                    const twodContainer = document.getElementById('twodContainer');
-                    if (twodContainer) {
-                        twodContainer.innerHTML = `
-                            <div class="expired-overlay">
-                                <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
-                                <div class="btn-group">
-                                    <a href="viber://chat?number=%2B959777966119" class="admin-btn viber" target="_blank">💬 Admin Viber: 09777966119</a>
-                                    <a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
-                                </div>
-                            </div>
-                        `;
-                    }
+                // Disable both tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('disabled'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('disabled'));
+                
+                // Show expired overlay on BOTH tabs
+                const twodContainer = document.getElementById('twodContainer');
+                const movieGrid = document.getElementById('movieGrid');
+                
+                const expiredHTML = `
+                    <div class="expired-overlay">
+                        <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
+                        <div class="btn-group">
+                            <a href="viber://chat?number=%2B959777966119" class="admin-btn viber" target="_blank">💬 Admin Viber: 09777966119</a>
+                            <a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
+                        </div>
+                    </div>
+                `;
+                
+                if (twodContainer) {
+                    twodContainer.innerHTML = expiredHTML;
                 }
+                if (movieGrid) {
+                    movieGrid.innerHTML = expiredHTML;
+                }
+                
+                updatePlayerState(); 
                 if (player) { try{player.destroy()}catch(e){} player = null; }
             } else {
                 document.getElementById('userStatusText').textContent = 'Active';
                 document.getElementById('userStatusText').className = 'active';
                 document.getElementById('statusDot').className = 'active';
+                
+                // Enable tabs
+                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('disabled'));
+                document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('disabled'));
+                
                 const mins = Math.floor(remaining / 60000);
                 const secs = Math.floor((remaining % 60000) / 1000);
                 if(homeTimeText) {
                     homeTimeText.textContent = `${mins}m ${secs}s`;
                     homeTimeBar.style.width = Math.min(100, (remaining / (60*60*1000)) * 100) + '%';
                 }
+                
+                // Restore 2D content if it was replaced
                 if (wasExpired) {
                     const twodContainer = document.getElementById('twodContainer');
                     if (twodContainer) {
@@ -669,6 +708,8 @@
                         `;
                         fetchDataFromSheets();
                     }
+                    // Reload movies
+                    loadMovies(false);
                 }
             }
         }, 1000);
@@ -721,14 +762,7 @@
     function renderIncrementalMovie(v, isFirst) {
         let grid = document.getElementById('movieGrid');
         if (isExpired) {
-            grid.innerHTML = `
-                <div class="expired-overlay">
-                    <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
-                    <div class="btn-group">
-                        <a href="viber://chat?number=%2B959777966119" class="admin-btn viber" target="_blank">💬 Admin Viber: 09777966119</a>
-                        <a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
-                    </div>
-                </div>`;
+            // Don't render movies if expired
             return;
         }
         if (isFirst || grid.querySelector('.loading-text-center') || grid.querySelector('.expired-overlay')) {
@@ -754,15 +788,9 @@
         let filtered = allMovies;
         if (currentFilter === 'favorites') filtered = filtered.filter(m => favorites.includes(m.videoId));
         if (searchTerm) filtered = filtered.filter(m => (m.title || "").toLowerCase().includes(searchTerm));
+        
         if (isExpired) {
-            grid.innerHTML = `
-                <div class="expired-overlay">
-                    <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
-                    <div class="btn-group">
-                        <a href="viber://chat?number=%2B959777966119" class="admin-btn viber" target="_blank">💬 Admin Viber: 09777966119</a>
-                        <a href="https://t.me/mmmovies002" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
-                    </div>
-                </div>`;
+            // Expired overlay will be shown by startExpiryChecker
             return;
         }
         if (filtered.length === 0) {
@@ -813,78 +841,41 @@
     // ==================== SRT LOADING ====================
     async function loadSRT(videoId) {
         try {
-            console.log('🔍 Loading SRT for video:', videoId);
             let res = await fetch(`/api/video/${videoId}`);
             let data = await res.json();
-            console.log('📦 API Response:', data);
-            
             if (data.success && data.subtitles) {
-                console.log('📝 SRT Content length:', data.subtitles.length);
                 subtitles = parseSRT(data.subtitles);
-                console.log('📊 Parsed subtitles count:', subtitles.length);
-                
                 if(subtitles.length > 0) {
                     document.getElementById('statusText').innerHTML = '✅ Premium Subtitle Loaded';
                     document.getElementById('fullscreenHint').style.display = 'block';
-                    console.log('✅ First subtitle:', subtitles[0]);
-                } else {
-                    console.log('⚠️ No subtitles parsed from SRT');
                 }
-            } else {
-                console.log('❌ No subtitles in response');
             }
-        } catch(e) {
-            console.error('❌ Error loading SRT:', e);
-        }
+        } catch(e) { console.log('No subtitles found'); }
     }
 
     function parseSRT(content) {
-        console.log('🔍 Parsing SRT content, length:', content ? content.length : 0);
         if (!content) return [];
-        
-        let lines = content.split(/\r?\n/);
-        let subs = [];
-        let i = 0;
-        
+        let lines = content.split(/\r?\n/), subs = [], i = 0;
         while (i < lines.length) {
             let line = lines[i] ? lines[i].trim() : '';
             if (!line) { i++; continue; }
-            
             let num = parseInt(line);
             if (!isNaN(num) && num > 0) {
                 i++;
-                if (i < lines.length) {
-                    let timeLine = lines[i] ? lines[i].trim() : '';
-                    let timeMatch = timeLine.match(/(\d{2}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,.]\d{3})/);
-                    if (timeMatch) {
-                        let start = toSeconds(timeMatch[1]);
-                        let end = toSeconds(timeMatch[2]);
-                        i++;
-                        let textLines = [];
-                        while (i < lines.length && lines[i].trim() !== '') {
-                            let textLine = lines[i] ? lines[i].trim() : '';
-                            if (textLine) {
-                                let nextNum = parseInt(textLine);
-                                if (!isNaN(nextNum) && nextNum > 0 && textLine === String(nextNum)) {
-                                    break;
-                                }
-                                textLines.push(textLine);
-                            }
-                            i++;
-                        }
-                        if (textLines.length > 0) {
-                            subs.push({ start: start, end: end, text: textLines.join(" ") });
-                        }
-                    } else {
+                let timeMatch = lines[i].match(/(\d{2}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,.]\d{3})/);
+                if (timeMatch) {
+                    let start = toSeconds(timeMatch[1]), end = toSeconds(timeMatch[2]);
+                    i++;
+                    let textLines = [];
+                    while (i < lines.length && lines[i].trim()) {
+                        textLines.push(lines[i].trim());
                         i++;
                     }
+                    subs.push({ start, end, text: textLines.join(" ") });
                 }
-            } else {
-                i++;
             }
+            i++;
         }
-        
-        console.log('✅ Parsed subtitles:', subs.length);
         return subs;
     }
 
@@ -902,26 +893,15 @@
                 let duration = player.getDuration();
                 let text = "";
                 for (let s of subtitles) {
-                    if (time >= s.start && time <= s.end) {
-                        text = s.text;
-                        break;
-                    }
+                    if (time >= s.start && time <= s.end) { text = s.text; break; }
                 }
                 const container = document.getElementById('subtitleText');
                 const inner = document.getElementById('subtitleInner');
-                if (text && text.trim() !== '') {
-                    inner.innerText = text;
-                    container.style.display = 'block';
-                } else {
-                    container.style.display = 'none';
-                }
-                
+                if (text) { inner.innerText = text; container.style.display = 'block'; }
+                else { container.style.display = 'none'; }
                 document.getElementById('progressSlider').value = (time / duration) * 100;
-                document.getElementById('timeDisplay').innerText = 
-                    `${Math.floor(time/60)}:${String(Math.floor(time%60)).padStart(2,'0')} / ${Math.floor(duration/60)}:${String(Math.floor(duration%60)).padStart(2,'0')}`;
-            } catch(e) {
-                console.log('Polling error:', e);
-            }
+                document.getElementById('timeDisplay').innerText = `${Math.floor(time/60)}:${String(Math.floor(time%60)).padStart(2,'0')} / ${Math.floor(duration/60)}:${String(Math.floor(duration%60)).padStart(2,'0')}`;
+            } catch(e){}
         }, 350);
     }
 
