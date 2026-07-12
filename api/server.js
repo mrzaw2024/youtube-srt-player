@@ -1,6 +1,7 @@
 const express = require('express');
 const path = require('path');
 const axios = require('axios');
+const fs = require('fs');
 
 const app = express();
 
@@ -52,7 +53,6 @@ app.get('/api/videos', async (req, res) => {
       if (videoUrl) {
         let videoId = `video_${i}`;
         
-        // YouTube URL
         if (videoUrl.includes('youtube.com/watch')) {
           const match = videoUrl.match(/[?&]v=([^&]+)/);
           if (match) videoId = match[1];
@@ -141,12 +141,40 @@ app.get('/api/video/:videoId', async (req, res) => {
           srtUrl: srtUrl
         };
         
-        if (srtUrl && srtUrl.startsWith('http')) {
+        // ⭐ SRT ဖိုင်ကို ရှာဖွေပါ
+        if (srtUrl) {
           try {
-            const srtRes = await axios.get(srtUrl);
-            subtitles = srtRes.data;
+            let srtContent = '';
+            
+            // Case 1: Full URL (http://...)
+            if (srtUrl.startsWith('http')) {
+              const srtRes = await axios.get(srtUrl);
+              srtContent = srtRes.data;
+            } 
+            // Case 2: Just filename (e.g., "0001.srt")
+            else {
+              // Try local file first
+              const localSrtPath = path.join(__dirname, '../public/srt', srtUrl);
+              if (fs.existsSync(localSrtPath)) {
+                srtContent = fs.readFileSync(localSrtPath, 'utf8');
+                console.log('✅ SRT loaded from local:', srtUrl);
+              } else {
+                // Try GitHub raw URL
+                const githubUrl = `https://raw.githubusercontent.com/mrzaw2024/youtube-srt-player/main/public/srt/${srtUrl}`;
+                try {
+                  const srtRes = await axios.get(githubUrl);
+                  srtContent = srtRes.data;
+                  console.log('✅ SRT loaded from GitHub:', srtUrl);
+                } catch(e) {
+                  console.log('❌ SRT not found:', srtUrl);
+                }
+              }
+            }
+            
+            subtitles = srtContent;
+            
           } catch(e) {
-            console.log('No SRT file found');
+            console.log('❌ Error loading SRT:', e.message);
           }
         }
         break;
@@ -167,6 +195,7 @@ app.get('/api/video/:videoId', async (req, res) => {
     }
     
   } catch (error) {
+    console.error('Error fetching video:', error);
     res.status(500).json({
       success: false,
       message: 'Failed to fetch video',
