@@ -51,12 +51,25 @@ app.get('/api/videos', async (req, res) => {
       
       if (videoUrl) {
         let videoId = `video_${i}`;
+        
+        // YouTube URL
         if (videoUrl.includes('youtube.com/watch')) {
           const match = videoUrl.match(/[?&]v=([^&]+)/);
           if (match) videoId = match[1];
         } else if (videoUrl.includes('youtu.be')) {
           const match = videoUrl.match(/youtu\.be\/([^?]+)/);
           if (match) videoId = match[1];
+        } 
+        // Google Drive URL
+        else if (videoUrl.includes('drive.google.com')) {
+          const match = videoUrl.match(/[?&]id=([^&]+)/);
+          if (match) videoId = match[1];
+        } 
+        // Direct URL (mp4, etc)
+        else {
+          const urlParts = videoUrl.split('/');
+          const filename = urlParts[urlParts.length - 1];
+          videoId = filename.replace(/\.[^/.]+$/, '') || `video_${i}`;
         }
         
         videos.push({
@@ -122,12 +135,20 @@ app.get('/api/video/:videoId', async (req, res) => {
       const title = columns[2] || 'Untitled';
       
       let vid = `video_${i}`;
+      
       if (videoUrl.includes('youtube.com/watch')) {
         const match = videoUrl.match(/[?&]v=([^&]+)/);
         if (match) vid = match[1];
       } else if (videoUrl.includes('youtu.be')) {
         const match = videoUrl.match(/youtu\.be\/([^?]+)/);
         if (match) vid = match[1];
+      } else if (videoUrl.includes('drive.google.com')) {
+        const match = videoUrl.match(/[?&]id=([^&]+)/);
+        if (match) vid = match[1];
+      } else {
+        const urlParts = videoUrl.split('/');
+        const filename = urlParts[urlParts.length - 1];
+        vid = filename.replace(/\.[^/.]+$/, '') || `video_${i}`;
       }
       
       if (vid === videoId) {

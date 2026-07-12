@@ -236,7 +236,7 @@
         
         .loading-text-center { text-align: center; padding: 40px; color: #aaa; font-size: 1rem; grid-column: span 2; }
 
-        /* ===== EXPIRED OVERLAY (from original index.html) ===== */
+        /* ===== EXPIRED OVERLAY ===== */
         .expired-overlay { 
             text-align: center; 
             padding: 50px 16px; 
@@ -270,8 +270,6 @@
             border-radius: 30px; 
             text-decoration: none; 
             transition: transform 0.2s;
-            pointer-events: auto !important;
-            cursor: pointer !important;
         }
         .admin-btn.viber { 
             background: linear-gradient(135deg, #7b51a1 0%, #593181 100%); 
@@ -614,7 +612,6 @@
                 updatePlayerState(); 
                 renderMovies();
                 if (!wasExpired) { 
-                    // Show expired overlay in 2D tab
                     const twodContainer = document.getElementById('twodContainer');
                     if (twodContainer) {
                         twodContainer.innerHTML = `
@@ -639,7 +636,6 @@
                     homeTimeText.textContent = `${mins}m ${secs}s`;
                     homeTimeBar.style.width = Math.min(100, (remaining / (60*60*1000)) * 100) + '%';
                 }
-                // Restore 2D content if expired was shown
                 if (wasExpired) {
                     const twodContainer = document.getElementById('twodContainer');
                     if (twodContainer) {
@@ -673,7 +669,6 @@
                                 </div>
                             </div>
                         `;
-                        // Re-fetch 2D data
                         fetchDataFromSheets();
                     }
                 }
@@ -750,7 +745,13 @@
             document.getElementById('gridSection').classList.add('hide');
             document.getElementById('playerSection').classList.add('active');
             updatePlayerState();
-            createPlayer(v.videoId);
+            // Check if video is YouTube or direct URL
+            const videoUrl = v.videoUrl || '';
+            if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+                createYouTubePlayer(v.videoId);
+            } else {
+                createDirectPlayer(v.videoId);
+            }
         };
         grid.appendChild(card);
     }
@@ -789,14 +790,20 @@
                 document.getElementById('gridSection').classList.add('hide');
                 document.getElementById('playerSection').classList.add('active');
                 updatePlayerState();
-                createPlayer(v.videoId);
+                const videoUrl = v.videoUrl || '';
+                if (videoUrl.includes('youtube.com') || videoUrl.includes('youtu.be')) {
+                    createYouTubePlayer(v.videoId);
+                } else {
+                    createDirectPlayer(v.videoId);
+                }
             };
             fragment.appendChild(card);
         });
         grid.appendChild(fragment);
     }
 
-    function createPlayer(videoId) {
+    // ==================== YOUTUBE PLAYER ====================
+    function createYouTubePlayer(videoId) {
         if (isExpired) return;
         if (player) { try{player.destroy()}catch(e){} player = null; }
         subtitles = [];
@@ -816,6 +823,83 @@
         });
     }
 
+    // ==================== DIRECT VIDEO PLAYER (Google Drive, MP4) ====================
+    function createDirectPlayer(videoId) {
+        if (isExpired) return;
+        if (player) { try{player.destroy()}catch(e){} player = null; }
+        subtitles = [];
+        document.getElementById('statusText').innerHTML = '⏳ Loading video...';
+        document.getElementById('subtitleInner').textContent = '';
+        document.getElementById('subtitleText').style.display = 'none';
+        
+        // Find video URL from allMovies
+        const videoData = allMovies.find(v => v.videoId === videoId);
+        if (!videoData || !videoData.videoUrl) {
+            document.getElementById('statusText').innerHTML = '❌ Video URL not found';
+            return;
+        }
+        
+        const videoUrl = videoData.videoUrl;
+        
+        // Create video element
+        const container = document.getElementById('videoContainer');
+        const existingVideo = document.getElementById('customVideoElement');
+        if (existingVideo) existingVideo.remove();
+        const existingIframe = document.querySelector('.youtube-iframe');
+        if (existingIframe) existingIframe.remove();
+        document.getElementById('youtubePlayer').style.display = 'none';
+        
+        const video = document.createElement('video');
+        video.id = 'customVideoElement';
+        video.controls = false;
+        video.playsInline = true;
+        video.style.width = '100%';
+        video.style.height = '100%';
+        video.style.objectFit = 'contain';
+        video.style.background = '#000';
+        
+        const source = document.createElement('source');
+        source.src = videoUrl;
+        source.type = 'video/mp4';
+        video.appendChild(source);
+        
+        container.appendChild(video);
+        
+        video.addEventListener('loadedmetadata', function() {
+            document.getElementById('statusText').innerHTML = '✅ Video loaded';
+            document.getElementById('fullscreenHint').style.display = 'block';
+            videoDuration = video.duration;
+        });
+        
+        video.addEventListener('timeupdate', function() {
+            currentTimeTracker = video.currentTime;
+            updateSubtitle(currentTimeTracker);
+            updateProgress();
+        });
+        
+        video.play().catch(e => {
+            document.getElementById('statusText').innerHTML = '⚠️ Tap to play video';
+        });
+        
+        // Store video reference for controls
+        window.customVideo = video;
+        
+        // Load SRT
+        loadSRT(videoId);
+        
+        // Start polling
+        if (intervalId) clearInterval(intervalId);
+        intervalId = setInterval(() => {
+            if (isExpired) return;
+            if (window.customVideo) {
+                currentTimeTracker = window.customVideo.currentTime || currentTimeTracker;
+                updateSubtitle(currentTimeTracker);
+                updateProgress();
+            }
+        }, 500);
+    }
+
+    // ==================== SRT LOADING ====================
     async function loadSRT(videoId) {
         try {
             let res = await fetch(`/api/video/${videoId}`);
@@ -861,6 +945,10 @@
         return parseInt(parts[0])*3600 + parseInt(parts[1])*60 + parseFloat(parts[2]);
     }
 
+    // ==================== POLLING ====================
+    let currentTimeTracker = 0;
+    let videoDuration = 300;
+
     function startPolling() {
         if (intervalId) clearInterval(intervalId);
         intervalId = setInterval(() => {
@@ -882,14 +970,68 @@
         }, 350);
     }
 
+    function updateSubtitle(time) {
+        let text = "";
+        for (let s of subtitles) {
+            if (time >= s.start && time <= s.end) { text = s.text; break; }
+        }
+        document.getElementById('subtitleDisplay') ? 
+            document.getElementById('subtitleDisplay').textContent = text : 
+            document.getElementById('subtitleInner').textContent = text;
+        const container = document.getElementById('subtitleText');
+        if (container) {
+            container.style.display = text ? 'block' : 'none';
+        }
+    }
+
+    function updateProgress() {
+        const time = window.customVideo ? window.customVideo.currentTime : currentTimeTracker;
+        const duration = window.customVideo ? window.customVideo.duration : videoDuration;
+        const progress = (time / duration) * 100;
+        document.getElementById('progressSlider').value = progress || 0;
+        document.getElementById('timeDisplay').innerText = `${formatTime(time)} / ${formatTime(duration)}`;
+    }
+
+    function formatTime(seconds) {
+        if (!seconds || isNaN(seconds)) return '0:00';
+        const mins = Math.floor(seconds / 60);
+        const secs = Math.floor(seconds % 60);
+        return `${String(mins).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+    }
+
+    // ==================== VIDEO CONTROLS ====================
     window.togglePlayPause = function() {
-        if (!player) return;
-        if (isPlaying) { player.pauseVideo(); document.getElementById('playPauseBtn').innerHTML = '▶️ Play'; isPlaying = false; }
-        else { player.playVideo(); document.getElementById('playPauseBtn').innerHTML = '⏸ Pause'; isPlaying = true; }
+        if (window.customVideo) {
+            if (window.customVideo.paused) {
+                window.customVideo.play();
+                document.getElementById('playPauseBtn').innerHTML = '⏸ Pause';
+            } else {
+                window.customVideo.pause();
+                document.getElementById('playPauseBtn').innerHTML = '▶️ Play';
+            }
+        } else if (player) {
+            if (isPlaying) { player.pauseVideo(); document.getElementById('playPauseBtn').innerHTML = '▶️ Play'; isPlaying = false; }
+            else { player.playVideo(); document.getElementById('playPauseBtn').innerHTML = '⏸ Pause'; isPlaying = true; }
+        }
     };
-    window.seekVideo = function(sec) { if(!player) return; try { player.seekTo(player.getCurrentTime()+sec, true); } catch(e) {} };
-    window.seekToPosition = function() { if(!player) return; try { let pct = parseFloat(document.getElementById('progressSlider').value); player.seekTo((pct/100)*player.getDuration(), true); } catch(e) {} };
-    
+
+    window.seekVideo = function(sec) {
+        if (window.customVideo) {
+            window.customVideo.currentTime += sec;
+        } else if (player) {
+            try { player.seekTo(player.getCurrentTime()+sec, true); } catch(e) {}
+        }
+    };
+
+    window.seekToPosition = function() {
+        const pct = parseFloat(document.getElementById('progressSlider').value);
+        if (window.customVideo && window.customVideo.duration) {
+            window.customVideo.currentTime = (pct / 100) * window.customVideo.duration;
+        } else if (player) {
+            try { player.seekTo((pct/100)*player.getDuration(), true); } catch(e) {}
+        }
+    };
+
     window.toggleFullscreen = function() {
         let c = document.getElementById('videoContainer');
         let pSection = document.getElementById('playerSection');
@@ -913,12 +1055,24 @@
         if (index > -1) favorites.splice(index, 1); else favorites.push(videoId);
         database.ref('favorites/' + currentUserId).set(favorites).then(() => renderMovies());
     }
-    function setFilter(f) { currentFilter = f; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); document.getElementById(f==='all'?'allBtn':'favBtn').classList.add('active'); renderMovies(); }
+
+    function setFilter(f) { 
+        currentFilter = f; 
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); 
+        document.getElementById(f==='all'?'allBtn':'favBtn').classList.add('active'); 
+        renderMovies(); 
+    }
+
     function searchMovies() { renderMovies(); }
+
     function showGrid() {
         if (intervalId) { clearInterval(intervalId); intervalId = null; }
         subtitles = [];
         if (player) { try{player.destroy()}catch(e){} player = null; }
+        const customVideo = document.getElementById('customVideoElement');
+        if (customVideo) { customVideo.pause(); customVideo.src = ''; customVideo.remove(); }
+        window.customVideo = null;
+        document.getElementById('youtubePlayer').style.display = 'block';
         document.getElementById('gridSection').classList.remove('hide');
         document.getElementById('playerSection').classList.remove('active');
         document.getElementById('playerSection').classList.remove('fs-active');
@@ -928,8 +1082,8 @@
     }
 
     // ==================== 2D SECTION (Bozaw 2D) ====================
-    const SHEET_ID = '1tNEhMx08S8rz84In1FdWLPcYlGJkzDCIXFMIhy5BrGU';
-    const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+    const SHEET_ID_2D = '1tNEhMx08S8rz84In1FdWLPcYlGJkzDCIXFMIhy5BrGU';
+    const SHEET_URL_2D = `https://docs.google.com/spreadsheets/d/${SHEET_ID_2D}/gviz/tq?tqx=out:csv`;
 
     let savedResults = [];
     let savedKhwayItems = [];
@@ -948,7 +1102,7 @@
     }
 
     function fetchDataFromSheets() {
-        const noCacheUrl = `${SHEET_URL}&_ts=${Date.now()}`;
+        const noCacheUrl = `${SHEET_URL_2D}&_ts=${Date.now()}`;
         fetch(noCacheUrl, { cache: 'no-store' })
             .then(response => response.text())
             .then(data => {
