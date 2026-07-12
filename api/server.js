@@ -141,12 +141,12 @@ app.get('/api/video/:videoId', async (req, res) => {
           srtUrl: srtUrl
         };
         
-        // ⭐ SRT ဖိုင်ကို ရှာဖွေပါ
+        // Try to load SRT
         if (srtUrl) {
           try {
             let srtContent = '';
             
-            // Case 1: Full URL (http://...)
+            // Case 1: Full URL
             if (srtUrl.startsWith('http')) {
               const srtRes = await axios.get(srtUrl);
               srtContent = srtRes.data;

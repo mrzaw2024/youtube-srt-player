@@ -810,43 +810,81 @@
         });
     }
 
+    // ==================== SRT LOADING ====================
     async function loadSRT(videoId) {
         try {
+            console.log('🔍 Loading SRT for video:', videoId);
             let res = await fetch(`/api/video/${videoId}`);
             let data = await res.json();
+            console.log('📦 API Response:', data);
+            
             if (data.success && data.subtitles) {
+                console.log('📝 SRT Content length:', data.subtitles.length);
                 subtitles = parseSRT(data.subtitles);
+                console.log('📊 Parsed subtitles count:', subtitles.length);
+                
                 if(subtitles.length > 0) {
                     document.getElementById('statusText').innerHTML = '✅ Premium Subtitle Loaded';
                     document.getElementById('fullscreenHint').style.display = 'block';
+                    console.log('✅ First subtitle:', subtitles[0]);
+                } else {
+                    console.log('⚠️ No subtitles parsed from SRT');
                 }
+            } else {
+                console.log('❌ No subtitles in response');
             }
-        } catch(e) { console.log('No subtitles found'); }
+        } catch(e) {
+            console.error('❌ Error loading SRT:', e);
+        }
     }
 
     function parseSRT(content) {
+        console.log('🔍 Parsing SRT content, length:', content ? content.length : 0);
         if (!content) return [];
-        let lines = content.split(/\r?\n/), subs = [], i = 0;
+        
+        let lines = content.split(/\r?\n/);
+        let subs = [];
+        let i = 0;
+        
         while (i < lines.length) {
             let line = lines[i] ? lines[i].trim() : '';
             if (!line) { i++; continue; }
+            
             let num = parseInt(line);
             if (!isNaN(num) && num > 0) {
                 i++;
-                let timeMatch = lines[i].match(/(\d{2}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,.]\d{3})/);
-                if (timeMatch) {
-                    let start = toSeconds(timeMatch[1]), end = toSeconds(timeMatch[2]);
-                    i++;
-                    let textLines = [];
-                    while (i < lines.length && lines[i].trim()) {
-                        textLines.push(lines[i].trim());
+                if (i < lines.length) {
+                    let timeLine = lines[i] ? lines[i].trim() : '';
+                    let timeMatch = timeLine.match(/(\d{2}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,.]\d{3})/);
+                    if (timeMatch) {
+                        let start = toSeconds(timeMatch[1]);
+                        let end = toSeconds(timeMatch[2]);
+                        i++;
+                        let textLines = [];
+                        while (i < lines.length && lines[i].trim() !== '') {
+                            let textLine = lines[i] ? lines[i].trim() : '';
+                            if (textLine) {
+                                let nextNum = parseInt(textLine);
+                                if (!isNaN(nextNum) && nextNum > 0 && textLine === String(nextNum)) {
+                                    break;
+                                }
+                                textLines.push(textLine);
+                            }
+                            i++;
+                        }
+                        if (textLines.length > 0) {
+                            subs.push({ start: start, end: end, text: textLines.join(" ") });
+                        }
+                    } else {
                         i++;
                     }
-                    subs.push({ start, end, text: textLines.join(" ") });
                 }
+            } else {
+                i++;
             }
-            i++;
         }
+        
+        console.log('✅ Parsed subtitles:', subs.length);
         return subs;
     }
 
@@ -864,15 +902,26 @@
                 let duration = player.getDuration();
                 let text = "";
                 for (let s of subtitles) {
-                    if (time >= s.start && time <= s.end) { text = s.text; break; }
+                    if (time >= s.start && time <= s.end) {
+                        text = s.text;
+                        break;
+                    }
                 }
                 const container = document.getElementById('subtitleText');
                 const inner = document.getElementById('subtitleInner');
-                if (text) { inner.innerText = text; container.style.display = 'block'; }
-                else { container.style.display = 'none'; }
+                if (text && text.trim() !== '') {
+                    inner.innerText = text;
+                    container.style.display = 'block';
+                } else {
+                    container.style.display = 'none';
+                }
+                
                 document.getElementById('progressSlider').value = (time / duration) * 100;
-                document.getElementById('timeDisplay').innerText = `${Math.floor(time/60)}:${String(Math.floor(time%60)).padStart(2,'0')} / ${Math.floor(duration/60)}:${String(Math.floor(duration%60)).padStart(2,'0')}`;
-            } catch(e){}
+                document.getElementById('timeDisplay').innerText = 
+                    `${Math.floor(time/60)}:${String(Math.floor(time%60)).padStart(2,'0')} / ${Math.floor(duration/60)}:${String(Math.floor(duration%60)).padStart(2,'0')}`;
+            } catch(e) {
+                console.log('Polling error:', e);
+            }
         }, 350);
     }
 
