@@ -52,18 +52,21 @@
             top: 0;
             z-index: 100006;
             backdrop-filter: var(--glass);
+            overflow-x: auto;
+            flex-wrap: nowrap;
         }
         .tab-btn {
-            flex: 1;
-            padding: 15px;
+            flex: 0 0 auto;
+            padding: 15px 12px;
             background: transparent;
             border: none;
             color: #aaa;
-            font-size: 1rem;
+            font-size: 0.85rem;
             font-weight: bold;
             cursor: pointer;
             transition: all 0.3s;
             text-align: center;
+            white-space: nowrap;
         }
         .tab-btn.active {
             color: var(--gold);
@@ -374,6 +377,79 @@
         .twod-container .admin-link { color: #3742fa; text-decoration: none; font-weight: 800; }
         .twod-container .flex-center { display: flex; justify-content: center; width: 100%; }
         .twod-container .view-count-num { color: #3742fa; font-weight: 800; }
+
+        /* ===== DUBAI 2D SECTION ===== */
+        .dubai-container {
+            width: 100%;
+            max-width: 650px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 24px;
+            margin: 20px auto;
+            color: #2c3e50;
+        }
+        .dubai-container .header-area { text-align: center; margin-bottom: 20px; }
+        .dubai-container .header-area h2 {
+            font-size: 26px; font-weight: 900; letter-spacing: 0.5px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        }
+        .dubai-container .sub-status-area {
+            font-size: 13px; color: #57606f; font-weight: 700; margin-top: 6px;
+            display: flex; align-items: center; justify-content: center; gap: 5px;
+        }
+        .dubai-container .table-title {
+            font-size: 15px; font-weight: 800; margin-bottom: 12px; color: #2c3e50;
+            border-left: 4px solid #f5576c; padding-left: 8px;
+        }
+        .dubai-container .table-wrapper {
+            width: 100%; overflow-x: auto; border-radius: 16px; border: 1px solid #dcdde1;
+            background: #ffffff; margin-bottom: 20px;
+        }
+        .dubai-container table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px; text-align: center; }
+        .dubai-container th {
+            background: linear-gradient(180deg, #e17055 0%, #d63031 100%);
+            color: #ffffff; font-weight: 700; padding: 14px 4px; font-size: 12px;
+        }
+        .dubai-container td {
+            border-bottom: 1px solid #dee2e6; border-right: 1px solid #eef0f2;
+            padding: 12px 6px; color: #2f3542; font-weight: 600; vertical-align: middle;
+        }
+        .dubai-container td:last-child { border-right: none; }
+        .dubai-container tr:nth-child(even) td { background-color: #f9fbfd; }
+        .dubai-container .num-box-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; }
+        .dubai-container .num-box {
+            display: inline-block; width: 90%; max-width: 85px; font-weight: 800; font-size: 16px;
+            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
+            padding: 8px 0; border-radius: 10px; border: 1px solid #fdcb6e; text-align: center;
+        }
+        .dubai-container .count-text { font-size: 11px; font-weight: 900; color: #e74c3c; margin-left: 2px; vertical-align: super; }
+        .dubai-container .highlight-am-pm-match { background: linear-gradient(135deg, #a8e6cf 0%, #2ecc71 100%) !important; }
+        .dubai-container .highlight-am-pm-match .num-box {
+            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
+            color: white; border-color: #00cec9;
+        }
+        .dubai-container .highlight-am-pm-match .count-text { color: #fff200; }
+        .dubai-container .badge-hit {
+            color: #fff; font-weight: 800; font-size: 13px;
+            background: linear-gradient(135deg, #fd79a8 0%, #e17055 100%);
+            padding: 5px 12px; border-radius: 10px; display: inline-block;
+        }
+        .dubai-container .khway-style {
+            color: #2f3542; font-weight: 700; font-size: 13px; background: #e8f0fe;
+            padding: 6px 8px; border-radius: 8px; display: inline-block; border: 1px solid #d2e3fc; word-break: break-all;
+        }
+        .dubai-container .empty-status { color: #57606f; padding: 30px !important; font-weight: 700; }
+        .dubai-container .admin-footer-box {
+            text-align: center; font-size: 13px; font-weight: bold; color: #57606f;
+            background: rgba(255, 255, 255, 0.6); padding: 10px 16px; border-radius: 14px; border: 1px solid rgba(0,0,0,0.05);
+            display: inline-block;
+        }
+        .dubai-container .admin-link { color: #f5576c; text-decoration: none; font-weight: 800; }
+        .dubai-container .flex-center { display: flex; justify-content: center; width: 100%; }
+        .dubai-container .view-count-num { color: #f5576c; font-weight: 800; }
     </style>
 </head>
 <body>
@@ -394,13 +470,14 @@
 
 <!-- ===== TABS ===== -->
 <div class="app-tabs" id="appTabs">
-    <button class="tab-btn active" id="tab2d" onclick="switchTab('twod')">📊 2D ခန့်မှန်းချက်</button>
+    <button class="tab-btn active" id="tabBozaw" onclick="switchTab('bozaw')">📊 Bozaw 2D</button>
+    <button class="tab-btn" id="tabDubai" onclick="switchTab('dubai')">🇦🇪 Dubai 2D</button>
     <button class="tab-btn" id="tabMovies" onclick="switchTab('movies')">🎬 ဇာတ်ကားများ</button>
 </div>
 
-<!-- ===== 2D TAB (Bozaw 2D) ===== -->
-<div id="twodSection" class="tab-content active">
-    <div class="twod-container" id="twodContainer">
+<!-- ===== BOZAW 2D TAB ===== -->
+<div id="bozawSection" class="tab-content active">
+    <div class="twod-container" id="bozawContainer">
         <div class="header-area">
             <h2>Bozaw 2D ခန့်မှန်းချက်</h2>
             <div class="sub-status-area">
@@ -420,7 +497,43 @@
                         <th style="width: 28%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th>
                     </tr>
                 </thead>
-                <tbody id="tableBody">
+                <tbody id="bozawTableBody">
+                    <tr><td colspan="4" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="flex-center">
+            <div class="admin-footer-box">
+                👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ===== DUBAI 2D TAB ===== -->
+<div id="dubaiSection" class="tab-content">
+    <div class="dubai-container" id="dubaiContainer">
+        <div class="header-area">
+            <h2>🇦🇪 Dubai 2D ခန့်မှန်းချက်</h2>
+            <div class="sub-status-area">
+                <span class="status-icon" id="dubaiStatusIcon">🔄</span> 
+                <span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="dubaiViewCount">0</span> views</span>
+            </div>
+        </div>
+
+        <div class="table-title">📊 AM / PM & အခွေပူး ဇယားကွက်</div>
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 23%;">AM ထွက်</th>
+                        <th style="width: 23%;">PM ထွက်</th>
+                        <th style="width: 26%;">ထိုတန်း၏ အခွေ/ပတ်</th>
+                        <th style="width: 28%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th>
+                    </tr>
+                </thead>
+                <tbody id="dubaiTableBody">
                     <tr><td colspan="4" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
                 </tbody>
             </table>
@@ -494,13 +607,18 @@
     function switchTab(tabId) {
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        if (tabId === 'movies') {
+        
+        if (tabId === 'bozaw') {
+            document.getElementById('tabBozaw').classList.add('active');
+            document.getElementById('bozawSection').classList.add('active');
+        } else if (tabId === 'dubai') {
+            document.getElementById('tabDubai').classList.add('active');
+            document.getElementById('dubaiSection').classList.add('active');
+            if (dubaiResults.length === 0) fetchDubaiData();
+        } else if (tabId === 'movies') {
             document.getElementById('tabMovies').classList.add('active');
             document.getElementById('moviesSection').classList.add('active');
             if (allMovies.length === 0) loadMovies();
-        } else {
-            document.getElementById('tab2d').classList.add('active');
-            document.getElementById('twodSection').classList.add('active');
         }
     }
 
@@ -629,14 +747,10 @@
                 document.getElementById('userStatusText').className = 'expired';
                 document.getElementById('statusDot').className = 'expired';
                 
-                // Disable both tabs
                 document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('disabled'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.add('disabled'));
                 
-                // Show expired overlay on BOTH tabs
-                const twodContainer = document.getElementById('twodContainer');
-                const movieGrid = document.getElementById('movieGrid');
-                
+                // Show expired overlay on ALL tabs
                 const expiredHTML = `
                     <div class="expired-overlay">
                         <span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span>
@@ -647,12 +761,13 @@
                     </div>
                 `;
                 
-                if (twodContainer) {
-                    twodContainer.innerHTML = expiredHTML;
-                }
-                if (movieGrid) {
-                    movieGrid.innerHTML = expiredHTML;
-                }
+                const bozawContainer = document.getElementById('bozawContainer');
+                const dubaiContainer = document.getElementById('dubaiContainer');
+                const movieGrid = document.getElementById('movieGrid');
+                
+                if (bozawContainer) bozawContainer.innerHTML = expiredHTML;
+                if (dubaiContainer) dubaiContainer.innerHTML = expiredHTML;
+                if (movieGrid) movieGrid.innerHTML = expiredHTML;
                 
                 updatePlayerState(); 
                 if (player) { try{player.destroy()}catch(e){} player = null; }
@@ -661,7 +776,6 @@
                 document.getElementById('userStatusText').className = 'active';
                 document.getElementById('statusDot').className = 'active';
                 
-                // Enable tabs
                 document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('disabled'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('disabled'));
                 
@@ -672,47 +786,88 @@
                     homeTimeBar.style.width = Math.min(100, (remaining / (60*60*1000)) * 100) + '%';
                 }
                 
-                // Restore 2D content if it was replaced
+                // Restore content if was expired
                 if (wasExpired) {
-                    const twodContainer = document.getElementById('twodContainer');
-                    if (twodContainer) {
-                        twodContainer.innerHTML = `
-                            <div class="header-area">
-                                <h2>Bozaw 2D ခန့်မှန်းချက်</h2>
-                                <div class="sub-status-area">
-                                    <span class="status-icon" id="statusIcon">✅</span> 
-                                    <span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="viewCountDisplay">0</span> views</span>
-                                </div>
-                            </div>
-                            <div class="table-title">📊 AM / PM & အခွေပူး ဇယားကွက်</div>
-                            <div class="table-wrapper">
-                                <table>
-                                    <thead>
-                                        <tr>
-                                            <th style="width: 23%;">AM ထွက်</th>
-                                            <th style="width: 23%;">PM ထွက်</th>
-                                            <th style="width: 26%;">ထိုတန်း၏ အခွေ/ပတ်</th>
-                                            <th style="width: 28%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody id="tableBody">
-                                        <tr><td colspan="4" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                            <div class="flex-center">
-                                <div class="admin-footer-box">
-                                    👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a>
-                                </div>
-                            </div>
-                        `;
-                        fetchDataFromSheets();
-                    }
-                    // Reload movies
+                    restoreBozawContent();
+                    restoreDubaiContent();
                     loadMovies(false);
                 }
             }
         }, 1000);
+    }
+
+    function restoreBozawContent() {
+        const bozawContainer = document.getElementById('bozawContainer');
+        if (bozawContainer) {
+            bozawContainer.innerHTML = `
+                <div class="header-area">
+                    <h2>Bozaw 2D ခန့်မှန်းချက်</h2>
+                    <div class="sub-status-area">
+                        <span class="status-icon" id="statusIcon">✅</span> 
+                        <span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="viewCountDisplay">0</span> views</span>
+                    </div>
+                </div>
+                <div class="table-title">📊 AM / PM & အခွေပူး ဇယားကွက်</div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 23%;">AM ထွက်</th>
+                                <th style="width: 23%;">PM ထွက်</th>
+                                <th style="width: 26%;">ထိုတန်း၏ အခွေ/ပတ်</th>
+                                <th style="width: 28%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th>
+                            </tr>
+                        </thead>
+                        <tbody id="bozawTableBody">
+                            <tr><td colspan="4" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex-center">
+                    <div class="admin-footer-box">
+                        👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a>
+                    </div>
+                </div>
+            `;
+            fetchBozawData();
+        }
+    }
+
+    function restoreDubaiContent() {
+        const dubaiContainer = document.getElementById('dubaiContainer');
+        if (dubaiContainer) {
+            dubaiContainer.innerHTML = `
+                <div class="header-area">
+                    <h2>🇦🇪 Dubai 2D ခန့်မှန်းချက်</h2>
+                    <div class="sub-status-area">
+                        <span class="status-icon" id="dubaiStatusIcon">✅</span> 
+                        <span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="dubaiViewCount">0</span> views</span>
+                    </div>
+                </div>
+                <div class="table-title">📊 AM / PM & အခွေပူး ဇယားကွက်</div>
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th style="width: 23%;">AM ထွက်</th>
+                                <th style="width: 23%;">PM ထွက်</th>
+                                <th style="width: 26%;">ထိုတန်း၏ အခွေ/ပတ်</th>
+                                <th style="width: 28%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th>
+                            </tr>
+                        </thead>
+                        <tbody id="dubaiTableBody">
+                            <tr><td colspan="4" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="flex-center">
+                    <div class="admin-footer-box">
+                        👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a>
+                    </div>
+                </div>
+            `;
+            fetchDubaiData();
+        }
     }
 
     function updatePlayerState() {
@@ -761,10 +916,7 @@
 
     function renderIncrementalMovie(v, isFirst) {
         let grid = document.getElementById('movieGrid');
-        if (isExpired) {
-            // Don't render movies if expired
-            return;
-        }
+        if (isExpired) return;
         if (isFirst || grid.querySelector('.loading-text-center') || grid.querySelector('.expired-overlay')) {
             grid.innerHTML = '';
         }
@@ -788,11 +940,7 @@
         let filtered = allMovies;
         if (currentFilter === 'favorites') filtered = filtered.filter(m => favorites.includes(m.videoId));
         if (searchTerm) filtered = filtered.filter(m => (m.title || "").toLowerCase().includes(searchTerm));
-        
-        if (isExpired) {
-            // Expired overlay will be shown by startExpiryChecker
-            return;
-        }
+        if (isExpired) return;
         if (filtered.length === 0) {
             if (allMovies.length === 0) { grid.innerHTML = '<div class="loading-text-center">⏳ Loading Movies...</div>'; }
             else { grid.innerHTML = '<div class="loading-text-center">📭 ဇာတ်ကားများ မရှိသေးပါ။</div>'; }
@@ -817,7 +965,6 @@
         grid.appendChild(fragment);
     }
 
-    // ==================== YOUTUBE PLAYER ====================
     function createPlayer(videoId) {
         if (isExpired) return;
         if (player) { try{player.destroy()}catch(e){} player = null; }
@@ -838,7 +985,6 @@
         });
     }
 
-    // ==================== SRT LOADING ====================
     async function loadSRT(videoId) {
         try {
             let res = await fetch(`/api/video/${videoId}`);
@@ -950,12 +1096,12 @@
         loadMovies(false);
     }
 
-    // ==================== 2D SECTION (Bozaw 2D) ====================
-    const SHEET_ID_2D = '1tNEhMx08S8rz84In1FdWLPcYlGJkzDCIXFMIhy5BrGU';
-    const SHEET_URL_2D = `https://docs.google.com/spreadsheets/d/${SHEET_ID_2D}/gviz/tq?tqx=out:csv`;
+    // ==================== BOZAW 2D SECTION ====================
+    const BOZAW_SHEET_ID = '1tNEhMx08S8rz84In1FdWLPcYlGJkzDCIXFMIhy5BrGU';
+    const BOZAW_SHEET_URL = `https://docs.google.com/spreadsheets/d/${BOZAW_SHEET_ID}/gviz/tq?tqx=out:csv`;
 
-    let savedResults = [];
-    let savedKhwayItems = [];
+    let bozawResults = [];
+    let bozawKhwayItems = [];
 
     function handleViewCounter() {
         const COUNTER_KEY = 'bozaw2d_vercel_app_2026_views';
@@ -965,30 +1111,29 @@
                 document.getElementById('viewCountDisplay').innerText = Number(data.value).toLocaleString();
             })
             .catch(error => {
-                console.error('View counter error:', error);
                 document.getElementById('viewCountDisplay').innerText = '-';
             });
     }
 
-    function fetchDataFromSheets() {
-        const noCacheUrl = `${SHEET_URL_2D}&_ts=${Date.now()}`;
+    function fetchBozawData() {
+        const noCacheUrl = `${BOZAW_SHEET_URL}&_ts=${Date.now()}`;
         fetch(noCacheUrl, { cache: 'no-store' })
             .then(response => response.text())
             .then(data => {
-                parseCSVData(data);
+                parseBozawCSV(data);
                 document.getElementById('statusIcon').innerText = '✅';
-                renderTable();
+                renderBozawTable();
             })
             .catch(error => {
-                console.error('Error fetching sheet data:', error);
+                console.error('Error fetching Bozaw data:', error);
                 document.getElementById('statusIcon').innerText = '❌';
             });
     }
 
-    function parseCSVData(csvText) {
+    function parseBozawCSV(csvText) {
         let lines = csvText.split('\n');
-        savedResults = [];
-        savedKhwayItems = [];
+        bozawResults = [];
+        bozawKhwayItems = [];
 
         for (let i = 1; i < lines.length; i++) {
             let currentLine = lines[i].trim();
@@ -1016,8 +1161,8 @@
                 }
 
                 if (res.length === 4) {
-                    savedResults.push(res);
-                    savedKhwayItems.push(khw || '-');
+                    bozawResults.push(res);
+                    bozawKhwayItems.push(khw || '-');
                 }
             }
         }
@@ -1039,28 +1184,28 @@
         }
     }
 
-    function renderTable() {
-        let tbody = document.getElementById('tableBody');
+    function renderBozawTable() {
+        let tbody = document.getElementById('bozawTableBody');
         if (!tbody) return;
         tbody.innerHTML = '';
 
-        if(savedResults.length === 0) {
+        if(bozawResults.length === 0) {
             tbody.innerHTML = `<tr><td colspan="4" class="empty-status">ဒေတာများ မရှိသေးပါ။ Google Sheet တွင် အရင်ဖြည့်ပါ။</td></tr>`;
             return;
         }
 
-        let amHitCounts = new Array(savedResults.length).fill(0);
-        let pmHitCounts = new Array(savedResults.length).fill(0);
+        let amHitCounts = new Array(bozawResults.length).fill(0);
+        let pmHitCounts = new Array(bozawResults.length).fill(0);
 
-        savedResults.forEach((numStr, index) => {
-            let currentKhwayStr = savedKhwayItems[index];
+        bozawResults.forEach((numStr, index) => {
+            let currentKhwayStr = bozawKhwayItems[index];
             if (currentKhwayStr && currentKhwayStr !== '-') {
                 let subKhways = currentKhwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
 
                 for (let i = 1; i <= 5; i++) {
                     let targetIndex = index + i;
-                    if (targetIndex < savedResults.length) {
-                        let targetNumStr = savedResults[targetIndex];
+                    if (targetIndex < bozawResults.length) {
+                        let targetNumStr = bozawResults[targetIndex];
                         let targetAm = targetNumStr.slice(0, 2);
                         let targetPm = targetNumStr.slice(2, 4);
 
@@ -1073,20 +1218,20 @@
             }
         });
 
-        savedResults.forEach((numStr, index) => {
+        bozawResults.forEach((numStr, index) => {
             let amNum = numStr.slice(0, 2); 
             let pmNum = numStr.slice(2, 4); 
             
-            let currentKhwayStr = savedKhwayItems[index] ? savedKhwayItems[index] : '-';
+            let currentKhwayStr = bozawKhwayItems[index] ? bozawKhwayItems[index] : '-';
             let hitNumbers = []; 
 
-            if (savedKhwayItems[index] && savedKhwayItems[index] !== '-') {
-                let subKhways = savedKhwayItems[index].split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+            if (bozawKhwayItems[index] && bozawKhwayItems[index] !== '-') {
+                let subKhways = bozawKhwayItems[index].split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
 
                 for (let i = 1; i <= 5; i++) {
                     let targetIndex = index + i;
-                    if (targetIndex < savedResults.length) {
-                        let targetNumStr = savedResults[targetIndex];
+                    if (targetIndex < bozawResults.length) {
+                        let targetNumStr = bozawResults[targetIndex];
                         let targetAm = targetNumStr.slice(0, 2);
                         let targetPm = targetNumStr.slice(2, 4);
 
@@ -1101,8 +1246,8 @@
             let tr = document.createElement('tr');
             
             let khwayDisplayHTML = '-';
-            if(savedKhwayItems[index] && savedKhwayItems[index] !== '-') {
-                let cleanDisplayParts = savedKhwayItems[index].split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+            if(bozawKhwayItems[index] && bozawKhwayItems[index] !== '-') {
+                let cleanDisplayParts = bozawKhwayItems[index].split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
                 if(cleanDisplayParts.length > 0) {
                     khwayDisplayHTML = `<span class="khway-style">${cleanDisplayParts.join('<br><hr style="border:0;border-top:1px dashed #b2bec3;margin:4px 0;">')}</span>`;
                 }
@@ -1110,7 +1255,169 @@
 
             let finalHitHTML = hitNumbers.length > 0 
                 ? `<span class="badge-hit">${hitNumbers.join(', ')}</span>` 
-                : (savedKhwayItems[index] && savedKhwayItems[index] !== '-' ? '<span style="color:#747d8c;font-size:12px;font-weight:700;">မပါဝင်ပါ</span>' : '-');
+                : (bozawKhwayItems[index] && bozawKhwayItems[index] !== '-' ? '<span style="color:#747d8c;font-size:12px;font-weight:700;">မပါဝင်ပါ</span>' : '-');
+
+            let amCountStr = amHitCounts[index] > 0 ? `<span class="count-text">(${amHitCounts[index]})</span>` : '';
+            let pmCountStr = pmHitCounts[index] > 0 ? `<span class="count-text">(${pmHitCounts[index]})</span>` : '';
+
+            tr.innerHTML = `
+                <td class="${amHitCounts[index] > 0 ? 'highlight-am-pm-match' : ''}">
+                    <div class="num-box-wrapper"><span class="num-box">${amNum}${amCountStr}</span></div>
+                </td>
+                <td class="${pmHitCounts[index] > 0 ? 'highlight-am-pm-match' : ''}">
+                    <div class="num-wrapper"><span class="num-box">${pmNum}${pmCountStr}</span></div>
+                </td>
+                <td>${khwayDisplayHTML}</td>
+                <td>${finalHitHTML}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    // ==================== DUBAI 2D SECTION ====================
+    const DUBAI_SHEET_ID = '1ICqRfe1aMsRmvjyfcaKFnqplubIyO3Xfe4JYgQRZP5E';
+    const DUBAI_SHEET_URL = `https://docs.google.com/spreadsheets/d/${DUBAI_SHEET_ID}/gviz/tq?tqx=out:csv`;
+
+    let dubaiResults = [];
+    let dubaiKhwayItems = [];
+
+    function handleDubaiViewCounter() {
+        const COUNTER_KEY = 'dubai2d_vercel_app_2026_views';
+        fetch(`https://countapi.mileshilliard.com/api/v1/hit/${COUNTER_KEY}`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('dubaiViewCount').innerText = Number(data.value).toLocaleString();
+            })
+            .catch(error => {
+                document.getElementById('dubaiViewCount').innerText = '-';
+            });
+    }
+
+    function fetchDubaiData() {
+        const noCacheUrl = `${DUBAI_SHEET_URL}&_ts=${Date.now()}`;
+        fetch(noCacheUrl, { cache: 'no-store' })
+            .then(response => response.text())
+            .then(data => {
+                parseDubaiCSV(data);
+                document.getElementById('dubaiStatusIcon').innerText = '✅';
+                renderDubaiTable();
+            })
+            .catch(error => {
+                console.error('Error fetching Dubai data:', error);
+                document.getElementById('dubaiStatusIcon').innerText = '❌';
+            });
+    }
+
+    function parseDubaiCSV(csvText) {
+        let lines = csvText.split('\n');
+        dubaiResults = [];
+        dubaiKhwayItems = [];
+
+        for (let i = 1; i < lines.length; i++) {
+            let currentLine = lines[i].trim();
+            if (!currentLine) continue;
+
+            let matches = currentLine.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || currentLine.split(',');
+            
+            if (matches.length >= 1) {
+                let res = matches[0].replace(/"/g, '').trim();
+                
+                let khw = '';
+                if (matches.length > 1) {
+                    let textParts = [];
+                    for(let j=1; j<matches.length; j++) {
+                        let part = matches[j].replace(/"/g, '').trim();
+                        if(part) textParts.push(part);
+                    }
+                    khw = textParts.join(',').trim();
+                }
+
+                if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
+
+                if (res.length > 0 && res.length < 4) {
+                    res = res.padStart(4, '0');
+                }
+
+                if (res.length === 4) {
+                    dubaiResults.push(res);
+                    dubaiKhwayItems.push(khw || '-');
+                }
+            }
+        }
+    }
+
+    function renderDubaiTable() {
+        let tbody = document.getElementById('dubaiTableBody');
+        if (!tbody) return;
+        tbody.innerHTML = '';
+
+        if(dubaiResults.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="4" class="empty-status">ဒေတာများ မရှိသေးပါ။ Google Sheet တွင် အရင်ဖြည့်ပါ။</td></tr>`;
+            return;
+        }
+
+        let amHitCounts = new Array(dubaiResults.length).fill(0);
+        let pmHitCounts = new Array(dubaiResults.length).fill(0);
+
+        dubaiResults.forEach((numStr, index) => {
+            let currentKhwayStr = dubaiKhwayItems[index];
+            if (currentKhwayStr && currentKhwayStr !== '-') {
+                let subKhways = currentKhwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+
+                for (let i = 1; i <= 5; i++) {
+                    let targetIndex = index + i;
+                    if (targetIndex < dubaiResults.length) {
+                        let targetNumStr = dubaiResults[targetIndex];
+                        let targetAm = targetNumStr.slice(0, 2);
+                        let targetPm = targetNumStr.slice(2, 4);
+
+                        subKhways.forEach(khway => {
+                            if (checkMatchLogic(khway, targetAm)) amHitCounts[targetIndex]++;
+                            if (checkMatchLogic(khway, targetPm)) pmHitCounts[targetIndex]++;
+                        });
+                    }
+                }
+            }
+        });
+
+        dubaiResults.forEach((numStr, index) => {
+            let amNum = numStr.slice(0, 2); 
+            let pmNum = numStr.slice(2, 4); 
+            
+            let currentKhwayStr = dubaiKhwayItems[index] ? dubaiKhwayItems[index] : '-';
+            let hitNumbers = []; 
+
+            if (dubaiKhwayItems[index] && dubaiKhwayItems[index] !== '-') {
+                let subKhways = dubaiKhwayItems[index].split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+
+                for (let i = 1; i <= 5; i++) {
+                    let targetIndex = index + i;
+                    if (targetIndex < dubaiResults.length) {
+                        let targetNumStr = dubaiResults[targetIndex];
+                        let targetAm = targetNumStr.slice(0, 2);
+                        let targetPm = targetNumStr.slice(2, 4);
+
+                        subKhways.forEach(khway => {
+                            if (checkMatchLogic(khway, targetAm) && !hitNumbers.includes(targetAm)) hitNumbers.push(targetAm);
+                            if (checkMatchLogic(khway, targetPm) && !hitNumbers.includes(targetPm)) hitNumbers.push(targetPm);
+                        });
+                    }
+                }
+            }
+
+            let tr = document.createElement('tr');
+            
+            let khwayDisplayHTML = '-';
+            if(dubaiKhwayItems[index] && dubaiKhwayItems[index] !== '-') {
+                let cleanDisplayParts = dubaiKhwayItems[index].split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+                if(cleanDisplayParts.length > 0) {
+                    khwayDisplayHTML = `<span class="khway-style">${cleanDisplayParts.join('<br><hr style="border:0;border-top:1px dashed #b2bec3;margin:4px 0;">')}</span>`;
+                }
+            }
+
+            let finalHitHTML = hitNumbers.length > 0 
+                ? `<span class="badge-hit">${hitNumbers.join(', ')}</span>` 
+                : (dubaiKhwayItems[index] && dubaiKhwayItems[index] !== '-' ? '<span style="color:#747d8c;font-size:12px;font-weight:700;">မပါဝင်ပါ</span>' : '-');
 
             let amCountStr = amHitCounts[index] > 0 ? `<span class="count-text">(${amHitCounts[index]})</span>` : '';
             let pmCountStr = pmHitCounts[index] > 0 ? `<span class="count-text">(${pmHitCounts[index]})</span>` : '';
@@ -1132,7 +1439,9 @@
     // ==================== INIT ====================
     window.onload = function() {
         handleViewCounter();
-        fetchDataFromSheets();
+        handleDubaiViewCounter();
+        fetchBozawData();
+        fetchDubaiData();
         if (typeof YT !== 'undefined' && YT.loaded) { autoLogin(); }
     };
 
