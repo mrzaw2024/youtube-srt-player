@@ -125,6 +125,7 @@
             text-align: center;
         }
 
+        /* ===== GREEN HIGHLIGHT - ONLY FOR MATCHING WITH NEXT ROW ===== */
         .highlight-match {
             background: linear-gradient(135deg, #a8e6cf 0%, #2ecc71 100%) !important;
         }
@@ -135,6 +136,7 @@
             box-shadow: 0 3px 10px rgba(0, 206, 201, 0.3);
         }
 
+        /* ===== PREDICTION ROW ===== */
         .pred-row td {
             background: #fef9e7 !important;
             font-weight: 700;
@@ -156,6 +158,7 @@
             border-color: #27ae60;
         }
 
+        /* ===== KHAWAY COLUMN ===== */
         .khaway-col {
             font-weight: 700;
             color: #2c3e50;
@@ -181,6 +184,7 @@
             background: linear-gradient(180deg, #6c5ce7 0%, #6c5ce7 100%) !important;
         }
 
+        /* ===== RESULT ROW ===== */
         .result-row td {
             background: #f8f9fa !important;
         }
@@ -334,7 +338,6 @@
                     for (let i = 0; i < 12; i += 2) {
                         pairs.push(res.substring(i, i + 2));
                     }
-                    // Reorder to [11,1,3,5,7,9]
                     if (pairs.length === 6) {
                         dubaiResults.push([
                             pairs[5], // 11
@@ -347,20 +350,19 @@
                     }
                 }
 
-                // Column B: Khaway (main khaway) - last column
+                // Column B: Khaway
                 if (matches.length > 1) {
                     let khw = matches[1].replace(/"/g, '').trim();
                     dubaiKhwayItems.push(khw || '-');
                 }
 
-                // Columns C-H: Hourly predictions (6 columns)
+                // Columns C-H: Hourly predictions
                 if (matches.length > 2) {
                     let hourlyPreds = [];
                     for (let j = 2; j < Math.min(matches.length, 8); j++) {
                         let pred = matches[j].replace(/"/g, '').trim();
                         hourlyPreds.push(pred || '-');
                     }
-                    // Pad to 6 columns if needed
                     while (hourlyPreds.length < 6) {
                         hourlyPreds.push('-');
                     }
@@ -369,7 +371,6 @@
             }
         }
 
-        // Ensure all arrays have same length
         while (dubaiHourlyPredictions.length < dubaiResults.length) {
             dubaiHourlyPredictions.push(['-', '-', '-', '-', '-', '-']);
         }
@@ -413,19 +414,44 @@
                 const td = document.createElement('td');
                 const val = row[col] || '-';
                 const displayVal = val === '-' ? '-' : val;
+                
+                // Check if this number matches the prediction in the same column (row 2)
+                const predVal = hourlyPreds[col] || '-';
+                let isMatch = false;
+                if (predVal !== '-' && val !== '-') {
+                    const predParts = predVal.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+                    for (let p of predParts) {
+                        if (checkMatchLogic(p, val)) {
+                            isMatch = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (isMatch) {
+                    td.className = 'highlight-match';
+                }
+                
                 td.innerHTML = `<div class="num-box-wrapper"><span class="num-box">${displayVal}</span></div>`;
                 tr1.appendChild(td);
             }
-            // Khaway column (B)
+            // Khaway column - check if khaway matches any number in this row
             const tdKhway = document.createElement('td');
             tdKhway.className = 'khaway-col';
             if (khwayStr && khwayStr !== '-') {
                 const khwayParts = khwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
                 let khwayHTML = '';
+                let anyMatch = false;
                 khwayParts.forEach((kh, idx) => {
-                    khwayHTML += `<span class="khaway-box">${kh}</span>`;
+                    const isHit = row.some(val => val !== '-' && checkMatchLogic(kh, val));
+                    if (isHit) anyMatch = true;
+                    khwayHTML += `<span class="khaway-box ${isHit ? 'hit' : ''}">${kh}</span>`;
                     if (idx < khwayParts.length - 1) khwayHTML += ' ';
                 });
+                // If any khaway matches, highlight the whole khaway column
+                if (anyMatch) {
+                    tdKhway.style.background = 'rgba(46, 204, 113, 0.15)';
+                }
                 tdKhway.innerHTML = khwayHTML;
             } else {
                 tdKhway.innerHTML = `<span style="color:#bdc3c7;font-size:11px;">-</span>`;
@@ -433,7 +459,7 @@
             tr1.appendChild(tdKhway);
             tbody.appendChild(tr1);
 
-            // ===== ROW 2: Prediction Row (C-H) =====
+            // ===== ROW 2: Prediction Row =====
             const trPred = document.createElement('tr');
             trPred.className = 'pred-row';
             for (let col = 0; col < 6; col++) {
@@ -464,7 +490,7 @@
                 td.innerHTML = displayHtml;
                 trPred.appendChild(td);
             }
-            // Prediction for khaway column - show khaway
+            // Prediction for khaway column
             const tdPredKhway = document.createElement('td');
             tdPredKhway.className = 'khaway-col';
             if (khwayStr && khwayStr !== '-') {
