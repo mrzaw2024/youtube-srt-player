@@ -305,7 +305,7 @@
         }
         .expired-overlay .admin-btn:active { transform: scale(0.95); }
 
-        /* ===== 2D SECTION (Bozaw 2D) ===== */
+        /* ===== 2D SECTION (Bozaw 2D) - Green Highlight ===== */
         .twod-container {
             width: 100%;
             max-width: 650px;
@@ -341,8 +341,12 @@
             color: #ffffff; font-weight: 700; padding: 14px 4px; font-size: 12px;
         }
         .twod-container td {
-            border-bottom: 1px solid #dee2e6; border-right: 1px solid #eef0f2;
-            padding: 12px 6px; color: #2f3542; font-weight: 600; vertical-align: middle;
+            border-bottom: 1px solid #dee2e6;
+            border-right: 1px solid #eef0f2;
+            padding: 12px 6px;
+            color: #2f3542;
+            font-weight: 600;
+            vertical-align: middle;
         }
         .twod-container td:last-child { border-right: none; }
         .twod-container tr:nth-child(even) td { background-color: #f9fbfd; }
@@ -350,28 +354,58 @@
         .twod-container .num-box {
             display: inline-block; width: 90%; max-width: 85px; font-weight: 800; font-size: 16px;
             background: linear-gradient(135deg, #fff3cd 0%, #ffe066 100%);
-            padding: 8px 0; border-radius: 10px; border: 1px solid #ffe066; text-align: center;
+            padding: 8px 0; border-radius: 10px; border: 1px solid #ffe066;
+            text-align: center;
         }
-        .twod-container .count-text { font-size: 11px; font-weight: 900; color: #e74c3c; margin-left: 2px; vertical-align: super; }
-        .twod-container .highlight-am-pm-match { background: linear-gradient(135deg, #a8e6cf 0%, #2ecc71 100%) !important; }
-        .twod-container .highlight-am-pm-match .num-box {
+        .twod-container .count-text {
+            font-size: 11px; font-weight: 900;
+            color: #e74c3c;
+            margin-left: 2px;
+            vertical-align: super;
+        }
+        /* Green Highlight for matching numbers */
+        .twod-container .highlight-match {
+            background: linear-gradient(135deg, #a8e6cf 0%, #2ecc71 100%) !important;
+        }
+        .twod-container .highlight-match .num-box {
             background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-            color: white; border-color: #10b981;
+            color: white;
+            border-color: #10b981;
+            box-shadow: 0 3px 6px rgba(16, 185, 129, 0.2);
         }
-        .twod-container .highlight-am-pm-match .count-text { color: #fff200; }
+        .twod-container .highlight-match .count-text {
+            color: #fff200;
+        }
         .twod-container .badge-hit {
-            color: #fff; font-weight: 800; font-size: 13px;
+            color: #fff;
+            font-weight: 800;
+            font-size: 13px;
             background: linear-gradient(135deg, #2ed573 0%, #1ebd60 100%);
-            padding: 5px 12px; border-radius: 10px; display: inline-block;
+            padding: 5px 12px;
+            border-radius: 10px;
+            display: inline-block;
         }
         .twod-container .khway-style {
-            color: #2f3542; font-weight: 700; font-size: 13px; background: #e8f0fe;
-            padding: 6px 8px; border-radius: 8px; display: inline-block; border: 1px solid #d2e3fc; word-break: break-all;
+            color: #2f3542;
+            font-weight: 700;
+            font-size: 13px;
+            background: #e8f0fe;
+            padding: 6px 8px;
+            border-radius: 8px;
+            display: inline-block;
+            border: 1px solid #d2e3fc;
+            word-break: break-all;
         }
         .twod-container .empty-status { color: #57606f; padding: 30px !important; font-weight: 700; }
         .twod-container .admin-footer-box {
-            text-align: center; font-size: 13px; font-weight: bold; color: #57606f;
-            background: rgba(255, 255, 255, 0.6); padding: 10px 16px; border-radius: 14px; border: 1px solid rgba(0,0,0,0.05);
+            text-align: center;
+            font-size: 13px;
+            font-weight: bold;
+            color: #57606f;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 10px 16px;
+            border-radius: 14px;
+            border: 1px solid rgba(0,0,0,0.05);
             display: inline-block;
         }
         .twod-container .admin-link { color: #3742fa; text-decoration: none; font-weight: 800; }
@@ -523,7 +557,6 @@
             color: #f5576c;
             font-weight: 800;
         }
-        /* Dubai 6-column layout */
         .dubai-container table th,
         .dubai-container table td {
             width: 16.66% !important;
@@ -1340,11 +1373,15 @@
             let amCountStr = amHitCounts[index] > 0 ? `<span class="count-text">(${amHitCounts[index]})</span>` : '';
             let pmCountStr = pmHitCounts[index] > 0 ? `<span class="count-text">(${pmHitCounts[index]})</span>` : '';
 
+            // Green highlight for AM if it matches
+            const amMatch = amHitCounts[index] > 0;
+            const pmMatch = pmHitCounts[index] > 0;
+
             tr.innerHTML = `
-                <td class="${amHitCounts[index] > 0 ? 'highlight-am-pm-match' : ''}">
+                <td class="${amMatch ? 'highlight-match' : ''}">
                     <div class="num-box-wrapper"><span class="num-box">${amNum}${amCountStr}</span></div>
                 </td>
-                <td class="${pmHitCounts[index] > 0 ? 'highlight-am-pm-match' : ''}">
+                <td class="${pmMatch ? 'highlight-match' : ''}">
                     <div class="num-wrapper"><span class="num-box">${pmNum}${pmCountStr}</span></div>
                 </td>
                 <td>${khwayDisplayHTML}</td>
@@ -1416,29 +1453,21 @@
 
                 // Dubai format: 12-digit number split into 6 pairs
                 if (res.length === 12) {
-                    // Split into 6 pairs: 11, 1, 3, 5, 7, 9
                     const pairs = [];
                     for (let i = 0; i < 12; i += 2) {
                         pairs.push(res.substring(i, i + 2));
                     }
-                    // Reorder: [11, 1, 3, 5, 7, 9]
-                    // Actually need to map correctly based on position
-                    // For now, use as-is from sheet
                     dubaiResults.push(pairs);
                     dubaiKhwayItems.push(khw || '-');
                 } else if (res.length === 2) {
-                    // Single pair - treat as one column
-                    // For backward compatibility
+                    // Single pair
                     if (!Array.isArray(dubaiResults[dubaiResults.length - 1])) {
-                        // Start new row
                         dubaiResults.push([res]);
                         dubaiKhwayItems.push(khw || '-');
                     } else {
-                        // Add to existing row
                         dubaiResults[dubaiResults.length - 1].push(res);
                     }
                 } else if (res.length === 4) {
-                    // Two pairs - add both
                     const pair1 = res.substring(0, 2);
                     const pair2 = res.substring(2, 4);
                     if (!Array.isArray(dubaiResults[dubaiResults.length - 1]) || dubaiResults[dubaiResults.length - 1].length >= 6) {
@@ -1451,7 +1480,7 @@
             }
         }
 
-        // Ensure each row has exactly 6 columns, pad with '-'
+        // Ensure each row has exactly 6 columns
         for (let i = 0; i < dubaiResults.length; i++) {
             if (Array.isArray(dubaiResults[i])) {
                 while (dubaiResults[i].length < 6) {
@@ -1475,7 +1504,6 @@
             const tr = document.createElement('tr');
             const columns = Array.isArray(row) ? row : [row];
             
-            // Pad to 6 columns
             while (columns.length < 6) {
                 columns.push('-');
             }
@@ -1485,7 +1513,6 @@
                 const val = columns[col] || '-';
                 const displayVal = val === '-' ? '-' : val;
                 
-                // Check if this value matches with khway items
                 const khwayStr = dubaiKhwayItems[rowIndex] || '';
                 const isMatch = khwayStr && khwayStr !== '-' && checkMatchLogic(khwayStr, val);
                 
