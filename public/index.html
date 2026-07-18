@@ -31,7 +31,7 @@
         /* ===== CONTAINER ===== */
         .container {
             width: 100%;
-            max-width: 750px;
+            max-width: 850px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -130,7 +130,7 @@
             text-align: center;
         }
 
-        /* ===== GREEN HIGHLIGHT - ONLY FOR MATCHING ===== */
+        /* ===== GREEN HIGHLIGHT ===== */
         .highlight-match {
             background: linear-gradient(135deg, #a8e6cf 0%, #2ecc71 100%) !important;
         }
@@ -139,6 +139,25 @@
             color: white;
             border-color: #00cec9;
             box-shadow: 0 3px 10px rgba(0, 206, 201, 0.3);
+        }
+
+        /* ===== PREDICTION NUMBER ROW ===== */
+        .pred-row td {
+            background: #fef9e7 !important;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        .pred-number {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        .pred-number.hit {
+            background: #2ecc71;
+            color: white;
         }
 
         /* ===== KHAWAY COLUMN ===== */
@@ -239,7 +258,7 @@
         </div>
     </div>
 
-    <div class="table-title">📊 ၆ ကွက် ထွက်ဂဏန်း + အခွေပူး ဇယား</div>
+    <div class="table-title">📊 ၆ ကွက် ထွက်ဂဏန်း + ထိုးရမဲ့ဂဏန်း + အခွေပူး ဇယား</div>
     <div class="table-wrapper">
         <table>
             <thead>
@@ -320,7 +339,7 @@
             if (matches.length >= 1) {
                 let res = matches[0].replace(/"/g, '').trim();
                 
-                // Khway is column B (index 1) onward - combine all
+                // Khway is column B (index 1) onward
                 let khw = '';
                 if (matches.length > 1) {
                     let textParts = [];
@@ -413,32 +432,21 @@
             
             // ===== ROW 1: Number Row =====
             const tr1 = document.createElement('tr');
-            
             for (let col = 0; col < 6; col++) {
                 const td = document.createElement('td');
                 const val = row[col] || '-';
                 const displayVal = val === '-' ? '-' : val;
-                
-                // Check if this number matches khway
-                const isMatch = khwayStr && khwayStr !== '-' && checkMatchLogic(khwayStr, val);
-                if (isMatch && val !== '-') {
-                    td.className = 'highlight-match';
-                }
-                
                 td.innerHTML = `<div class="num-box-wrapper"><span class="num-box">${displayVal}</span></div>`;
                 tr1.appendChild(td);
             }
-            
-            // Khaway column - show ONLY khaway numbers (no hour labels)
+            // Khaway column
             const tdKhway = document.createElement('td');
             tdKhway.className = 'khaway-col';
             if (khwayStr && khwayStr !== '-') {
                 const khwayParts = khwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
                 let khwayHTML = '';
                 khwayParts.forEach((kh, idx) => {
-                    // Check if this khaway matches any number in the row
-                    const isHit = row.some(val => val !== '-' && checkMatchLogic(kh, val));
-                    khwayHTML += `<span class="khaway-box ${isHit ? 'hit' : ''}">${kh}</span>`;
+                    khwayHTML += `<span class="khaway-box">${kh}</span>`;
                     if (idx < khwayParts.length - 1) khwayHTML += ' ';
                 });
                 tdKhway.innerHTML = khwayHTML;
@@ -448,7 +456,54 @@
             tr1.appendChild(tdKhway);
             tbody.appendChild(tr1);
 
-            // ===== ROW 2: Result Row (check next row) =====
+            // ===== ROW 2: Prediction Number Row (ထိုးရမဲ့ဂဏန်း - နာရီအောက်မှာ) =====
+            const trPred = document.createElement('tr');
+            trPred.className = 'pred-row';
+            const khwayParts = khwayStr && khwayStr !== '-' ? khwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0) : [];
+            
+            for (let col = 0; col < 6; col++) {
+                const td = document.createElement('td');
+                const val = row[col] || '-';
+                let predDisplay = '';
+                
+                if (khwayParts.length > 0 && val !== '-') {
+                    // Find matching khaway for this specific column value
+                    const matchedKhways = khwayParts.filter(kh => checkMatchLogic(kh, val));
+                    if (matchedKhways.length > 0) {
+                        // Show the khaway that matches this column
+                        const displayKh = matchedKhways.join(', ');
+                        predDisplay = `<span class="pred-number hit">${displayKh}</span>`;
+                    } else {
+                        predDisplay = `<span class="pred-number" style="color:#bdc3c7;">-</span>`;
+                    }
+                } else {
+                    predDisplay = `<span style="color:#bdc3c7;font-size:11px;">-</span>`;
+                }
+                
+                td.innerHTML = predDisplay;
+                trPred.appendChild(td);
+            }
+            // Khaway column prediction - show which khaway matched
+            const tdPredKhway = document.createElement('td');
+            tdPredKhway.className = 'khaway-col';
+            if (khwayParts.length > 0) {
+                let hitKhways = [];
+                khwayParts.forEach(kh => {
+                    const isHit = row.some(val => val !== '-' && checkMatchLogic(kh, val));
+                    if (isHit) hitKhways.push(kh);
+                });
+                if (hitKhways.length > 0) {
+                    tdPredKhway.innerHTML = `<span class="khaway-box hit">✓ ${hitKhways.join(', ')}</span>`;
+                } else {
+                    tdPredKhway.innerHTML = `<span style="color:#bdc3c7;font-size:11px;">မကိုက်</span>`;
+                }
+            } else {
+                tdPredKhway.innerHTML = `<span style="color:#bdc3c7;font-size:11px;">-</span>`;
+            }
+            trPred.appendChild(tdPredKhway);
+            tbody.appendChild(trPred);
+
+            // ===== ROW 3: Result Row (check next row) =====
             const trResult = document.createElement('tr');
             trResult.className = 'result-row';
             const nextRowIndex = rowIndex + 1;
@@ -477,7 +532,7 @@
                 trResult.appendChild(td);
             }
             
-            // Result for khaway column - show only khaway match count
+            // Result for khaway column
             const tdResultKhway = document.createElement('td');
             if (nextRowIndex < dubaiResults.length && khwayStr && khwayStr !== '-') {
                 const nextRow = dubaiResults[nextRowIndex];
