@@ -31,7 +31,7 @@
         /* ===== CONTAINER ===== */
         .container {
             width: 100%;
-            max-width: 700px;
+            max-width: 800px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -120,9 +120,9 @@
         .num-box {
             display: inline-block;
             width: 90%;
-            max-width: 60px;
+            max-width: 55px;
             font-weight: 800;
-            font-size: 15px;
+            font-size: 14px;
             background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
             padding: 7px 0;
             border-radius: 10px;
@@ -141,16 +141,10 @@
             box-shadow: 0 3px 10px rgba(0, 206, 201, 0.3);
         }
 
-        /* ===== ROW LABELS ===== */
-        .row-label {
-            font-weight: 800;
-            font-size: 11px;
-            color: #7f8c8d;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        .khaway-row td {
-            background: #fef9e7 !important;
+        /* ===== KHAWAY / PREDICTION COLUMN ===== */
+        .khaway-col {
+            font-weight: 700;
+            color: #2c3e50;
         }
         .khaway-box {
             display: inline-block;
@@ -167,6 +161,8 @@
             color: white;
             border-color: #27ae60;
         }
+
+        /* ===== RESULT ROW ===== */
         .result-row td {
             background: #eafaf1 !important;
         }
@@ -220,10 +216,13 @@
             width: 100%;
         }
 
-        /* ===== 6 COLUMNS LAYOUT ===== */
+        /* ===== 7 COLUMNS LAYOUT ===== */
         table th,
         table td {
-            width: 16.66% !important;
+            width: 14.28% !important;
+        }
+        .khaway-col-header {
+            background: linear-gradient(180deg, #6c5ce7 0%, #6c5ce7 100%) !important;
         }
     </style>
 </head>
@@ -238,7 +237,7 @@
         </div>
     </div>
 
-    <div class="table-title">📊 ၆ ကွက် ထွက်ဂဏန်း ဇယား</div>
+    <div class="table-title">📊 ၆ ကွက် ထွက်ဂဏန်း + အခွေပူး ဇယား</div>
     <div class="table-wrapper">
         <table>
             <thead>
@@ -249,11 +248,12 @@
                     <th>၅ နာရီ</th>
                     <th>၇ နာရီ</th>
                     <th>၉ နာရီ</th>
+                    <th class="khaway-col-header">🎯 ထိုးရမဲ့ဂဏန်း<br>အခွေပူး</th>
                 </tr>
             </thead>
             <tbody id="dubaiTableBody">
                 <tr>
-                    <td colspan="6" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td>
+                    <td colspan="7" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td>
                 </tr>
             </tbody>
         </table>
@@ -400,7 +400,7 @@
         tbody.innerHTML = '';
 
         if(dubaiResults.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" class="empty-status">ဒေတာများ မရှိသေးပါ။ Google Sheet တွင် အရင်ဖြည့်ပါ။</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="7" class="empty-status">ဒေတာများ မရှိသေးပါ။ Google Sheet တွင် အရင်ဖြည့်ပါ။</td></tr>`;
             return;
         }
 
@@ -415,7 +415,6 @@
                 const val = row[col] || '-';
                 const displayVal = val === '-' ? '-' : val;
                 
-                // Check if khway matches this column
                 const isMatch = khwayStr && khwayStr !== '-' && checkMatchLogic(khwayStr, val);
                 if (isMatch && val !== '-') {
                     td.className = 'highlight-match';
@@ -424,34 +423,27 @@
                 td.innerHTML = `<div class="num-box-wrapper"><span class="num-box">${displayVal}</span></div>`;
                 tr1.appendChild(td);
             }
+            // Khaway column (7th column)
+            const tdKhway = document.createElement('td');
+            tdKhway.className = 'khaway-col';
+            if (khwayStr && khwayStr !== '-') {
+                const khwayParts = khwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+                let khwayHTML = '';
+                khwayParts.forEach((kh, idx) => {
+                    const isHit = row.some(val => val !== '-' && checkMatchLogic(kh, val));
+                    khwayHTML += `<span class="khaway-box ${isHit ? 'hit' : ''}">${kh}</span>`;
+                    if (idx < khwayParts.length - 1) khwayHTML += ' ';
+                });
+                tdKhway.innerHTML = khwayHTML;
+            } else {
+                tdKhway.innerHTML = `<span style="color:#bdc3c7;font-size:11px;">မရှိ</span>`;
+            }
+            tr1.appendChild(tdKhway);
             tbody.appendChild(tr1);
 
-            // ===== ROW 2: Khaway / Prediction Row =====
+            // ===== ROW 2: Result Row (check next row) =====
             const tr2 = document.createElement('tr');
-            tr2.className = 'khaway-row';
-            for (let col = 0; col < 6; col++) {
-                const td = document.createElement('td');
-                const val = row[col] || '-';
-                
-                let khwayDisplay = '';
-                if (khwayStr && khwayStr !== '-') {
-                    const khwayParts = khwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                    const isInKhway = khwayParts.some(kh => checkMatchLogic(kh, val));
-                    if (isInKhway && val !== '-') {
-                        khwayDisplay = `<span class="khaway-box hit">✓ ${khwayStr}</span>`;
-                    } else if (khwayStr) {
-                        khwayDisplay = `<span class="khaway-box">${khwayStr}</span>`;
-                    }
-                }
-                
-                td.innerHTML = khwayDisplay || `<span style="color:#bdc3c7;font-size:11px;">-</span>`;
-                tr2.appendChild(td);
-            }
-            tbody.appendChild(tr2);
-
-            // ===== ROW 3: Result Row (check next row) =====
-            const tr3 = document.createElement('tr');
-            tr3.className = 'result-row';
+            tr2.className = 'result-row';
             const nextRowIndex = rowIndex + 1;
             
             for (let col = 0; col < 6; col++) {
@@ -465,19 +457,42 @@
                     if (isMatch && nextVal !== '-') {
                         td.innerHTML = `<span class="result-badge hit">✅ ${nextVal}</span>`;
                     } else if (isMatch && nextVal === '-') {
-                        td.innerHTML = `<span class="result-badge waiting">⏳ စောင့်ဆိုင်း</span>`;
+                        td.innerHTML = `<span class="result-badge waiting">⏳</span>`;
                     } else {
                         td.innerHTML = `<span class="result-badge miss">❌</span>`;
                     }
                 } else if (nextRowIndex < dubaiResults.length) {
-                    td.innerHTML = `<span style="color:#bdc3c7;font-size:11px;">မထိုးရ</span>`;
+                    td.innerHTML = `<span style="color:#bdc3c7;font-size:11px;">-</span>`;
                 } else {
-                    td.innerHTML = `<span style="color:#bdc3c7;font-size:11px;">မရှိသေး</span>`;
+                    td.innerHTML = `<span style="color:#bdc3c7;font-size:11px;">-</span>`;
                 }
                 
-                tr3.appendChild(td);
+                tr2.appendChild(td);
             }
-            tbody.appendChild(tr3);
+            // Result for khaway column (7th column) - show overall result
+            const tdResultKhway = document.createElement('td');
+            if (nextRowIndex < dubaiResults.length && khwayStr && khwayStr !== '-') {
+                const nextRow = dubaiResults[nextRowIndex];
+                let hasHit = false;
+                let hitVal = '';
+                for (let col = 0; col < 6; col++) {
+                    const nextVal = nextRow[col] || '-';
+                    if (checkMatchLogic(khwayStr, nextVal) && nextVal !== '-') {
+                        hasHit = true;
+                        hitVal = nextVal;
+                        break;
+                    }
+                }
+                if (hasHit) {
+                    tdResultKhway.innerHTML = `<span class="result-badge hit">✅ ${hitVal}</span>`;
+                } else {
+                    tdResultKhway.innerHTML = `<span class="result-badge miss">❌</span>`;
+                }
+            } else {
+                tdResultKhway.innerHTML = `<span style="color:#bdc3c7;font-size:11px;">-</span>`;
+            }
+            tr2.appendChild(tdResultKhway);
+            tbody.appendChild(tr2);
         }
     }
 
