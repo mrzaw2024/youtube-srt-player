@@ -31,7 +31,7 @@
         /* ===== CONTAINER ===== */
         .container {
             width: 100%;
-            max-width: 800px;
+            max-width: 820px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -130,9 +130,9 @@
             text-align: center;
         }
 
-        /* ===== GREEN HIGHLIGHT ===== */
+        /* ===== GREEN HIGHLIGHT (ONLY FOR MATCHING) ===== */
         .highlight-match {
-            background: linear-gradient(135deg, #a8e6cf 0%, #00b894 100%) !important;
+            background: linear-gradient(135deg, #a8e6cf 0%, #2ecc71 100%) !important;
         }
         .highlight-match .num-box {
             background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
@@ -141,10 +141,11 @@
             box-shadow: 0 3px 10px rgba(0, 206, 201, 0.3);
         }
 
-        /* ===== KHAWAY / PREDICTION COLUMN ===== */
+        /* ===== KHAWAY COLUMN ===== */
         .khaway-col {
             font-weight: 700;
             color: #2c3e50;
+            min-width: 100px;
         }
         .khaway-box {
             display: inline-block;
@@ -155,6 +156,7 @@
             font-size: 12px;
             font-weight: 700;
             color: #2c3e50;
+            margin: 2px;
         }
         .khaway-box.hit {
             background: #2ecc71;
@@ -164,7 +166,7 @@
 
         /* ===== RESULT ROW ===== */
         .result-row td {
-            background: #eafaf1 !important;
+            background: #f8f9fa !important;
         }
         .result-badge {
             display: inline-block;
@@ -410,26 +412,37 @@
             
             // ===== ROW 1: Number Row =====
             const tr1 = document.createElement('tr');
+            
+            // Check which columns match with khaway
+            const matchResults = [];
+            for (let col = 0; col < 6; col++) {
+                const val = row[col] || '-';
+                const isMatch = khwayStr && khwayStr !== '-' && checkMatchLogic(khwayStr, val);
+                matchResults.push(isMatch && val !== '-');
+            }
+            
             for (let col = 0; col < 6; col++) {
                 const td = document.createElement('td');
                 const val = row[col] || '-';
                 const displayVal = val === '-' ? '-' : val;
                 
-                const isMatch = khwayStr && khwayStr !== '-' && checkMatchLogic(khwayStr, val);
-                if (isMatch && val !== '-') {
+                // Only highlight if this column matches
+                if (matchResults[col]) {
                     td.className = 'highlight-match';
                 }
                 
                 td.innerHTML = `<div class="num-box-wrapper"><span class="num-box">${displayVal}</span></div>`;
                 tr1.appendChild(td);
             }
-            // Khaway column (7th column)
+            
+            // Khaway column (7th column) - show the khaway numbers
             const tdKhway = document.createElement('td');
             tdKhway.className = 'khaway-col';
             if (khwayStr && khwayStr !== '-') {
                 const khwayParts = khwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
                 let khwayHTML = '';
                 khwayParts.forEach((kh, idx) => {
+                    // Check if this khaway matches any number in the row
                     const isHit = row.some(val => val !== '-' && checkMatchLogic(kh, val));
                     khwayHTML += `<span class="khaway-box ${isHit ? 'hit' : ''}">${kh}</span>`;
                     if (idx < khwayParts.length - 1) khwayHTML += ' ';
@@ -469,22 +482,25 @@
                 
                 tr2.appendChild(td);
             }
-            // Result for khaway column (7th column) - show overall result
+            
+            // Result for khaway column - show overall hit
             const tdResultKhway = document.createElement('td');
             if (nextRowIndex < dubaiResults.length && khwayStr && khwayStr !== '-') {
                 const nextRow = dubaiResults[nextRowIndex];
                 let hasHit = false;
                 let hitVal = '';
+                let hitCount = 0;
                 for (let col = 0; col < 6; col++) {
                     const nextVal = nextRow[col] || '-';
                     if (checkMatchLogic(khwayStr, nextVal) && nextVal !== '-') {
                         hasHit = true;
                         hitVal = nextVal;
+                        hitCount++;
                         break;
                     }
                 }
                 if (hasHit) {
-                    tdResultKhway.innerHTML = `<span class="result-badge hit">✅ ${hitVal}</span>`;
+                    tdResultKhway.innerHTML = `<span class="result-badge hit">✅ ${hitVal} (${hitCount})</span>`;
                 } else {
                     tdResultKhway.innerHTML = `<span class="result-badge miss">❌</span>`;
                 }
