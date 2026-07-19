@@ -317,6 +317,37 @@
             });
     }
 
+    // Proper quote-aware CSV line parser.
+    // Unlike a regex split, this KEEPS empty cells as empty strings so that
+    // column positions (A, B, C, D...) never shift out of alignment.
+    function parseCSVLine(line) {
+        const result = [];
+        let cur = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (inQuotes) {
+                if (char === '"') {
+                    if (line[i + 1] === '"') { cur += '"'; i++; }
+                    else { inQuotes = false; }
+                } else {
+                    cur += char;
+                }
+            } else {
+                if (char === '"') {
+                    inQuotes = true;
+                } else if (char === ',') {
+                    result.push(cur);
+                    cur = '';
+                } else {
+                    cur += char;
+                }
+            }
+        }
+        result.push(cur);
+        return result.map(s => s.trim());
+    }
+
     function parseDubaiCSV(csvText) {
         let lines = csvText.split('\n');
         dubaiResults = [];
@@ -324,52 +355,31 @@
         dubaiHourlyPredictions = [];
 
         for (let i = 1; i < lines.length; i++) {
-            let currentLine = lines[i].trim();
-            if (!currentLine) continue;
+            let currentLine = lines[i].replace(/\r$/, '');
+            if (!currentLine.trim()) continue;
 
-            let matches = currentLine.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || currentLine.split(',');
-            
-            if (matches.length >= 1) {
-                let res = matches[0].replace(/"/g, '').trim();
-                if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
+            // matches[0]=A(result), matches[1]=B(khway), matches[2..7]=C..H(hourly preds)
+            let matches = parseCSVLine(currentLine);
 
-                if (res.length === 12) {
-                    const pairs = [];
-                    for (let i = 0; i < 12; i += 2) {
-                        pairs.push(res.substring(i, i + 2));
-                    }
-                    // FIX: pairs ကို ရရှိသည့်အစဉ်အတိုင်းပဲ တန်းစီပေးမည်
-                    // (၁၁နာရီ, ၁နာရီ, ၃နာရီ, ၅နာရီ, ၇နာရီ, ၉နာရီ) column အစဉ်အတိုင်းနှင့် ကိုက်ညီစေရန်
-                    // rotate မလုပ်တော့ပါ
-                    if (pairs.length === 6) {
-                        dubaiResults.push(pairs);
-                    }
-                }
+            let res = (matches[0] || '').trim();
+            if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
+            if (res.length !== 12) continue; // skip rows without a full 12-digit result
 
-                if (matches.length > 1) {
-                    let khw = matches[1].replace(/"/g, '').trim();
-                    dubaiKhwayItems.push(khw || '-');
-                }
-
-                if (matches.length > 2) {
-                    let hourlyPreds = [];
-                    for (let j = 2; j < Math.min(matches.length, 8); j++) {
-                        let pred = matches[j].replace(/"/g, '').trim();
-                        hourlyPreds.push(pred || '-');
-                    }
-                    while (hourlyPreds.length < 6) {
-                        hourlyPreds.push('-');
-                    }
-                    dubaiHourlyPredictions.push(hourlyPreds);
-                }
+            const pairs = [];
+            for (let p = 0; p < 12; p += 2) {
+                pairs.push(res.substring(p, p + 2));
             }
-        }
+            dubaiResults.push(pairs);
 
-        while (dubaiHourlyPredictions.length < dubaiResults.length) {
-            dubaiHourlyPredictions.push(['-', '-', '-', '-', '-', '-']);
-        }
-        while (dubaiKhwayItems.length < dubaiResults.length) {
-            dubaiKhwayItems.push('-');
+            let khw = (matches[1] || '').trim();
+            dubaiKhwayItems.push(khw || '-');
+
+            let hourlyPreds = [];
+            for (let col = 0; col < 6; col++) {
+                let pred = (matches[2 + col] || '').trim();
+                hourlyPreds.push(pred || '-');
+            }
+            dubaiHourlyPredictions.push(hourlyPreds);
         }
     }
 
