@@ -1136,10 +1136,10 @@
         fetch(DUBAI_SHEET_URL + '&_ts=' + Date.now(), { cache: 'no-store' })
             .then(r => r.text())
             .then(d => { parseDubaiCSV(d); document.getElementById('dubaiStatusIcon').innerText = '✅'; renderDubaiTable(); })
-            .catch(() => { document.getElementById('dubaiStatusIcon').innerText = '❌'; });
+            .catch(() => { document.getElementById('dubaiStatusIcon').innerText = '❌'); });
     }
 
-    // ===== FIXED: parseDubaiCSV with padding and ordering =====
+    // ===== FIXED: Dubai 2D parse with correct order =====
     function parseDubaiCSV(csvText) {
         let lines = csvText.split('\n');
         dubaiResults = [];
@@ -1156,24 +1156,22 @@
                 let res = matches[0].replace(/"/g, '').trim();
                 if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
 
-                // ===== MAIN FIX: 12-digit number with padding =====
+                // ===== 12-digit number with padding =====
                 if (res.length >= 10 && res.length <= 12) {
-                    // Pad with leading zeros to make 12 digits
                     let paddedRes = res.padStart(12, '0');
-                    
                     const pairs = [];
                     for (let j = 0; j < 12; j += 2) {
                         pairs.push(paddedRes.substring(j, j + 2));
                     }
                     if (pairs.length === 6) {
-                        // Order: [11, 1, 3, 5, 7, 9]
+                        // ===== NORMAL ORDER: [1, 3, 5, 7, 9, 11] =====
                         dubaiResults.push([
-                            pairs[5], // 11
                             pairs[0], // 1
                             pairs[1], // 3
                             pairs[2], // 5
                             pairs[3], // 7
-                            pairs[4]  // 9
+                            pairs[4], // 9
+                            pairs[5]  // 11
                         ]);
                     }
                 } else if (res.length === 12) {
@@ -1183,12 +1181,12 @@
                     }
                     if (pairs.length === 6) {
                         dubaiResults.push([
-                            pairs[5], // 11
                             pairs[0], // 1
                             pairs[1], // 3
                             pairs[2], // 5
                             pairs[3], // 7
-                            pairs[4]  // 9
+                            pairs[4], // 9
+                            pairs[5]  // 11
                         ]);
                     }
                 }
@@ -1214,7 +1212,6 @@
             }
         }
 
-        // Pad arrays to match length
         while (dubaiHourlyPredictions.length < dubaiResults.length) {
             dubaiHourlyPredictions.push(['-', '-', '-', '-', '-', '-']);
         }
