@@ -1139,34 +1139,88 @@
             .catch(() => { document.getElementById('dubaiStatusIcon').innerText = '❌'; });
     }
 
+    // ===== FIXED: parseDubaiCSV with padding and ordering =====
     function parseDubaiCSV(csvText) {
         let lines = csvText.split('\n');
-        dubaiResults = []; dubaiKhwayItems = []; dubaiHourlyPredictions = [];
+        dubaiResults = [];
+        dubaiKhwayItems = [];
+        dubaiHourlyPredictions = [];
+
         for (let i = 1; i < lines.length; i++) {
-            let line = lines[i].trim();
-            if (!line) continue;
-            let matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
+            let currentLine = lines[i].trim();
+            if (!currentLine) continue;
+
+            let matches = currentLine.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || currentLine.split(',');
+            
             if (matches.length >= 1) {
                 let res = matches[0].replace(/"/g, '').trim();
                 if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
-                if (res.length === 12) {
-                    let pairs = [];
-                    for (let j = 0; j < 12; j += 2) pairs.push(res.substring(j, j+2));
-                    if (pairs.length === 6) dubaiResults.push([pairs[5], pairs[0], pairs[1], pairs[2], pairs[3], pairs[4]]);
-                }
-                if (matches.length > 1) dubaiKhwayItems.push(matches[1].replace(/"/g, '').trim() || '-');
-                if (matches.length > 2) {
-                    let preds = [];
-                    for (let j = 2; j < Math.min(matches.length, 8); j++) {
-                        preds.push(matches[j].replace(/"/g, '').trim() || '-');
+
+                // ===== MAIN FIX: 12-digit number with padding =====
+                if (res.length >= 10 && res.length <= 12) {
+                    // Pad with leading zeros to make 12 digits
+                    let paddedRes = res.padStart(12, '0');
+                    
+                    const pairs = [];
+                    for (let j = 0; j < 12; j += 2) {
+                        pairs.push(paddedRes.substring(j, j + 2));
                     }
-                    while (preds.length < 6) preds.push('-');
-                    dubaiHourlyPredictions.push(preds);
+                    if (pairs.length === 6) {
+                        // Order: [11, 1, 3, 5, 7, 9]
+                        dubaiResults.push([
+                            pairs[5], // 11
+                            pairs[0], // 1
+                            pairs[1], // 3
+                            pairs[2], // 5
+                            pairs[3], // 7
+                            pairs[4]  // 9
+                        ]);
+                    }
+                } else if (res.length === 12) {
+                    const pairs = [];
+                    for (let j = 0; j < 12; j += 2) {
+                        pairs.push(res.substring(j, j + 2));
+                    }
+                    if (pairs.length === 6) {
+                        dubaiResults.push([
+                            pairs[5], // 11
+                            pairs[0], // 1
+                            pairs[1], // 3
+                            pairs[2], // 5
+                            pairs[3], // 7
+                            pairs[4]  // 9
+                        ]);
+                    }
+                }
+
+                // ===== Khaway (Column B) =====
+                if (matches.length > 1) {
+                    let khw = matches[1].replace(/"/g, '').trim();
+                    dubaiKhwayItems.push(khw || '-');
+                }
+
+                // ===== Hourly Predictions (Columns C-H) =====
+                if (matches.length > 2) {
+                    let hourlyPreds = [];
+                    for (let j = 2; j < Math.min(matches.length, 8); j++) {
+                        let pred = matches[j].replace(/"/g, '').trim();
+                        hourlyPreds.push(pred || '-');
+                    }
+                    while (hourlyPreds.length < 6) {
+                        hourlyPreds.push('-');
+                    }
+                    dubaiHourlyPredictions.push(hourlyPreds);
                 }
             }
         }
-        while (dubaiHourlyPredictions.length < dubaiResults.length) dubaiHourlyPredictions.push(['-', '-', '-', '-', '-', '-']);
-        while (dubaiKhwayItems.length < dubaiResults.length) dubaiKhwayItems.push('-');
+
+        // Pad arrays to match length
+        while (dubaiHourlyPredictions.length < dubaiResults.length) {
+            dubaiHourlyPredictions.push(['-', '-', '-', '-', '-', '-']);
+        }
+        while (dubaiKhwayItems.length < dubaiResults.length) {
+            dubaiKhwayItems.push('-');
+        }
     }
 
     function renderDubaiTable() {
