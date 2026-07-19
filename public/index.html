@@ -383,14 +383,19 @@
         }
     }
 
+    // Match logic:
+    // - 1 digit khway: matches if that digit appears anywhere in the 2D result
+    // - 2 digit khway: matches on exact equality OR on digit-reversal (e.g. 48 <-> 84)
+    // - 3+ digit khway: matches if BOTH digits of the 2D result appear somewhere in the khway digit set
     function checkMatchLogic(khwayItem, target2D) {
         let cleanKhway = khwayItem.replace(/[^\d]/g, '').trim();
-        if (!cleanKhway) return false;
+        if (!cleanKhway || !target2D || target2D === '-') return false;
 
         if (cleanKhway.length === 1) {
             return target2D.includes(cleanKhway);
         } else if (cleanKhway.length === 2) {
-            return (cleanKhway === target2D);
+            const reversed = cleanKhway.split('').reverse().join('');
+            return (cleanKhway === target2D) || (reversed === target2D);
         } else {
             let digitsArray = cleanKhway.split('');
             return (digitsArray.includes(target2D[0]) && digitsArray.includes(target2D[1]));
@@ -411,6 +416,9 @@
             const row = dubaiResults[rowIndex];
             const khwayStr = dubaiKhwayItems[rowIndex] || '-';
             const hourlyPreds = dubaiHourlyPredictions[rowIndex] || ['-', '-', '-', '-', '-', '-'];
+            const khwayParts = (khwayStr && khwayStr !== '-')
+                ? khwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0)
+                : [];
 
             // ===== ROW 1: Prediction Row (TOP) =====
             const trPred = document.createElement('tr');
@@ -444,8 +452,7 @@
             // Khaway column prediction
             const tdPredKhway = document.createElement('td');
             tdPredKhway.className = 'khaway-col';
-            if (khwayStr && khwayStr !== '-') {
-                const khwayParts = khwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+            if (khwayParts.length > 0) {
                 let hitKhways = [];
                 khwayParts.forEach(kh => {
                     const isHit = row.some(val => val !== '-' && checkMatchLogic(kh, val));
@@ -469,15 +476,20 @@
                 const val = row[col] || '-';
                 const displayVal = val === '-' ? '-' : val;
                 
-                // Check if this number matches any prediction in the same column
-                const predVal = hourlyPreds[col] || '-';
                 let isMatch = false;
-                if (predVal !== '-' && val !== '-') {
-                    const predParts = predVal.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                    for (let p of predParts) {
-                        if (checkMatchLogic(p, val)) {
-                            isMatch = true;
-                            break;
+                if (val !== '-') {
+                    // 1) Check against this column's hourly prediction
+                    const predVal = hourlyPreds[col] || '-';
+                    if (predVal !== '-') {
+                        const predParts = predVal.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+                        for (let p of predParts) {
+                            if (checkMatchLogic(p, val)) { isMatch = true; break; }
+                        }
+                    }
+                    // 2) Also check against the row's khway (အခွေပူး) numbers
+                    if (!isMatch && khwayParts.length > 0) {
+                        for (let kh of khwayParts) {
+                            if (checkMatchLogic(kh, val)) { isMatch = true; break; }
                         }
                     }
                 }
@@ -492,8 +504,7 @@
             // Khaway column
             const tdKhway = document.createElement('td');
             tdKhway.className = 'khaway-col';
-            if (khwayStr && khwayStr !== '-') {
-                const khwayParts = khwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+            if (khwayParts.length > 0) {
                 let khwayHTML = '';
                 let anyMatch = false;
                 khwayParts.forEach((kh, idx) => {
