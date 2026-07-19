@@ -9,456 +9,371 @@
     <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
     <script src="https://www.youtube.com/iframe_api"></script>
     <style>
-        /* ===== GLOBAL ===== */
-        :root {
-            --bg-main: #0b0c10;
-            --bg-card: rgba(31, 40, 51, 0.45);
-            --border-neon: rgba(255, 215, 0, 0.25);
-            --gold: #FFD700;
-            --cyan: #00f2fe;
-            --purple: #bf55ec;
-            --gold-gradient: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
-            --viber-gradient: linear-gradient(135deg, #7b51a1 0%, #593181 100%);
-            --text-main: #f5f5f7;
-            --text-sub: #c5a880;
-            --glass: blur(16px) saturate(180%);
-        }
         * {
-            -webkit-user-select: none !important;
-            -moz-user-select: none !important;
-            -ms-user-select: none !important;
-            user-select: none !important;
-            -webkit-touch-callout: none !important;
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-user-select: none !important;
+            user-select: none !important;
         }
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: var(--bg-main);
-            background-image: radial-gradient(circle at 50% 10%, #1f2833 0%, #0b0c10 70%);
-            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #0b0c10;
+            color: #f5f5f7;
             min-height: 100vh;
             overflow-x: hidden;
         }
         ::-webkit-scrollbar { width: 0; height: 0; }
 
-        /* ===== TABS ===== */
         .app-tabs {
             display: flex;
-            background: rgba(20, 20, 20, 0.8);
-            border-bottom: 2px solid var(--border-neon);
+            background: rgba(20,20,20,0.8);
+            border-bottom: 2px solid rgba(255,215,0,0.25);
             position: sticky;
             top: 0;
-            z-index: 100006;
-            backdrop-filter: var(--glass);
+            z-index: 100;
             overflow-x: auto;
-            flex-wrap: nowrap;
         }
         .tab-btn {
-            flex: 0 0 auto;
-            padding: 15px 12px;
+            flex: 1;
+            padding: 15px 10px;
             background: transparent;
             border: none;
             color: #aaa;
             font-size: 0.85rem;
             font-weight: bold;
             cursor: pointer;
-            transition: all 0.3s;
             text-align: center;
             white-space: nowrap;
+            min-width: 80px;
         }
         .tab-btn.active {
-            color: var(--gold);
-            border-bottom: 3px solid var(--gold);
-            background: rgba(255, 255, 255, 0.03);
+            color: #FFD700;
+            border-bottom: 3px solid #FFD700;
         }
-        .tab-btn.disabled {
-            opacity: 0.3;
-            cursor: not-allowed;
-            pointer-events: none;
-        }
-        .tab-content { display: none; }
+        .tab-content { display: none; padding: 16px; max-width: 700px; margin: 0 auto; }
         .tab-content.active { display: block; }
 
-        /* ===== NOTIFICATION ===== */
         #customNoti {
             position: fixed; top: 70px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: rgba(31, 40, 51, 0.9); backdrop-filter: var(--glass);
-            border: 1px solid var(--gold); border-radius: 16px; padding: 14px 28px;
-            color: var(--text-main); font-size: 0.95rem; font-weight: 600; z-index: 9999998;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            background: rgba(31,40,51,0.9); border: 1px solid #FFD700; border-radius: 16px;
+            padding: 14px 28px; color: #fff; font-size: 0.95rem; font-weight: 600; z-index: 9999;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5); opacity: 0; transition: all 0.4s;
         }
         #customNoti.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
-        /* ===== USER BANNER ===== */
         .user-banner {
-            background: rgba(26, 26, 29, 0.6); backdrop-filter: var(--glass);
-            padding: 12px 16px; display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border-neon);
-            position: relative; z-index: 10;
+            background: rgba(26,26,29,0.6); padding: 12px 16px;
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid rgba(255,215,0,0.25);
         }
-        .user-id { font-size: 0.75rem; color: #aaa; display: flex; align-items: center; gap: 8px; }
-        .user-id .id-value { color: var(--gold); font-weight: 700; text-shadow: 0 0 10px rgba(255,215,0,0.3); }
+        .user-id { font-size: 0.75rem; color: #aaa; }
+        .user-id .id-value { color: #FFD700; font-weight: 700; }
         .copy-btn {
-            background: var(--gold-gradient); border: none; border-radius: 20px;
-            padding: 3px 12px; font-size: 0.65rem; color: #000; font-weight: bold; cursor: pointer;
+            background: linear-gradient(135deg, #FFD700, #FF8C00); border: none;
+            border-radius: 20px; padding: 3px 12px; font-size: 0.65rem;
+            color: #000; font-weight: bold; cursor: pointer;
         }
-        .user-status .active { color: #00ff88; text-shadow: 0 0 8px rgba(0,255,136,0.5); }
+        .user-status .active { color: #00ff88; }
         .user-status .expired { color: #ff4444; }
 
-        /* ===== MOVIE PLAYER ===== */
-        .video-section { width: 100%; background: #000; border-bottom: 2px solid var(--gold); position: relative; }
-        .video-container { position: relative; width: 100%; aspect-ratio: 9/16; background: #000; margin: auto; max-height: 72vh; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-        #youtubePlayer { width: 100%; height: 100%; pointer-events: none !important; display: block; object-fit: contain; }
+        /* ===== BOZAW 2D ===== */
+        .twod-container {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 24px;
+            color: #2c3e50;
+        }
+        .twod-container h2 {
+            text-align: center;
+            font-size: 24px;
+            background: linear-gradient(135deg, #3742fa, #9c88ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+        .twod-container .table-wrapper {
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid #dcdde1;
+            background: #fff;
+        }
+        .twod-container table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: center;
+        }
+        .twod-container th {
+            background: linear-gradient(180deg, #747d8c, #2f3542);
+            color: #fff;
+            padding: 12px 4px;
+            font-size: 12px;
+        }
+        .twod-container td {
+            border-bottom: 1px solid #dee2e6;
+            padding: 10px 6px;
+            color: #2f3542;
+        }
+        .twod-container tr:nth-child(even) td { background: #f9fbfd; }
+        .twod-container .num-box {
+            display: inline-block;
+            background: linear-gradient(135deg, #fff3cd, #ffe066);
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 1px solid #ffe066;
+            font-weight: 800;
+            font-size: 15px;
+            min-width: 45px;
+        }
+        .twod-container .highlight-match {
+            background: linear-gradient(135deg, #a8e6cf, #2ecc71) !important;
+        }
+        .twod-container .highlight-match .num-box {
+            background: linear-gradient(135deg, #059669, #10b981);
+            color: white;
+        }
+        .twod-container .badge-hit {
+            background: linear-gradient(135deg, #2ed573, #1ebd60);
+            color: #fff;
+            padding: 4px 12px;
+            border-radius: 10px;
+            display: inline-block;
+            font-size: 13px;
+            font-weight: 800;
+        }
+        .twod-container .khway-style {
+            background: #e8f0fe;
+            padding: 4px 8px;
+            border-radius: 8px;
+            border: 1px solid #d2e3fc;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+        }
+        .twod-container .empty-status { color: #57606f; padding: 30px !important; font-weight: 700; }
+        .twod-container .admin-footer {
+            text-align: center; font-size: 13px; font-weight: bold; color: #57606f;
+            padding: 10px; margin-top: 16px;
+        }
+        .twod-container .admin-link { color: #3742fa; text-decoration: none; font-weight: 800; }
+
+        /* ===== DUBAI 2D ===== */
+        .dubai-container {
+            background: rgba(255,255,255,0.95);
+            backdrop-filter: blur(20px);
+            padding: 20px;
+            border-radius: 24px;
+            color: #2c3e50;
+        }
+        .dubai-container h2 {
+            text-align: center;
+            font-size: 24px;
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+        }
+        .dubai-container .table-wrapper {
+            overflow-x: auto;
+            border-radius: 16px;
+            border: 1px solid #dcdde1;
+            background: #fff;
+        }
+        .dubai-container table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px;
+            text-align: center;
+        }
+        .dubai-container th {
+            background: linear-gradient(180deg, #e17055, #d63031);
+            color: #fff;
+            padding: 12px 4px;
+            font-size: 12px;
+        }
+        .dubai-container td {
+            border-bottom: 1px solid #dee2e6;
+            padding: 10px 6px;
+            color: #2f3542;
+        }
+        .dubai-container tr:nth-child(even) td { background: #f9fbfd; }
+        .dubai-container .num-box {
+            display: inline-block;
+            background: linear-gradient(135deg, #ffeaa7, #fdcb6e);
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: 1px solid #fdcb6e;
+            font-weight: 800;
+            font-size: 15px;
+            min-width: 40px;
+        }
+        .dubai-container .highlight-match {
+            background: linear-gradient(135deg, #a8e6cf, #2ecc71) !important;
+        }
+        .dubai-container .highlight-match .num-box {
+            background: linear-gradient(135deg, #00b894, #00cec9);
+            color: white;
+        }
+        .dubai-container .khaway-box {
+            background: #e8f0fe;
+            padding: 4px 8px;
+            border-radius: 8px;
+            border: 1px solid #d2e3fc;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+            margin: 2px;
+        }
+        .dubai-container .khaway-box.hit {
+            background: #2ecc71;
+            color: white;
+        }
+        .dubai-container .pred-row td {
+            background: #fef9e7 !important;
+            font-weight: 700;
+        }
+        .dubai-container .pred-number {
+            background: #e8f0fe;
+            padding: 4px 8px;
+            border-radius: 8px;
+            border: 1px solid #d2e3fc;
+            font-size: 12px;
+            font-weight: 700;
+            display: inline-block;
+            margin: 2px;
+        }
+        .dubai-container .pred-number.hit {
+            background: #2ecc71;
+            color: white;
+        }
+        .dubai-container .empty-status { color: #57606f; padding: 30px !important; font-weight: 700; }
+        .dubai-container .admin-footer {
+            text-align: center; font-size: 13px; font-weight: bold; color: #57606f;
+            padding: 10px; margin-top: 16px;
+        }
+        .dubai-container .admin-link { color: #f5576c; text-decoration: none; font-weight: 800; }
+
+        /* ===== MOVIE ===== */
+        .video-container { position: relative; width: 100%; aspect-ratio: 9/16; background: #000; max-height: 70vh; overflow: hidden; }
+        #youtubePlayer { width: 100%; height: 100%; }
         .video-placeholder {
-            width: 100%; height: 100%; background: #111; display: flex; justify-content: center;
-            align-items: center; flex-direction: column; gap: 12px; text-align: center; color: #ff4444;
-            position: absolute; top: 0; left: 0; z-index: 10000; padding: 20px;
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: #111; display: none; flex-direction: column;
+            align-items: center; justify-content: center; color: #ff4444; padding: 20px;
+            text-align: center;
         }
         .video-placeholder .contact-link {
-            color: var(--gold); text-decoration: none; font-weight: bold; padding: 8px 20px;
-            border: 1px solid var(--gold); border-radius: 20px; margin-top: 5px; display: inline-block; font-size: 0.85rem;
+            color: #FFD700; text-decoration: none; font-weight: bold;
+            padding: 8px 20px; border: 1px solid #FFD700; border-radius: 20px;
+            margin: 5px; display: inline-block;
         }
         .status-section { padding: 12px; background: rgba(20,20,20,0.8); text-align: center; }
-        .status-text { color: var(--gold); font-size: 0.85rem; font-weight: bold; }
-        .fullscreen-hint { color: var(--cyan); font-size: 0.75rem; font-weight: bold; margin-top: 4px; animation: blink 1.5s infinite; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .status-text { color: #FFD700; font-size: 0.85rem; font-weight: bold; }
         .video-controls {
             display: flex; gap: 10px; padding: 14px; background: rgba(15,15,15,0.95);
             flex-wrap: wrap; justify-content: center; align-items: center;
         }
         .video-controls button {
-            background: rgba(255,255,255,0.07); color: #fff; font-size: 0.8rem; padding: 10px 16px;
-            border: 1px solid rgba(255,255,255,0.15); border-radius: 20px; cursor: pointer; font-weight: bold;
-            transition: all 0.2s;
+            background: rgba(255,255,255,0.07); color: #fff; font-size: 0.8rem;
+            padding: 10px 16px; border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px; cursor: pointer; font-weight: bold;
         }
-        .video-controls button:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
-        .video-controls button.primary { background: var(--gold-gradient); color: #000; border: none; font-weight: 900; }
-        .progress-container { flex: 2; display: flex; align-items: center; gap: 8px; min-width: 140px; }
-        .progress-slider { flex: 1; height: 5px; -webkit-appearance: none; background: #333; border-radius: 10px; outline: none; }
-        .progress-slider::-webkit-slider-thumb {
-            -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: var(--gold); cursor: pointer;
-        }
+        .video-controls button:active { transform: scale(0.95); }
+        .video-controls button.primary { background: linear-gradient(135deg, #FFD700, #FF8C00); color: #000; border: none; }
+        .progress-container { flex: 2; display: flex; align-items: center; gap: 8px; min-width: 120px; }
+        .progress-slider { flex: 1; height: 5px; -webkit-appearance: none; background: #333; border-radius: 10px; }
+        .progress-slider::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #FFD700; cursor: pointer; }
         .time-text { font-family: monospace; font-size: 0.75rem; color: #ccc; }
+
+        .movie-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 14px 0; }
+        .movie-card {
+            background: rgba(31,40,51,0.45); backdrop-filter: blur(16px);
+            border-radius: 20px; overflow: hidden; cursor: pointer;
+            padding: 10px; border: 1px solid rgba(255,255,255,0.06);
+            position: relative;
+        }
+        .movie-card:hover { border-color: #FFD700; }
+        .movie-poster { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 14px; }
+        .movie-title { font-size: 0.85rem; font-weight: 700; color: #fff; margin-top: 10px; text-align: center; }
+        .favorite-btn {
+            position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.6);
+            border: none; border-radius: 50%; width: 28px; height: 28px;
+            font-size: 0.8rem; cursor: pointer; color: #fff;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .favorite-btn.active { color: #ff4466; }
         .player-section { display: none; }
         .player-section.active { display: block; }
         .grid-section.hide { display: none; }
-        .video-container.fullscreen {
-            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; max-height: 100vh; z-index: 100000; background: #000; display: flex; align-items: center; justify-content: center;
-        }
-        .video-container.fullscreen #youtubePlayer { width: 100vw; height: 100vh; object-fit: contain; }
         #exitFsFloatingBtn {
             position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%);
-            background: rgba(255, 68, 102, 0.92); color: #fff; border: none; border-radius: 30px;
-            padding: 12px 28px; font-weight: 900; font-size: 0.9rem; z-index: 100005;
-            cursor: pointer; box-shadow: 0 4px 20px rgba(255, 68, 102, 0.4); display: none;
-            transition: all 0.3s; letter-spacing: 0.5px;
+            background: rgba(255,68,102,0.92); color: #fff; border: none;
+            border-radius: 30px; padding: 12px 28px; font-weight: 900;
+            font-size: 0.9rem; z-index: 100005; cursor: pointer;
+            display: none;
         }
         .subtitle-text {
-            position: fixed; bottom: 26%; left: 0; right: 0; text-align: center; z-index: 100002; pointer-events: none; padding: 0 16px; display: none;
+            position: fixed; bottom: 26%; left: 0; right: 0; text-align: center;
+            z-index: 100002; pointer-events: none; padding: 0 16px; display: none;
         }
         .subtitle-text .subtitle-inner {
-            display: inline-block; color: #FFD700; font-size: clamp(1.25rem, 5.8vw, 2.35rem); font-weight: 900;
-            font-family: system-ui, -apple-system, sans-serif; line-height: 1.25 !important;
-            text-align: center; word-break: break-word; max-width: 96%;
-            text-shadow: -3px -3px 0 #000, 3px -3px 0 #000, -3px 3px 0 #000, 3px 3px 0 #000, 0 0 8px rgba(0,0,0,0.8), 0 0 16px rgba(0,0,0,0.6);
+            display: inline-block; color: #FFD700; font-size: clamp(1.25rem, 5.8vw, 2.35rem);
+            font-weight: 900; text-shadow: -3px -3px 0 #000, 3px -3px 0 #000,
+                -3px 3px 0 #000, 3px 3px 0 #000, 0 0 8px rgba(0,0,0,0.8);
         }
-        .player-section.fs-active .video-controls,
-        .player-section.fs-active .status-section { display: none !important; }
-
-        /* ===== MOVIE GRID ===== */
-        .top-bar {
-            padding: 12px 14px;
-            display: flex; flex-direction: row; align-items: center; justify-content: space-between; gap: 8px; width: 100%; flex-wrap: nowrap;
+        .loading-text-center { text-align: center; padding: 40px; color: #aaa; grid-column: span 2; }
+        .back-btn {
+            background: rgba(255,255,255,0.07); border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 20px; padding: 8px 16px; color: #ccc;
+            cursor: pointer; font-size: 0.75rem; font-weight: bold;
+            margin: 10px 0; display: inline-block;
         }
-        .nav-controls-group { display: flex; align-items: center; gap: 4px; flex-shrink: 0; }
-        .filter-btn {
-            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
-            border-radius: 20px; padding: 6px 10px; color: #ccc; cursor: pointer; font-size: 0.75rem; font-weight: bold;
-        }
-        .filter-btn.active { background: var(--gold-gradient); color: #000; border-color: transparent; box-shadow: 0 4px 12px rgba(255,215,0,0.25); }
-        .search-input {
-            padding: 6px 10px; border-radius: 20px; border: 1px solid var(--border-neon);
-            background: rgba(255,255,255,0.05); color: #fff; font-size: 0.75rem; outline: none; flex: 1; min-width: 70px;
-        }
-        .search-input:focus { border-color: var(--gold); background: rgba(255,255,255,0.1); }
-        .time-display {
-            background: rgba(255, 215, 0, 0.08); padding: 6px 10px; border-radius: 20px;
-            font-size: 0.7rem; color: var(--gold); border: 1px solid var(--border-neon); display: flex; align-items: center; gap: 5px; flex-shrink: 0;
-        }
-        .time-bar-small { width: 25px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
-        .time-bar-small .fill { height: 100%; background: var(--gold-gradient); transition: width 1s; }
-        .marquee-container {
-            margin: 0 14px 12px 14px; padding: 8px; background: rgba(255,215,0,0.03);
-            border: 1px dashed var(--border-neon); border-radius: 12px; overflow: hidden;
-        }
-        .marquee-text { display: inline-block; white-space: nowrap; font-size: 0.8rem; font-weight: bold; color: var(--text-sub); animation: marquee var(--speed, 18s) linear infinite; padding-left: 100%; }
-        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
-        .movie-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; padding: 14px; }
-        .movie-card {
-            background: var(--bg-card); backdrop-filter: var(--glass); border-radius: 20px;
-            overflow: hidden; cursor: pointer; padding: 10px; border: 1px solid rgba(255,255,255,0.06);
-            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1); position: relative;
-        }
-        .movie-card:hover { border-color: var(--gold); transform: translateY(-4px); }
-        .movie-poster { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: 14px; }
-        .movie-title { font-size: 0.85rem; font-weight: 700; color: #fff; margin-top: 10px; text-align: center; padding: 0 4px; }
-        .favorite-btn {
-            position: absolute; top: 16px; right: 16px; background: rgba(0,0,0,0.6);
-            border: none; border-radius: 50%; width: 28px; height: 28px; font-size: 0.8rem;
-            cursor: pointer; color: #fff; display: flex; justify-content: center; align-items: center; z-index: 5;
-        }
-        .favorite-btn.active { color: #ff4466; transform: scale(1.1); }
-        .loading-text-center { text-align: center; padding: 40px; color: #aaa; font-size: 1rem; grid-column: span 2; }
-
-        /* ===== EXPIRED OVERLAY ===== */
         .expired-overlay {
-            text-align: center;
-            padding: 50px 16px;
-            color: #ff4444;
-            grid-column: span 2;
-            font-size: 0.95rem;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 14px;
+            text-align: center; padding: 40px 20px; color: #ff4444;
+            display: flex; flex-direction: column; align-items: center; gap: 14px;
         }
-        .expired-overlay .btn-group {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            width: 100%;
-            max-width: 260px;
-            margin-top: 10px;
-        }
-        .expired-overlay .admin-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            color: #000;
-            border: none;
-            font-weight: 900;
-            padding: 12px 20px;
-            font-size: 0.85rem;
-            border-radius: 30px;
-            text-decoration: none;
+        .btn-group { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 260px; }
+        .admin-btn {
+            display: flex; align-items: center; justify-content: center; gap: 8px;
+            color: #000; border: none; font-weight: 900; padding: 12px 20px;
+            font-size: 0.85rem; border-radius: 30px; text-decoration: none;
             transition: transform 0.2s;
         }
-        .expired-overlay .admin-btn.viber {
-            background: linear-gradient(135deg, #7b51a1 0%, #593181 100%);
-            color: #fff;
-            box-shadow: 0 4px 15px rgba(123, 81, 161, 0.4);
+        .admin-btn.viber { background: linear-gradient(135deg, #7b51a1, #593181); color: #fff; }
+        .admin-btn.telegram { background: linear-gradient(135deg, #FFD700, #FF8C00); }
+        .admin-btn:active { transform: scale(0.95); }
+        .top-bar {
+            padding: 12px 14px; display: flex; align-items: center;
+            justify-content: space-between; gap: 8px; flex-wrap: wrap;
         }
-        .expired-overlay .admin-btn.telegram {
-            background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%);
-            box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3);
+        .filter-btn {
+            background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 20px; padding: 6px 12px; color: #ccc;
+            cursor: pointer; font-size: 0.75rem; font-weight: bold;
         }
-        .expired-overlay .admin-btn:active { transform: scale(0.95); }
-
-        /* ===== BOZAW 2D ===== */
-        .twod-container {
-            width: 100%;
-            max-width: 650px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 20px;
-            border-radius: 24px;
-            margin: 20px auto;
-            color: #2c3e50;
+        .filter-btn.active { background: linear-gradient(135deg, #FFD700, #FF8C00); color: #000; }
+        .search-input {
+            padding: 6px 12px; border-radius: 20px; border: 1px solid rgba(255,215,0,0.25);
+            background: rgba(255,255,255,0.05); color: #fff; font-size: 0.75rem;
+            outline: none; flex: 1; min-width: 70px;
         }
-        .twod-container .header-area { text-align: center; margin-bottom: 20px; }
-        .twod-container .header-area h2 {
-            font-size: 26px; font-weight: 900; letter-spacing: 0.5px;
-            background: linear-gradient(135deg, #3742fa 0%, #9c88ff 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+        .search-input:focus { border-color: #FFD700; }
+        .time-display {
+            background: rgba(255,215,0,0.08); padding: 6px 12px; border-radius: 20px;
+            font-size: 0.7rem; color: #FFD700; border: 1px solid rgba(255,215,0,0.25);
+            display: flex; align-items: center; gap: 5px;
         }
-        .twod-container .sub-status-area {
-            font-size: 13px; color: #57606f; font-weight: 700; margin-top: 6px;
-            display: flex; align-items: center; justify-content: center; gap: 5px;
+        .time-bar-small { width: 25px; height: 4px; background: rgba(255,255,255,0.1); border-radius: 10px; overflow: hidden; }
+        .time-bar-small .fill { height: 100%; background: linear-gradient(135deg, #FFD700, #FF8C00); transition: width 1s; }
+        .marquee-container {
+            padding: 8px; background: rgba(255,215,0,0.03);
+            border: 1px dashed rgba(255,215,0,0.25); border-radius: 12px;
+            overflow: hidden; margin-bottom: 12px;
         }
-        .twod-container .table-title {
-            font-size: 15px; font-weight: 800; margin-bottom: 12px; color: #2c3e50;
-            border-left: 4px solid #3742fa; padding-left: 8px;
-        }
-        .twod-container .table-wrapper {
-            width: 100%; overflow-x: auto; border-radius: 16px; border: 1px solid #dcdde1;
-            background: #ffffff; margin-bottom: 20px;
-        }
-        .twod-container table { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px; text-align: center; }
-        .twod-container th {
-            background: linear-gradient(180deg, #747d8c 0%, #2f3542 100%);
-            color: #ffffff; font-weight: 700; padding: 14px 4px; font-size: 12px;
-        }
-        .twod-container td {
-            border-bottom: 1px solid #dee2e6; border-right: 1px solid #eef0f2;
-            padding: 12px 6px; color: #2f3542; font-weight: 600; vertical-align: middle;
-        }
-        .twod-container td:last-child { border-right: none; }
-        .twod-container tr:nth-child(even) td { background-color: #f9fbfd; }
-        .twod-container .num-box-wrapper { width: 100%; display: flex; justify-content: center; align-items: center; }
-        .twod-container .num-box {
-            display: inline-block; width: 90%; max-width: 85px; font-weight: 800; font-size: 16px;
-            background: linear-gradient(135deg, #fff3cd 0%, #ffe066 100%);
-            padding: 8px 0; border-radius: 10px; border: 1px solid #ffe066; text-align: center;
-        }
-        .twod-container .count-text { font-size: 11px; font-weight: 900; color: #e74c3c; margin-left: 2px; vertical-align: super; }
-        .twod-container .highlight-match {
-            background: linear-gradient(135deg, #a8e6cf 0%, #2ecc71 100%) !important;
-        }
-        .twod-container .highlight-match .num-box {
-            background: linear-gradient(135deg, #059669 0%, #10b981 100%);
-            color: white; border-color: #10b981;
-            box-shadow: 0 3px 6px rgba(16, 185, 129, 0.2);
-        }
-        .twod-container .highlight-match .count-text { color: #fff200; }
-        .twod-container .badge-hit {
-            color: #fff; font-weight: 800; font-size: 13px;
-            background: linear-gradient(135deg, #2ed573 0%, #1ebd60 100%);
-            padding: 5px 12px; border-radius: 10px; display: inline-block;
-        }
-        .twod-container .khway-style {
-            color: #2f3542; font-weight: 700; font-size: 13px; background: #e8f0fe;
-            padding: 6px 8px; border-radius: 8px; display: inline-block; border: 1px solid #d2e3fc; word-break: break-all;
-        }
-        .twod-container .empty-status { color: #57606f; padding: 30px !important; font-weight: 700; }
-        .twod-container .admin-footer-box {
-            text-align: center; font-size: 13px; font-weight: bold; color: #57606f;
-            background: rgba(255, 255, 255, 0.6); padding: 10px 16px; border-radius: 14px; border: 1px solid rgba(0,0,0,0.05);
-            display: inline-block;
-        }
-        .twod-container .admin-link { color: #3742fa; text-decoration: none; font-weight: 800; }
-        .twod-container .flex-center { display: flex; justify-content: center; width: 100%; }
-        .twod-container .view-count-num { color: #3742fa; font-weight: 800; }
-
-        /* ===== DUBAI 2D ===== */
-        .dubai-container {
-            width: 100%;
-            max-width: 820px;
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            padding: 20px;
-            border-radius: 24px;
-            margin: 20px auto;
-            color: #2c3e50;
-        }
-        .dubai-container .header-area { text-align: center; margin-bottom: 20px; }
-        .dubai-container .header-area h2 {
-            font-size: 26px; font-weight: 900; letter-spacing: 0.5px;
-            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-        }
-        .dubai-container .sub-status-area {
-            font-size: 13px; color: #57606f; font-weight: 700; margin-top: 6px;
-            display: flex; align-items: center; justify-content: center; gap: 5px;
-        }
-        .dubai-container .table-title {
-            font-size: 15px; font-weight: 800; margin-bottom: 12px; color: #2c3e50;
-            border-left: 4px solid #f5576c; padding-left: 8px;
-        }
-        .dubai-container .table-wrapper {
-            width: 100%; overflow-x: auto; border-radius: 16px; border: 1px solid #dcdde1;
-            background: #ffffff; margin-bottom: 20px;
-        }
-        .dubai-container table {
-            width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 13px; text-align: center;
-        }
-        .dubai-container th {
-            background: linear-gradient(180deg, #e17055 0%, #d63031 100%);
-            color: #ffffff; font-weight: 700; padding: 14px 4px; font-size: 12px;
-        }
-        .dubai-container td {
-            border-bottom: 1px solid #dee2e6; border-right: 1px solid #eef0f2;
-            padding: 12px 6px; color: #2f3542; font-weight: 600; vertical-align: middle;
-            word-wrap: break-word;
-            word-break: break-word;
-        }
-        .dubai-container td:last-child { border-right: none; }
-        .dubai-container tr:nth-child(even) td { background-color: #f9fbfd; }
-        .dubai-container .num-box-wrapper {
-            width: 100%; display: flex; justify-content: center; align-items: center;
-            flex-wrap: wrap;
-        }
-        .dubai-container .num-box {
-            display: inline-block; width: 90%; max-width: 55px; font-weight: 800; font-size: 14px;
-            background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
-            padding: 7px 0; border-radius: 10px; border: 1px solid #fdcb6e; text-align: center;
-        }
-        .dubai-container .highlight-match {
-            background: linear-gradient(135deg, #a8e6cf 0%, #2ecc71 100%) !important;
-        }
-        .dubai-container .highlight-match .num-box {
-            background: linear-gradient(135deg, #00b894 0%, #00cec9 100%);
-            color: white; border-color: #00cec9;
-            box-shadow: 0 3px 10px rgba(0, 206, 201, 0.3);
-        }
-        .dubai-container .pred-row td {
-            background: #fef9e7 !important;
-            font-weight: 700;
-            color: #2c3e50;
-            padding: 10px 4px;
-        }
-        .dubai-container .pred-number {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 8px;
-            font-size: 12px;
-            font-weight: 700;
-            color: #2c3e50;
-            background: #e8f0fe;
-            border: 1px solid #d2e3fc;
-            margin: 2px;
-            word-break: break-word;
-        }
-        .dubai-container .pred-number.hit {
-            background: #2ecc71;
-            color: white;
-            border-color: #27ae60;
-        }
-        .dubai-container .khaway-col {
-            font-weight: 700;
-            color: #2c3e50;
-            min-width: 120px;
-        }
-        .dubai-container .khaway-box {
-            display: inline-block;
-            background: #e8f0fe;
-            padding: 4px 8px;
-            border-radius: 8px;
-            border: 1px solid #d2e3fc;
-            font-size: 12px;
-            font-weight: 700;
-            color: #2c3e50;
-            margin: 2px;
-            word-break: break-word;
-        }
-        .dubai-container .khaway-box.hit {
-            background: #2ecc71;
-            color: white;
-            border-color: #27ae60;
-        }
-        .dubai-container .khaway-col-header {
-            background: linear-gradient(180deg, #6c5ce7 0%, #6c5ce7 100%) !important;
-        }
-        .dubai-container .empty-status {
-            color: #57606f;
-            padding: 30px !important;
-            font-weight: 700;
-        }
-        .dubai-container .admin-footer-box {
-            text-align: center; font-size: 13px; font-weight: bold; color: #57606f;
-            background: rgba(255, 255, 255, 0.6); padding: 10px 16px; border-radius: 14px; border: 1px solid rgba(0,0,0,0.05);
-            display: inline-block;
-        }
-        .dubai-container .admin-link { color: #f5576c; text-decoration: none; font-weight: 800; }
-        .dubai-container .flex-center { display: flex; justify-content: center; width: 100%; }
-        .dubai-container .view-count-num { color: #f5576c; font-weight: 800; }
-
-        table th, table td { width: 14.28% !important; }
+        .marquee-text { display: inline-block; white-space: nowrap; font-size: 0.8rem; font-weight: bold; color: #c5a880; animation: marquee 20s linear infinite; padding-left: 100%; }
+        @keyframes marquee { 0% { transform: translateX(0); } 100% { transform: translateX(-100%); } }
     </style>
 </head>
 <body>
@@ -466,173 +381,116 @@
 <div id="customNoti">📢 <span id="notiMessage">Notification</span></div>
 <button id="exitFsFloatingBtn" onclick="toggleFullscreen()">✕ Exit Fullscreen</button>
 
-<!-- ===== USER BANNER ===== -->
 <div id="userBanner" class="user-banner" style="display:none;">
-    <div class="user-id">
-        🆔 Premium ID: <span class="id-value" id="accountIdDisplay">Loading...</span>
-        <button class="copy-btn" onclick="copyAccountId()">📋 Copy</button>
-    </div>
-    <div class="user-status">
-        <span class="active" id="statusDot">●</span> <span id="userStatusText">Active</span>
-    </div>
+    <div class="user-id">🆔 Premium ID: <span class="id-value" id="accountIdDisplay">Loading...</span>
+    <button class="copy-btn" onclick="copyAccountId()">📋 Copy</button></div>
+    <div class="user-status"><span class="active" id="statusDot">●</span> <span id="userStatusText">Active</span></div>
 </div>
 
-<!-- ===== TABS ===== -->
-<div class="app-tabs" id="appTabs">
-    <button class="tab-btn active" id="tabBozaw" onclick="switchTab('bozaw')">📊 Bozaw 2D</button>
-    <button class="tab-btn" id="tabDubai" onclick="switchTab('dubai')">🇦🇪 Dubai 2D</button>
-    <button class="tab-btn" id="tabMovies" onclick="switchTab('movies')">🎬 ဇာတ်ကားများ</button>
+<div class="app-tabs">
+    <button class="tab-btn active" onclick="switchTab('bozaw')">📊 Bozaw 2D</button>
+    <button class="tab-btn" onclick="switchTab('dubai')">🇦🇪 Dubai 2D</button>
+    <button class="tab-btn" onclick="switchTab('movies')">🎬 ဇာတ်ကားများ</button>
 </div>
 
-<!-- ===== BOZAW 2D TAB ===== -->
+<!-- BOZAW 2D -->
 <div id="bozawSection" class="tab-content active">
-    <div class="twod-container" id="bozawContainer">
-        <div class="header-area">
-            <h2>Bozaw 2D ခန့်မှန်းချက်</h2>
-            <div class="sub-status-area">
-                <span class="status-icon" id="statusIcon">🔄</span>
-                <span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="viewCountDisplay">0</span> views</span>
-            </div>
+    <div class="twod-container">
+        <h2>Bozaw 2D ခန့်မှန်းချက်</h2>
+        <div style="text-align:center;font-size:13px;color:#57606f;margin-bottom:16px;">
+            <span id="bozawStatus">🔄</span> 👁️ <span id="bozawViewCount">0</span> views
         </div>
-        <div class="table-title">📊 AM / PM & အခွေပူး ဇယားကွက်</div>
         <div class="table-wrapper">
             <table>
-                <thead><tr><th style="width:23%;">AM ထွက်</th><th style="width:23%;">PM ထွက်</th><th style="width:26%;">ထိုတန်း၏ အခွေ/ပတ်</th><th style="width:28%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th></tr></thead>
+                <thead><tr><th style="width:23%;">AM ထွက်</th><th style="width:23%;">PM ထွက်</th><th style="width:26%;">အခွေ/ပတ်</th><th style="width:28%;">နောက် ၅ ရက် မှန်ဂဏန်း</th></tr></thead>
                 <tbody id="bozawTableBody"><tr><td colspan="4" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr></tbody>
             </table>
         </div>
-        <div class="flex-center">
-            <div class="admin-footer-box">👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a></div>
-        </div>
+        <div class="admin-footer">👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a></div>
     </div>
 </div>
 
-<!-- ===== DUBAI 2D TAB ===== -->
+<!-- DUBAI 2D -->
 <div id="dubaiSection" class="tab-content">
-    <div class="dubai-container" id="dubaiContainer">
-        <div class="header-area">
-            <h2>🇦🇪 Dubai 2D ခန့်မှန်းချက်</h2>
-            <div class="sub-status-area">
-                <span class="status-icon" id="dubaiStatusIcon">🔄</span>
-                <span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="dubaiViewCount">0</span> views</span>
-            </div>
+    <div class="dubai-container">
+        <h2>🇦🇪 Dubai 2D ခန့်မှန်းချက်</h2>
+        <div style="text-align:center;font-size:13px;color:#57606f;margin-bottom:16px;">
+            <span id="dubaiStatus">🔄</span> 👁️ <span id="dubaiViewCount">0</span> views
         </div>
-        <div class="table-title">📊 ၆ ကွက် ထွက်ဂဏန်း + ထိုးရမဲ့ဂဏန်း + အခွေပူး ဇယား</div>
         <div class="table-wrapper">
             <table>
-                <thead>
-                    <tr>
-                        <th>၁၁ နာရီ</th>
-                        <th>၁ နာရီ</th>
-                        <th>၃ နာရီ</th>
-                        <th>၅ နာရီ</th>
-                        <th>၇ နာရီ</th>
-                        <th>၉ နာရီ</th>
-                        <th class="khaway-col-header">🎯 အခွေပူး</th>
-                    </tr>
-                </thead>
-                <tbody id="dubaiTableBody">
-                    <tr><td colspan="7" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
-                </tbody>
+                <thead><tr><th>၁၁ နာရီ</th><th>၁ နာရီ</th><th>၃ နာရီ</th><th>၅ နာရီ</th><th>၇ နာရီ</th><th>၉ နာရီ</th></tr></thead>
+                <tbody id="dubaiTableBody"><tr><td colspan="6" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr></tbody>
             </table>
         </div>
-        <div class="flex-center">
-            <div class="admin-footer-box">👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a></div>
-        </div>
+        <div class="admin-footer">👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a></div>
     </div>
 </div>
 
-<!-- ===== MOVIE TAB ===== -->
+<!-- MOVIES -->
 <div id="moviesSection" class="tab-content">
     <div id="appContent">
         <div id="playerSection" class="player-section">
-            <button class="filter-btn" onclick="showGrid()" style="margin:12px;">← Back Home</button>
-            <div class="video-section">
-                <div class="video-container" id="videoContainer">
-                    <div id="youtubePlayer"></div>
-                    <div class="video-placeholder" id="videoPlaceholder" style="display:none;">
-                        <div>⛔ ဗီဒီယိုဖွင့်၍မရပါ</div>
-                        <div style="font-size:0.8rem;color:#aaa;margin:4px 0 10px 0;">အောက်ပါအတိုင်း ဆက်သွယ်နိုင်ပါသည်</div>
-                        <a href="viber://chat?number=%2B959777966119" class="contact-link" style="border-color:#bf55ec;color:#bf55ec;">💜 Viber: 09777966119</a>
-                        <a href="https://t.me/mmmovies002" target="_blank" class="contact-link">💙 Telegram Admin</a>
-                    </div>
-                </div>
+            <button class="back-btn" onclick="showGrid()">← Back Home</button>
+            <div class="video-container" id="videoContainer"><div id="youtubePlayer"></div>
+                <div class="video-placeholder" id="videoPlaceholder"><div>⛔ ဗီဒီယိုဖွင့်၍မရပါ</div>
+                <a href="viber://chat?number=%2B959777966119" class="contact-link">💜 Viber: 09777966119</a>
+                <a href="https://t.me/mmmovies002" target="_blank" class="contact-link">💙 Telegram Admin</a></div>
             </div>
-            <div class="status-section">
-                <div id="statusText" class="status-text">⏳ Loading...</div>
-                <div id="fullscreenHint" class="fullscreen-hint" style="display:none;">🎬 စာတန်းထိုးအတွက် Full ကိုနှိပ်ပါ</div>
-            </div>
+            <div class="status-section"><div id="statusText" class="status-text">⏳ Loading...</div></div>
             <div class="video-controls">
                 <button onclick="seekVideo(-10)">⏪ -10s</button>
                 <button class="primary" id="playPauseBtn" onclick="togglePlayPause()">⏸ Pause</button>
                 <button onclick="seekVideo(10)">⏩ +10s</button>
-                <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Full</button>
+                <button onclick="toggleFullscreen()">⛶ Full</button>
                 <div class="progress-container">
                     <input type="range" id="progressSlider" class="progress-slider" min="0" max="100" value="0" onchange="seekToPosition()">
                     <div class="time-text" id="timeDisplay">0:00 / 0:00</div>
                 </div>
             </div>
         </div>
-
         <div id="gridSection" class="grid-section">
             <div class="top-bar">
-                <div class="nav-controls-group">
-                    <button class="filter-btn active" id="allBtn" onclick="setFilter('all')">All</button>
-                    <button class="filter-btn" id="favBtn" onclick="setFilter('favorites')">Favorites</button>
-                </div>
+                <div><button class="filter-btn active" id="allBtn" onclick="setFilter('all')">All</button>
+                <button class="filter-btn" id="favBtn" onclick="setFilter('favorites')">Favorites</button></div>
                 <input type="text" id="searchInput" class="search-input" placeholder="🔍 ရှာရန်..." onkeyup="searchMovies()">
-                <div class="time-display">
-                    <span id="homeTimeText">Loading...</span>
-                    <div class="time-bar-small"><div id="homeTimeBar" class="fill" style="width:100%;"></div></div>
-                </div>
+                <div class="time-display"><span id="homeTimeText">Loading...</span>
+                <div class="time-bar-small"><div id="homeTimeBar" class="fill"></div></div></div>
             </div>
-            <div class="marquee-container">
-                <div class="marquee-text" id="marqueeText">✨ Movie App သက်တမ်းတိုးလိုပါက Admin Viber 09777966119 သို့ ဆက်သွယ်နိုင်ပါသည်။ 🍿</div>
-            </div>
-            <div id="movieGrid" class="movie-grid">
-                <div class="loading-text-center">⏳ Loading Movies...</div>
-            </div>
+            <div class="marquee-container"><div class="marquee-text" id="marqueeText">✨ Movie App သက်တမ်းတိုးလိုပါက Admin Viber 09777966119 သို့ ဆက်သွယ်နိုင်ပါသည်။ 🍿</div></div>
+            <div id="movieGrid" class="movie-grid"><div class="loading-text-center">⏳ Loading Movies...</div></div>
         </div>
     </div>
     <div id="subtitleText" class="subtitle-text"><div id="subtitleInner" class="subtitle-inner"></div></div>
 </div>
 
 <script>
-    // ==================== TAB SWITCHER ====================
+    // ==================== TABS ====================
     function switchTab(tabId) {
-        document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-        if (tabId === 'movies') {
-            document.getElementById('tabMovies').classList.add('active');
-            document.getElementById('moviesSection').classList.add('active');
-            if (allMovies.length === 0) loadMovies();
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        if (tabId === 'bozaw') {
+            document.querySelector('.tab-btn:nth-child(1)').classList.add('active');
+            document.getElementById('bozawSection').classList.add('active');
         } else if (tabId === 'dubai') {
-            document.getElementById('tabDubai').classList.add('active');
+            document.querySelector('.tab-btn:nth-child(2)').classList.add('active');
             document.getElementById('dubaiSection').classList.add('active');
             if (dubaiResults.length === 0) fetchDubaiData();
         } else {
-            document.getElementById('tabBozaw').classList.add('active');
-            document.getElementById('bozawSection').classList.add('active');
+            document.querySelector('.tab-btn:nth-child(3)').classList.add('active');
+            document.getElementById('moviesSection').classList.add('active');
+            if (allMovies.length === 0) loadMovies();
         }
     }
 
-    // ==================== NOTIFICATION ====================
-    function showNoti(message) {
-        const noti = document.getElementById('customNoti');
-        document.getElementById('notiMessage').textContent = message;
-        noti.classList.add('show');
-        clearTimeout(window.notiTimeout);
-        window.notiTimeout = setTimeout(() => noti.classList.remove('show'), 3000);
+    function showNoti(msg) {
+        const n = document.getElementById('customNoti');
+        document.getElementById('notiMessage').textContent = msg;
+        n.classList.add('show');
+        clearTimeout(window._nt);
+        window._nt = setTimeout(() => n.classList.remove('show'), 3000);
     }
     window.alert = showNoti;
-
-    // ==================== SECURITY ====================
-    document.addEventListener('contextmenu', e => e.preventDefault());
-    document.addEventListener('keydown', e => {
-        if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.key==='I'||e.key==='J'||e.key==='C')) || (e.ctrlKey && e.key==='U')) {
-            e.preventDefault();
-        }
-    });
 
     // ==================== FIREBASE ====================
     const firebaseConfig = {
@@ -645,34 +503,17 @@
         databaseURL: "https://movie-app-f6a8e-default-rtdb.firebaseio.com"
     };
     firebase.initializeApp(firebaseConfig);
-    const database = firebase.database();
+    const db = firebase.database();
 
-    // ==================== MOVIE APP VARIABLES ====================
-    let currentUserData = null, isExpired = false, player = null, subtitles = [], intervalId = null;
-    let isFullscreen = false, isPlaying = true, allMovies = [], currentFilter = 'all', currentUserId = '', favorites = [], expiryCheckInterval = null;
-    let ytReady = false;
+    // ==================== MOVIE APP ====================
+    let allMovies = [], favorites = [], currentFilter = 'all', currentUserId = '', isExpired = false, player = null, subtitles = [], intervalId = null;
+    let isFullscreen = false, isPlaying = true, expiryCheckInterval = null;
 
-    // ==================== DEVICE ID ====================
-    function generateDeviceFingerprint() {
-        const screenInfo = window.screen.width + 'x' + window.screen.height + 'x' + window.screen.colorDepth;
-        const navigatorInfo = navigator.hardwareConcurrency + '-' + (navigator.deviceMemory || 'M');
-        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-        const rawString = screenInfo + navigatorInfo + timezone;
-        let hash = 0;
-        for (let i = 0; i < rawString.length; i++) {
-            hash = ((hash << 5) - hash) + rawString.charCodeAt(i);
-            hash = hash & hash;
-        }
-        return 'DEV-' + Math.abs(hash).toString(36).toUpperCase();
-    }
-
-    function getAccountId(deviceId) {
-        let hash = 0;
-        for (let i = 0; i < deviceId.length; i++) {
-            hash = ((hash << 5) - hash) + deviceId.charCodeAt(i);
-            hash = hash & hash;
-        }
-        return 'UID-' + Math.abs(hash).toString(36).toUpperCase().padStart(8, '0').substring(0, 8);
+    function genId() {
+        let h = 0;
+        const s = screen.width + 'x' + screen.height + navigator.hardwareConcurrency + Intl.DateTimeFormat().resolvedOptions().timeZone;
+        for (let i = 0; i < s.length; i++) h = ((h << 5) - h) + s.charCodeAt(i);
+        return 'UID-' + Math.abs(h).toString(36).toUpperCase().padStart(8, '0').substring(0, 8);
     }
 
     function copyAccountId() {
@@ -680,211 +521,102 @@
         navigator.clipboard.writeText(id).then(() => showNoti('✅ Copy ကူးပြီးပါပြီ။'));
     }
 
-    // ==================== AUTO LOGIN ====================
-    let autoLoginDone = false;
-    async function autoLogin() {
-        if (autoLoginDone) return;
-        autoLoginDone = true;
-        let deviceId = localStorage.getItem('deviceId') || generateDeviceFingerprint();
+    window.onload = function() {
+        const deviceId = localStorage.getItem('deviceId') || 'DEV-' + Math.random().toString(36).substring(2, 8).toUpperCase();
         localStorage.setItem('deviceId', deviceId);
-        const accountId = getAccountId(deviceId);
-        currentUserId = accountId;
+        currentUserId = genId();
         document.getElementById('userBanner').style.display = 'flex';
-        document.getElementById('accountIdDisplay').textContent = accountId;
+        document.getElementById('accountIdDisplay').textContent = currentUserId;
         loadMoviesFromCache();
-        try {
-            const userRef = database.ref('devices/' + deviceId);
-            const snapshot = await userRef.once('value');
-            const data = snapshot.val();
+        db.ref('devices/' + deviceId).once('value').then(snap => {
+            const data = snap.val();
             if (data) {
-                currentUserData = data;
                 isExpired = Date.now() > data.expiry;
                 startExpiryChecker();
-                await loadMovies(false);
+                loadMovies(false);
+                fetchBozawData();
             } else {
-                let freeDays = 1;
-                const freeDaysSnap = await database.ref('settings/defaultFreeDays').once('value');
-                if (freeDaysSnap.exists() && typeof freeDaysSnap.val() === 'number') { freeDays = freeDaysSnap.val(); }
-                const expiry = Date.now() + (freeDays * 24 * 60 * 60 * 1000);
-                const newUserData = { deviceId, accountId, expiry, createdAt: Date.now(), isAdmin: false };
-                await database.ref('devices/' + deviceId).set(newUserData);
-                currentUserData = newUserData;
-                isExpired = freeDays <= 0;
-                if (freeDays > 0) {
-                    showNoti('🎉 အကောင့်အသစ် ဖွင့်လှစ်ပြီးပါပြီ။ (' + freeDays + ' ရက် အခမဲ့ စမ်းသုံးခွင့်ရရှိပါသည်)');
-                } else {
-                    showNoti('⚠️ ဤအက်ပ်ကို အသုံးပြုရန် သက်တမ်းတိုးရပါမည်။');
-                }
+                const expiry = Date.now() + 60 * 60 * 1000;
+                db.ref('devices/' + deviceId).set({ deviceId, accountId: currentUserId, expiry, createdAt: Date.now() });
+                isExpired = false;
                 startExpiryChecker();
-                await loadMovies(false);
+                loadMovies(false);
+                fetchBozawData();
             }
-        } catch(e) {
-            showNoti('⚠️ ကွန်ရက်ချိတ်ဆက်မှု နှေးကွေးနေပါသည်။');
-        }
-    }
+        }).catch(() => showNoti('⚠️ ကွန်ရက်ချိတ်ဆက်မှု နှေးကွေးနေပါသည်။'));
+        handleViewCounter();
+        handleDubaiViewCounter();
+        if (typeof YT !== 'undefined' && YT.loaded) { } else { autoLogin(); }
+    };
 
-    function onYouTubeIframeAPIReady() { ytReady = true; autoLogin(); }
+    function autoLogin() { /* already done in onload */ }
 
     function startExpiryChecker() {
         if (expiryCheckInterval) clearInterval(expiryCheckInterval);
         expiryCheckInterval = setInterval(() => {
-            if (!currentUserData) return;
-            const remaining = currentUserData.expiry - Date.now();
-            const wasExpired = isExpired;
-            isExpired = remaining <= 0;
-            const homeTimeText = document.getElementById('homeTimeText');
-            const homeTimeBar = document.getElementById('homeTimeBar');
-
-            if (isExpired) {
-                if(homeTimeText) { homeTimeText.textContent = '⛔ Expired'; homeTimeBar.style.width = '0%'; }
-                document.getElementById('userStatusText').textContent = 'Expired';
-                document.getElementById('userStatusText').className = 'expired';
-                document.getElementById('statusDot').className = 'expired';
-
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('disabled'));
-                const expiredHTML = '<div class="expired-overlay"><span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span><div class="btn-group"><a href="viber://chat?number=%2B959777966119" class="admin-btn viber" target="_blank">💬 Admin Viber: 09777966119</a><a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a></div></div>';
-                const bozawContainer = document.getElementById('bozawContainer');
-                const dubaiContainer = document.getElementById('dubaiContainer');
-                const movieGrid = document.getElementById('movieGrid');
-                if (bozawContainer) bozawContainer.innerHTML = expiredHTML;
-                if (dubaiContainer) dubaiContainer.innerHTML = expiredHTML;
-                if (movieGrid) movieGrid.innerHTML = expiredHTML;
-                updatePlayerState();
-                if (player) { try{player.destroy()}catch(e){} player = null; }
-            } else {
-                document.getElementById('userStatusText').textContent = 'Active';
-                document.getElementById('userStatusText').className = 'active';
-                document.getElementById('statusDot').className = 'active';
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('disabled'));
-                const mins = Math.floor(remaining / 60000);
-                const secs = Math.floor((remaining % 60000) / 1000);
-                if(homeTimeText) {
-                    homeTimeText.textContent = mins + 'm ' + secs + 's';
-                    homeTimeBar.style.width = Math.min(100, (remaining / (60*60*1000)) * 100) + '%';
-                }
-                if (wasExpired) {
-                    restoreBozawContent();
-                    restoreDubaiContent();
-                    loadMovies(false);
+            const remaining = 3600000 - (Date.now() % 3600000);
+            const expired = remaining <= 0;
+            if (expired !== isExpired) {
+                isExpired = expired;
+                document.getElementById('userStatusText').textContent = isExpired ? 'Expired' : 'Active';
+                document.getElementById('userStatusText').className = isExpired ? 'expired' : 'active';
+                document.getElementById('statusDot').className = isExpired ? 'expired' : 'active';
+                if (isExpired) {
+                    document.querySelectorAll('.tab-btn').forEach(b => b.style.opacity = '0.3');
+                    const html = '<div class="expired-overlay"><span>⚠️ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ။</span><div class="btn-group"><a href="viber://chat?number=%2B959777966119" class="admin-btn viber" target="_blank">💬 Viber: 09777966119</a><a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">📲 Telegram Admin</a></div></div>';
+                    document.querySelectorAll('.twod-container, .dubai-container, #movieGrid').forEach(el => el.innerHTML = html);
+                    if (player) { try { player.destroy(); } catch(e) {} player = null; }
                 }
             }
+            const mins = Math.floor(remaining / 60000);
+            const secs = Math.floor((remaining % 60000) / 1000);
+            document.getElementById('homeTimeText').textContent = mins + 'm ' + secs + 's';
+            document.getElementById('homeTimeBar').style.width = Math.min(100, (remaining / 3600000) * 100) + '%';
         }, 1000);
     }
 
-    function restoreBozawContent() {
-        const bozawContainer = document.getElementById('bozawContainer');
-        if (bozawContainer) {
-            bozawContainer.innerHTML = '<div class="header-area"><h2>Bozaw 2D ခန့်မှန်းချက်</h2><div class="sub-status-area"><span class="status-icon" id="statusIcon">✅</span><span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="viewCountDisplay">0</span> views</span></div></div><div class="table-title">📊 AM / PM & အခွေပူး ဇယားကွက်</div><div class="table-wrapper"><table><thead><tr><th style="width:23%;">AM ထွက်</th><th style="width:23%;">PM ထွက်</th><th style="width:26%;">ထိုတန်း၏ အခွေ/ပတ်</th><th style="width:28%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th></tr></thead><tbody id="bozawTableBody"><tr><td colspan="4" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr></tbody></table></div><div class="flex-center"><div class="admin-footer-box">👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a></div></div>';
-            fetchBozawData();
-        }
-    }
-
-    function restoreDubaiContent() {
-        const dubaiContainer = document.getElementById('dubaiContainer');
-        if (dubaiContainer) {
-            dubaiContainer.innerHTML = '<div class="header-area"><h2>🇦🇪 Dubai 2D ခန့်မှန်းချက်</h2><div class="sub-status-area"><span class="status-icon" id="dubaiStatusIcon">✅</span><span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="dubaiViewCount">0</span> views</span></div></div><div class="table-title">📊 ၆ ကွက် ထွက်ဂဏန်း + ထိုးရမဲ့ဂဏန်း + အခွေပူး ဇယား</div><div class="table-wrapper"><table><thead><tr><th>၁၁ နာရီ</th><th>၁ နာရီ</th><th>၃ နာရီ</th><th>၅ နာရီ</th><th>၇ နာရီ</th><th>၉ နာရီ</th><th class="khaway-col-header">🎯 အခွေပူး</th></tr></thead><tbody id="dubaiTableBody"><tr><td colspan="7" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr></tbody></table></div><div class="flex-center"><div class="admin-footer-box">👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a></div></div>';
-            fetchDubaiData();
-        }
-    }
-
-    function updatePlayerState() {
-        const placeholder = document.getElementById('videoPlaceholder');
-        const controls = document.querySelectorAll('.video-controls button, .video-controls input');
-        if (isExpired) {
-            if (placeholder) placeholder.style.display = 'flex';
-            controls.forEach(el => el.disabled = true);
-            document.getElementById('statusText').innerHTML = '⛔ သက်တမ်းကုန်ဆုံးနေပါသည်။';
-        } else {
-            if (placeholder) placeholder.style.display = 'none';
-            controls.forEach(el => el.disabled = false);
-        }
-    }
-
-    // ==================== MOVIE LOADING ====================
+    // ==================== MOVIES ====================
     function loadMoviesFromCache() {
-        try {
-            const cachedMovies = localStorage.getItem('cached_movies');
-            if (cachedMovies) { allMovies = JSON.parse(cachedMovies); renderMovies(); }
-        } catch(e) {}
+        try { const c = localStorage.getItem('cached_movies'); if (c) { allMovies = JSON.parse(c); renderMovies(); } } catch(e) {}
     }
 
     async function loadMovies(showLoading = true) {
-        let grid = document.getElementById('movieGrid');
-        if (showLoading && allMovies.length === 0) {
-            grid.innerHTML = '<div class="loading-text-center">⏳ Loading Movies...</div>';
-        }
+        const grid = document.getElementById('movieGrid');
+        if (showLoading && allMovies.length === 0) grid.innerHTML = '<div class="loading-text-center">⏳ Loading Movies...</div>';
         try {
-            if (currentUserId) {
-                const favSnap = await database.ref('favorites/' + currentUserId).once('value');
-                favorites = favSnap.val() || [];
-            }
-            let res = await fetch('/api/videos');
-            let data = await res.json();
+            const res = await fetch('/api/videos');
+            const data = await res.json();
             if (data.success && data.videos && data.videos.length > 0) {
-                allMovies = [];
+                allMovies = data.videos;
                 localStorage.setItem('cached_movies', JSON.stringify(data.videos));
-                for (let i = 0; i < data.videos.length; i++) {
-                    allMovies.push(data.videos[i]);
-                    renderIncrementalMovie(data.videos[i], i === 0);
-                }
+                renderMovies();
             }
-        } catch(e) { console.error('Error loading movies:', e); }
-    }
-
-    function renderIncrementalMovie(v, isFirst) {
-        let grid = document.getElementById('movieGrid');
-        if (isExpired) return;
-        if (isFirst || grid.querySelector('.loading-text-center') || grid.querySelector('.expired-overlay')) {
-            grid.innerHTML = '';
-        }
-        let isFav = favorites.includes(v.videoId);
-        let card = document.createElement('div');
-        card.className = 'movie-card';
-        card.innerHTML = '<button class="favorite-btn ' + (isFav?'active':'') + '" onclick="toggleFavorite(\'' + v.videoId + '\', event)">' + (isFav?'❤️':'🤍') + '</button><img class="movie-poster" src="https://img.youtube.com/vi/' + v.videoId + '/mqdefault.jpg"><div class="movie-title">' + (v.title || "Premium Video") + '</div>';
-        card.onclick = () => {
-            if (isExpired) return;
-            document.getElementById('gridSection').classList.add('hide');
-            document.getElementById('playerSection').classList.add('active');
-            updatePlayerState();
-            createPlayer(v.videoId);
-        };
-        grid.appendChild(card);
+        } catch(e) {}
     }
 
     function renderMovies() {
-        let grid = document.getElementById('movieGrid');
-        let searchTerm = document.getElementById('searchInput').value.toLowerCase().trim();
+        const grid = document.getElementById('movieGrid');
+        const term = document.getElementById('searchInput').value.toLowerCase().trim();
         let filtered = allMovies;
         if (currentFilter === 'favorites') filtered = filtered.filter(m => favorites.includes(m.videoId));
-        if (searchTerm) filtered = filtered.filter(m => (m.title || "").toLowerCase().includes(searchTerm));
-        if (isExpired) return;
-        if (filtered.length === 0) {
-            if (allMovies.length === 0) { grid.innerHTML = '<div class="loading-text-center">⏳ Loading Movies...</div>'; }
-            else { grid.innerHTML = '<div class="loading-text-center">📭 ဇာတ်ကားများ မရှိသေးပါ။</div>'; }
-            return;
-        }
+        if (term) filtered = filtered.filter(m => (m.title || "").toLowerCase().includes(term));
+        if (filtered.length === 0) { grid.innerHTML = '<div class="loading-text-center">📭 ဇာတ်ကားများ မရှိသေးပါ။</div>'; return; }
         grid.innerHTML = '';
-        const fragment = document.createDocumentFragment();
         filtered.forEach(v => {
-            let isFav = favorites.includes(v.videoId);
-            let card = document.createElement('div');
+            const isFav = favorites.includes(v.videoId);
+            const card = document.createElement('div');
             card.className = 'movie-card';
-            card.innerHTML = '<button class="favorite-btn ' + (isFav?'active':'') + '" onclick="toggleFavorite(\'' + v.videoId + '\', event)">' + (isFav?'❤️':'🤍') + '</button><img class="movie-poster" src="https://img.youtube.com/vi/' + v.videoId + '/mqdefault.jpg"><div class="movie-title">' + (v.title || "Premium Video") + '</div>';
-            card.onclick = () => {
-                if (isExpired) return;
-                document.getElementById('gridSection').classList.add('hide');
-                document.getElementById('playerSection').classList.add('active');
-                updatePlayerState();
-                createPlayer(v.videoId);
-            };
-            fragment.appendChild(card);
+            card.innerHTML = `<button class="favorite-btn ${isFav?'active':''}" onclick="toggleFavorite('${v.videoId}', event)">${isFav?'❤️':'🤍'}</button>
+                <img class="movie-poster" src="https://img.youtube.com/vi/${v.videoId}/mqdefault.jpg">
+                <div class="movie-title">${v.title || "Premium Video"}</div>`;
+            card.onclick = () => { if (isExpired) return; document.getElementById('gridSection').classList.add('hide'); document.getElementById('playerSection').classList.add('active'); createPlayer(v.videoId); };
+            grid.appendChild(card);
         });
-        grid.appendChild(fragment);
     }
 
     function createPlayer(videoId) {
-        if (isExpired) return;
-        if (player) { try{player.destroy()}catch(e){} player = null; }
+        if (isExpired || !videoId) return;
+        if (player) { try { player.destroy(); } catch(e) {} player = null; }
         subtitles = [];
         document.getElementById('statusText').innerHTML = '⏳ Loading stream...';
         document.getElementById('subtitleInner').textContent = '';
@@ -904,36 +636,32 @@
 
     async function loadSRT(videoId) {
         try {
-            let res = await fetch('/api/video/' + videoId);
-            let data = await res.json();
+            const res = await fetch('/api/video/' + videoId);
+            const data = await res.json();
             if (data.success && data.subtitles) {
                 subtitles = parseSRT(data.subtitles);
-                if(subtitles.length > 0) {
-                    document.getElementById('statusText').innerHTML = '✅ Premium Subtitle Loaded';
-                    document.getElementById('fullscreenHint').style.display = 'block';
-                }
+                if (subtitles.length > 0) document.getElementById('statusText').innerHTML = '✅ Premium Subtitle Loaded';
             }
-        } catch(e) { console.log('No subtitles found'); }
+        } catch(e) {}
     }
 
     function parseSRT(content) {
         if (!content) return [];
-        let lines = content.split(/\r?\n/), subs = [], i = 0;
+        const lines = content.split(/\r?\n/);
+        const subs = [];
+        let i = 0;
         while (i < lines.length) {
-            let line = lines[i] ? lines[i].trim() : '';
+            const line = lines[i] ? lines[i].trim() : '';
             if (!line) { i++; continue; }
-            let num = parseInt(line);
+            const num = parseInt(line);
             if (!isNaN(num) && num > 0) {
                 i++;
-                let timeMatch = lines[i].match(/(\d{2}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,.]\d{3})/);
+                const timeMatch = lines[i] ? lines[i].match(/(\d{2}:\d{2}:\d{2}[,.]\d{3})\s*-->\s*(\d{2}:\d{2}:\d{2}[,.]\d{3})/) : null;
                 if (timeMatch) {
-                    let start = toSeconds(timeMatch[1]), end = toSeconds(timeMatch[2]);
+                    const start = toSec(timeMatch[1]), end = toSec(timeMatch[2]);
                     i++;
-                    let textLines = [];
-                    while (i < lines.length && lines[i].trim()) {
-                        textLines.push(lines[i].trim());
-                        i++;
-                    }
+                    const textLines = [];
+                    while (i < lines.length && lines[i].trim()) { textLines.push(lines[i].trim()); i++; }
                     subs.push({ start, end, text: textLines.join(" ") });
                 }
             }
@@ -942,9 +670,9 @@
         return subs;
     }
 
-    function toSeconds(t) {
-        let parts = t.replace(',', '.').split(':');
-        return parseInt(parts[0])*3600 + parseInt(parts[1])*60 + parseFloat(parts[2]);
+    function toSec(t) {
+        const p = t.replace(',', '.').split(':');
+        return parseInt(p[0]) * 3600 + parseInt(p[1]) * 60 + parseFloat(p[2]);
     }
 
     function startPolling() {
@@ -952,19 +680,17 @@
         intervalId = setInterval(() => {
             if (!player || isExpired) return;
             try {
-                let time = player.getCurrentTime();
-                let duration = player.getDuration();
+                const time = player.getCurrentTime();
+                const duration = player.getDuration();
                 let text = "";
-                for (let s of subtitles) {
+                for (const s of subtitles) {
                     if (time >= s.start && time <= s.end) { text = s.text; break; }
                 }
-                const container = document.getElementById('subtitleText');
-                const inner = document.getElementById('subtitleInner');
-                if (text) { inner.innerText = text; container.style.display = 'block'; }
-                else { container.style.display = 'none'; }
+                document.getElementById('subtitleInner').textContent = text;
+                document.getElementById('subtitleText').style.display = text ? 'block' : 'none';
                 document.getElementById('progressSlider').value = (time / duration) * 100;
                 document.getElementById('timeDisplay').innerText = Math.floor(time/60) + ':' + String(Math.floor(time%60)).padStart(2,'0') + ' / ' + Math.floor(duration/60) + ':' + String(Math.floor(duration%60)).padStart(2,'0');
-            } catch(e){}
+            } catch(e) {}
         }, 350);
     }
 
@@ -973,37 +699,21 @@
         if (isPlaying) { player.pauseVideo(); document.getElementById('playPauseBtn').innerHTML = '▶️ Play'; isPlaying = false; }
         else { player.playVideo(); document.getElementById('playPauseBtn').innerHTML = '⏸ Pause'; isPlaying = true; }
     };
-    window.seekVideo = function(sec) { if(!player) return; try { player.seekTo(player.getCurrentTime()+sec, true); } catch(e) {} };
-    window.seekToPosition = function() { if(!player) return; try { let pct = parseFloat(document.getElementById('progressSlider').value); player.seekTo((pct/100)*player.getDuration(), true); } catch(e) {} };
+    window.seekVideo = function(s) { if (player) try { player.seekTo(player.getCurrentTime() + s, true); } catch(e) {} };
+    window.seekToPosition = function() { if (!player) return; const pct = parseFloat(document.getElementById('progressSlider').value); try { player.seekTo((pct/100) * player.getDuration(), true); } catch(e) {} };
     window.toggleFullscreen = function() {
-        let c = document.getElementById('videoContainer');
-        let pSection = document.getElementById('playerSection');
-        let floatBtn = document.getElementById('exitFsFloatingBtn');
-        if (!isFullscreen) {
-            c.classList.add('fullscreen');
-            pSection.classList.add('fs-active');
-            floatBtn.style.display = 'block';
-            isFullscreen = true;
-        } else {
-            c.classList.remove('fullscreen');
-            pSection.classList.remove('fs-active');
-            floatBtn.style.display = 'none';
-            isFullscreen = false;
-        }
+        const c = document.getElementById('videoContainer');
+        const p = document.getElementById('playerSection');
+        const b = document.getElementById('exitFsFloatingBtn');
+        if (!isFullscreen) { c.classList.add('fullscreen'); p.classList.add('fs-active'); b.style.display = 'block'; isFullscreen = true; }
+        else { c.classList.remove('fullscreen'); p.classList.remove('fs-active'); b.style.display = 'none'; isFullscreen = false; }
     };
-
-    function toggleFavorite(videoId, event) {
-        event.stopPropagation();
-        const index = favorites.indexOf(videoId);
-        if (index > -1) favorites.splice(index, 1); else favorites.push(videoId);
-        database.ref('favorites/' + currentUserId).set(favorites).then(() => renderMovies());
-    }
-    function setFilter(f) { currentFilter = f; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); document.getElementById(f==='all'?'allBtn':'favBtn').classList.add('active'); renderMovies(); }
+    function toggleFavorite(id, e) { e.stopPropagation(); const idx = favorites.indexOf(id); if (idx > -1) favorites.splice(idx, 1); else favorites.push(id); db.ref('favorites/' + currentUserId).set(favorites); renderMovies(); }
+    function setFilter(f) { currentFilter = f; document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active')); document.getElementById(f === 'all' ? 'allBtn' : 'favBtn').classList.add('active'); renderMovies(); }
     function searchMovies() { renderMovies(); }
     function showGrid() {
         if (intervalId) { clearInterval(intervalId); intervalId = null; }
-        subtitles = [];
-        if (player) { try{player.destroy()}catch(e){} player = null; }
+        if (player) { try { player.destroy(); } catch(e) {} player = null; }
         document.getElementById('gridSection').classList.remove('hide');
         document.getElementById('playerSection').classList.remove('active');
         document.getElementById('playerSection').classList.remove('fs-active');
@@ -1013,298 +723,172 @@
     }
 
     // ==================== BOZAW 2D ====================
-    const BOZAW_SHEET_ID = '1tNEhMx08S8rz84In1FdWLPcYlGJkzDCIXFMIhy5BrGU';
-    const BOZAW_SHEET_URL = 'https://docs.google.com/spreadsheets/d/' + BOZAW_SHEET_ID + '/gviz/tq?tqx=out:csv';
-    let bozawResults = [], bozawKhwayItems = [];
+    const BOZAW_SHEET = '1tNEhMx08S8rz84In1FdWLPcYlGJkzDCIXFMIhy5BrGU';
+    let bozawResults = [], bozawKhways = [];
 
     function handleViewCounter() {
         fetch('https://countapi.mileshilliard.com/api/v1/hit/bozaw2d_vercel_app_2026_views')
-            .then(r => r.json())
-            .then(d => { document.getElementById('viewCountDisplay').innerText = Number(d.value).toLocaleString(); })
-            .catch(() => { document.getElementById('viewCountDisplay').innerText = '-'; });
+            .then(r => r.json()).then(d => document.getElementById('bozawViewCount').innerText = Number(d.value).toLocaleString())
+            .catch(() => document.getElementById('bozawViewCount').innerText = '-');
     }
 
     function fetchBozawData() {
-        fetch(BOZAW_SHEET_URL + '&_ts=' + Date.now(), { cache: 'no-store' })
-            .then(r => r.text())
-            .then(d => { parseBozawCSV(d); document.getElementById('statusIcon').innerText = '✅'; renderBozawTable(); })
-            .catch(() => { document.getElementById('statusIcon').innerText = '❌'); });
+        const url = `https://docs.google.com/spreadsheets/d/${BOZAW_SHEET}/gviz/tq?tqx=out:csv&_ts=${Date.now()}`;
+        fetch(url, { cache: 'no-store' })
+            .then(r => r.text()).then(d => { parseBozaw(d); document.getElementById('bozawStatus').innerText = '✅'; renderBozaw(); })
+            .catch(() => document.getElementById('bozawStatus').innerText = '❌');
     }
 
-    function parseBozawCSV(csvText) {
-        let lines = csvText.split('\n');
-        bozawResults = []; bozawKhwayItems = [];
+    function parseBozaw(csv) {
+        const lines = csv.split('\n');
+        bozawResults = []; bozawKhways = [];
         for (let i = 1; i < lines.length; i++) {
-            let line = lines[i].trim();
+            const line = lines[i].trim();
             if (!line) continue;
-            let matches = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
-            if (matches.length >= 1) {
-                let res = matches[0].replace(/"/g, '').trim();
-                let khw = '';
-                if (matches.length > 1) {
-                    let parts = [];
-                    for (let j = 1; j < matches.length; j++) {
-                        let p = matches[j].replace(/"/g, '').trim();
-                        if (p) parts.push(p);
-                    }
-                    khw = parts.join(',').trim();
-                }
-                if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
-                if (res.length > 0 && res.length < 4) res = res.padStart(4, '0');
-                if (res.length === 4) { bozawResults.push(res); bozawKhwayItems.push(khw || '-'); }
+            const parts = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
+            if (parts.length < 1) continue;
+            let res = parts[0].replace(/"/g, '').trim();
+            let khw = '';
+            if (parts.length > 1) {
+                const arr = [];
+                for (let j = 1; j < parts.length; j++) { const p = parts[j].replace(/"/g, '').trim(); if (p) arr.push(p); }
+                khw = arr.join(',').trim();
             }
+            if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
+            if (res.length > 0 && res.length < 4) res = res.padStart(4, '0');
+            if (res.length === 4) { bozawResults.push(res); bozawKhways.push(khw || '-'); }
         }
     }
 
-    function checkMatchLogic(khwayItem, target2D) {
-        let clean = khwayItem.replace(/[^\d]/g, '').trim();
+    function matchLogic(kh, target) {
+        const clean = kh.replace(/[^\d]/g, '').trim();
         if (!clean) return false;
-        if (clean.length === 1) return target2D.includes(clean);
-        if (clean.length === 2) return clean === target2D;
-        let digits = clean.split('');
-        return digits.includes(target2D[0]) && digits.includes(target2D[1]);
+        if (clean.length === 1) return target.includes(clean);
+        if (clean.length === 2) return clean === target;
+        const digits = clean.split('');
+        return digits.includes(target[0]) && digits.includes(target[1]);
     }
 
-    function renderBozawTable() {
-        let tbody = document.getElementById('bozawTableBody');
+    function renderBozaw() {
+        const tbody = document.getElementById('bozawTableBody');
         if (!tbody) return;
         tbody.innerHTML = '';
         if (bozawResults.length === 0) {
             tbody.innerHTML = '<tr><td colspan="4" class="empty-status">ဒေတာများ မရှိသေးပါ။ Google Sheet တွင် အရင်ဖြည့်ပါ။</td></tr>';
             return;
         }
-        let amHit = new Array(bozawResults.length).fill(0);
-        let pmHit = new Array(bozawResults.length).fill(0);
-        for (let idx = 0; idx < bozawResults.length; idx++) {
-            let khw = bozawKhwayItems[idx];
-            if (khw && khw !== '-') {
-                let khs = khw.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                for (let i = 1; i <= 5; i++) {
-                    let tIdx = idx + i;
-                    if (tIdx < bozawResults.length) {
-                        let tNum = bozawResults[tIdx];
-                        let tAm = tNum.slice(0, 2), tPm = tNum.slice(2, 4);
-                        khs.forEach(k => { if (checkMatchLogic(k, tAm)) amHit[tIdx]++; if (checkMatchLogic(k, tPm)) pmHit[tIdx]++; });
+        const amHits = new Array(bozawResults.length).fill(0);
+        const pmHits = new Array(bozawResults.length).fill(0);
+        for (let i = 0; i < bozawResults.length; i++) {
+            const kh = bozawKhways[i];
+            if (kh && kh !== '-') {
+                const kArr = kh.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+                for (let d = 1; d <= 5; d++) {
+                    const t = i + d;
+                    if (t < bozawResults.length) {
+                        const num = bozawResults[t];
+                        const am = num.slice(0, 2), pm = num.slice(2, 4);
+                        kArr.forEach(k => { if (matchLogic(k, am)) amHits[t]++; if (matchLogic(k, pm)) pmHits[t]++; });
                     }
                 }
             }
         }
-        for (let idx = 0; idx < bozawResults.length; idx++) {
-            let num = bozawResults[idx];
-            let am = num.slice(0, 2), pm = num.slice(2, 4);
-            let khw = bozawKhwayItems[idx] || '-';
-            let hits = [];
-            if (bozawKhwayItems[idx] && bozawKhwayItems[idx] !== '-') {
-                let khs = bozawKhwayItems[idx].split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                for (let i = 1; i <= 5; i++) {
-                    let tIdx = idx + i;
-                    if (tIdx < bozawResults.length) {
-                        let tNum = bozawResults[tIdx];
-                        let tAm = tNum.slice(0, 2), tPm = tNum.slice(2, 4);
-                        khs.forEach(k => { if (checkMatchLogic(k, tAm) && !hits.includes(tAm)) hits.push(tAm); if (checkMatchLogic(k, tPm) && !hits.includes(tPm)) hits.push(tPm); });
+        for (let i = 0; i < bozawResults.length; i++) {
+            const num = bozawResults[i];
+            const am = num.slice(0, 2), pm = num.slice(2, 4);
+            const kh = bozawKhways[i] || '-';
+            const hits = [];
+            if (bozawKhways[i] && bozawKhways[i] !== '-') {
+                const kArr = bozawKhways[i].split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+                for (let d = 1; d <= 5; d++) {
+                    const t = i + d;
+                    if (t < bozawResults.length) {
+                        const num2 = bozawResults[t];
+                        const am2 = num2.slice(0, 2), pm2 = num2.slice(2, 4);
+                        kArr.forEach(k => { if (matchLogic(k, am2) && !hits.includes(am2)) hits.push(am2); if (matchLogic(k, pm2) && !hits.includes(pm2)) hits.push(pm2); });
                     }
                 }
             }
-            let tr = document.createElement('tr');
-            let khwDisplay = '-';
-            if (bozawKhwayItems[idx] && bozawKhwayItems[idx] !== '-') {
-                let parts = bozawKhwayItems[idx].split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                if (parts.length > 0) khwDisplay = '<span class="khway-style">' + parts.join('<br><hr style="border:0;border-top:1px dashed #b2bec3;margin:4px 0;">') + '</span>';
-            }
-            let hitHTML = hits.length > 0 ? '<span class="badge-hit">' + hits.join(', ') + '</span>' : (bozawKhwayItems[idx] && bozawKhwayItems[idx] !== '-' ? '<span style="color:#747d8c;font-size:12px;font-weight:700;">မပါဝင်ပါ</span>' : '-');
-            let amCount = amHit[idx] > 0 ? '<span class="count-text">(' + amHit[idx] + ')</span>' : '';
-            let pmCount = pmHit[idx] > 0 ? '<span class="count-text">(' + pmHit[idx] + ')</span>' : '';
-            let amMatch = amHit[idx] > 0, pmMatch = pmHit[idx] > 0;
-            tr.innerHTML = '<td class="' + (amMatch ? 'highlight-match' : '') + '"><div class="num-box-wrapper"><span class="num-box">' + am + amCount + '</span></div></td><td class="' + (pmMatch ? 'highlight-match' : '') + '"><div class="num-wrapper"><span class="num-box">' + pm + pmCount + '</span></div></td><td>' + khwDisplay + '</td><td>' + hitHTML + '</td>';
+            const tr = document.createElement('tr');
+            const khDisplay = (kh && kh !== '-') ? `<span class="khway-style">${kh.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0).join('<br><hr style="border:0;border-top:1px dashed #b2bec3;margin:4px 0;">')}</span>` : '-';
+            const hitHTML = hits.length > 0 ? `<span class="badge-hit">${hits.join(', ')}</span>` : (kh !== '-' ? '<span style="color:#747d8c;font-size:12px;font-weight:700;">မပါဝင်ပါ</span>' : '-');
+            const amHit = amHits[i] > 0, pmHit = pmHits[i] > 0;
+            tr.innerHTML = `<td class="${amHit ? 'highlight-match' : ''}"><span class="num-box">${am}${amHits[i] > 0 ? '<span style="font-size:11px;font-weight:900;color:#e74c3c;vertical-align:super;margin-left:2px;">(' + amHits[i] + ')</span>' : ''}</span></td>
+                <td class="${pmHit ? 'highlight-match' : ''}"><span class="num-box">${pm}${pmHits[i] > 0 ? '<span style="font-size:11px;font-weight:900;color:#e74c3c;vertical-align:super;margin-left:2px;">(' + pmHits[i] + ')</span>' : ''}</span></td>
+                <td>${khDisplay}</td><td>${hitHTML}</td>`;
             tbody.appendChild(tr);
         }
     }
 
-    // ==================== DUBAI 2D (FIXED) ====================
-    const DUBAI_SHEET_ID = '1ICqRfe1aMsRmvjyfcaKFnqplubIyO3Xfe4JYgQRZP5E';
-    const DUBAI_SHEET_URL = 'https://docs.google.com/spreadsheets/d/' + DUBAI_SHEET_ID + '/gviz/tq?tqx=out:csv';
-    let dubaiResults = [], dubaiKhwayItems = [], dubaiHourlyPredictions = [];
+    // ==================== DUBAI 2D ====================
+    const DUBAI_SHEET = '1ICqRfe1aMsRmvjyfcaKFnqplubIyO3Xfe4JYgQRZP5E';
+    let dubaiResults = [], dubaiKhways = [];
 
     function handleDubaiViewCounter() {
         fetch('https://countapi.mileshilliard.com/api/v1/hit/dubai2d_vercel_app_2026_views')
-            .then(r => r.json())
-            .then(d => { document.getElementById('dubaiViewCount').innerText = Number(d.value).toLocaleString(); })
-            .catch(() => { document.getElementById('dubaiViewCount').innerText = '-'; });
+            .then(r => r.json()).then(d => document.getElementById('dubaiViewCount').innerText = Number(d.value).toLocaleString())
+            .catch(() => document.getElementById('dubaiViewCount').innerText = '-');
     }
 
     function fetchDubaiData() {
-        fetch(DUBAI_SHEET_URL + '&_ts=' + Date.now(), { cache: 'no-store' })
-            .then(r => r.text())
-            .then(d => { parseDubaiCSV(d); document.getElementById('dubaiStatusIcon').innerText = '✅'; renderDubaiTable(); })
-            .catch(() => { document.getElementById('dubaiStatusIcon').innerText = '❌'); });
+        const url = `https://docs.google.com/spreadsheets/d/${DUBAI_SHEET}/gviz/tq?tqx=out:csv&_ts=${Date.now()}`;
+        fetch(url, { cache: 'no-store' })
+            .then(r => r.text()).then(d => { parseDubai(d); document.getElementById('dubaiStatus').innerText = '✅'; renderDubai(); })
+            .catch(() => document.getElementById('dubaiStatus').innerText = '❌');
     }
 
-    // ===== FIXED: Dubai 2D parse - normal order =====
-    function parseDubaiCSV(csvText) {
-        let lines = csvText.split('\n');
-        dubaiResults = [];
-        dubaiKhwayItems = [];
-        dubaiHourlyPredictions = [];
-
+    function parseDubai(csv) {
+        const lines = csv.split('\n');
+        dubaiResults = []; dubaiKhways = [];
         for (let i = 1; i < lines.length; i++) {
-            let currentLine = lines[i].trim();
-            if (!currentLine) continue;
-
-            let matches = currentLine.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || currentLine.split(',');
-            
-            if (matches.length >= 1) {
-                let res = matches[0].replace(/"/g, '').trim();
-                if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
-
-                // ===== FIXED: Normal order (no reordering) =====
-                if (res.length >= 10 && res.length <= 12) {
-                    let paddedRes = res.padStart(12, '0');
-                    const pairs = [];
-                    for (let j = 0; j < 12; j += 2) {
-                        pairs.push(paddedRes.substring(j, j + 2));
-                    }
-                    if (pairs.length === 6) {
-                        // ===== NORMAL ORDER: [0,1,2,3,4,5] =====
-                        dubaiResults.push([
-                            pairs[0],
-                            pairs[1],
-                            pairs[2],
-                            pairs[3],
-                            pairs[4],
-                            pairs[5]
-                        ]);
-                    }
-                } else if (res.length === 12) {
-                    const pairs = [];
-                    for (let j = 0; j < 12; j += 2) {
-                        pairs.push(res.substring(j, j + 2));
-                    }
-                    if (pairs.length === 6) {
-                        dubaiResults.push([
-                            pairs[0],
-                            pairs[1],
-                            pairs[2],
-                            pairs[3],
-                            pairs[4],
-                            pairs[5]
-                        ]);
-                    }
+            const line = lines[i].trim();
+            if (!line) continue;
+            const parts = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
+            if (parts.length < 1) continue;
+            let res = parts[0].replace(/"/g, '').trim();
+            let khw = '';
+            if (parts.length > 1) khw = parts[1].replace(/"/g, '').trim();
+            if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
+            if (res.length >= 10 && res.length <= 12) {
+                const p = res.padStart(12, '0');
+                const pairs = [];
+                for (let j = 0; j < 12; j += 2) pairs.push(p.substring(j, j + 2));
+                if (pairs.length === 6) {
+                    dubaiResults.push(pairs);
+                    dubaiKhways.push(khw || '-');
                 }
-
-                // ===== Khaway (Column B) =====
-                if (matches.length > 1) {
-                    let khw = matches[1].replace(/"/g, '').trim();
-                    dubaiKhwayItems.push(khw || '-');
-                }
-
-                // ===== Hourly Predictions (Columns C-H) =====
-                if (matches.length > 2) {
-                    let hourlyPreds = [];
-                    for (let j = 2; j < Math.min(matches.length, 8); j++) {
-                        let pred = matches[j].replace(/"/g, '').trim();
-                        hourlyPreds.push(pred || '-');
-                    }
-                    while (hourlyPreds.length < 6) {
-                        hourlyPreds.push('-');
-                    }
-                    dubaiHourlyPredictions.push(hourlyPreds);
+            } else if (res.length === 12) {
+                const pairs = [];
+                for (let j = 0; j < 12; j += 2) pairs.push(res.substring(j, j + 2));
+                if (pairs.length === 6) {
+                    dubaiResults.push(pairs);
+                    dubaiKhways.push(khw || '-');
                 }
             }
         }
-
-        while (dubaiHourlyPredictions.length < dubaiResults.length) {
-            dubaiHourlyPredictions.push(['-', '-', '-', '-', '-', '-']);
-        }
-        while (dubaiKhwayItems.length < dubaiResults.length) {
-            dubaiKhwayItems.push('-');
-        }
     }
 
-    function renderDubaiTable() {
-        let tbody = document.getElementById('dubaiTableBody');
+    function renderDubai() {
+        const tbody = document.getElementById('dubaiTableBody');
         if (!tbody) return;
         tbody.innerHTML = '';
         if (dubaiResults.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="empty-status">ဒေတာများ မရှိသေးပါ။ Google Sheet တွင် အရင်ဖြည့်ပါ။</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" class="empty-status">ဒေတာများ မရှိသေးပါ။ Google Sheet တွင် အရင်ဖြည့်ပါ။</td></tr>';
             return;
         }
-        for (let rowIdx = 0; rowIdx < dubaiResults.length; rowIdx++) {
-            let row = dubaiResults[rowIdx];
-            let khway = dubaiKhwayItems[rowIdx] || '-';
-            let preds = dubaiHourlyPredictions[rowIdx] || ['-', '-', '-', '-', '-', '-'];
-
-            // Row 1: Prediction (TOP)
-            let trPred = document.createElement('tr');
-            trPred.className = 'pred-row';
-            for (let col = 0; col < 6; col++) {
-                let td = document.createElement('td');
-                let predVal = preds[col] || '-';
-                let rowVal = row[col] || '-';
-                let html = '';
-                if (predVal !== '-') {
-                    let parts = predVal.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                    let ph = '';
-                    parts.forEach((p, idx) => {
-                        let isMatch = false;
-                        if (rowVal !== '-') isMatch = checkMatchLogic(p, rowVal);
-                        ph += '<span class="pred-number ' + (isMatch ? 'hit' : '') + '">' + p + '</span>';
-                        if (idx < parts.length - 1) ph += ' ';
-                    });
-                    html = ph;
-                } else {
-                    html = '<span style="color:#bdc3c7;font-size:11px;">-</span>';
-                }
-                td.innerHTML = html;
-                trPred.appendChild(td);
+        for (let i = 0; i < dubaiResults.length; i++) {
+            const row = dubaiResults[i];
+            const kh = dubaiKhways[i] || '-';
+            const tr = document.createElement('tr');
+            for (let c = 0; c < 6; c++) {
+                const td = document.createElement('td');
+                const val = row[c] || '-';
+                const isMatch = kh !== '-' && kh !== '' && matchLogic(kh, val);
+                if (isMatch && val !== '-') td.className = 'highlight-match';
+                td.innerHTML = `<span class="num-box">${val}</span>`;
+                tr.appendChild(td);
             }
-            let tdPredKh = document.createElement('td');
-            tdPredKh.className = 'khaway-col';
-            if (khway && khway !== '-') {
-                let parts = khway.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                let hits = [];
-                parts.forEach(k => { if (row.some(v => v !== '-' && checkMatchLogic(k, v))) hits.push(k); });
-                tdPredKh.innerHTML = hits.length > 0 ? '<span class="khaway-box hit">✓ ' + hits.join(', ') + '</span>' : '<span class="khaway-box">' + khway + '</span>';
-            } else {
-                tdPredKh.innerHTML = '<span style="color:#bdc3c7;font-size:11px;">-</span>';
-            }
-            trPred.appendChild(tdPredKh);
-            tbody.appendChild(trPred);
-
-            // Row 2: Numbers (BOTTOM)
-            let trNum = document.createElement('tr');
-            for (let col = 0; col < 6; col++) {
-                let td = document.createElement('td');
-                let val = row[col] || '-';
-                let display = val === '-' ? '-' : val;
-                let predVal = preds[col] || '-';
-                let isMatch = false;
-                if (predVal !== '-' && val !== '-') {
-                    let parts = predVal.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                    for (let p of parts) { if (checkMatchLogic(p, val)) { isMatch = true; break; } }
-                }
-                if (isMatch) td.className = 'highlight-match';
-                td.innerHTML = '<div class="num-box-wrapper"><span class="num-box">' + display + '</span></div>';
-                trNum.appendChild(td);
-            }
-            let tdKh = document.createElement('td');
-            tdKh.className = 'khaway-col';
-            if (khway && khway !== '-') {
-                let parts = khway.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                let html = '';
-                let anyMatch = false;
-                parts.forEach((k, idx) => {
-                    let isHit = row.some(v => v !== '-' && checkMatchLogic(k, v));
-                    if (isHit) anyMatch = true;
-                    html += '<span class="khaway-box ' + (isHit ? 'hit' : '') + '">' + k + '</span>';
-                    if (idx < parts.length - 1) html += ' ';
-                });
-                if (anyMatch) tdKh.style.background = 'rgba(46, 204, 113, 0.15)';
-                tdKh.innerHTML = html;
-            } else {
-                tdKh.innerHTML = '<span style="color:#bdc3c7;font-size:11px;">-</span>';
-            }
-            trNum.appendChild(tdKh);
-            tbody.appendChild(trNum);
+            tbody.appendChild(tr);
         }
     }
 
@@ -1314,16 +898,28 @@
         handleDubaiViewCounter();
         fetchBozawData();
         fetchDubaiData();
-        if (typeof YT !== 'undefined' && YT.loaded) { autoLogin(); }
+        const deviceId = localStorage.getItem('deviceId') || 'DEV-' + Math.random().toString(36).substring(2, 8).toUpperCase();
+        localStorage.setItem('deviceId', deviceId);
+        currentUserId = genId();
+        document.getElementById('userBanner').style.display = 'flex';
+        document.getElementById('accountIdDisplay').textContent = currentUserId;
+        loadMoviesFromCache();
+        db.ref('devices/' + deviceId).once('value').then(snap => {
+            const data = snap.val();
+            if (data) {
+                isExpired = Date.now() > data.expiry;
+                startExpiryChecker();
+                loadMovies(false);
+            } else {
+                const expiry = Date.now() + 60 * 60 * 1000;
+                db.ref('devices/' + deviceId).set({ deviceId, accountId: currentUserId, expiry, createdAt: Date.now() });
+                isExpired = false;
+                startExpiryChecker();
+                loadMovies(false);
+            }
+        }).catch(() => showNoti('⚠️ ကွန်ရက်ချိတ်ဆက်မှု နှေးကွေးနေပါသည်။'));
+        if (typeof YT !== 'undefined' && YT.loaded) { } else { autoLogin(); }
     };
-
-    // Firebase listeners
-    database.ref('settings/marqueeSpeed').on('value', snap => {
-        if(snap.val()) document.getElementById('marqueeText').style.setProperty('--speed', snap.val()+'s');
-    });
-    database.ref('devices/' + generateDeviceFingerprint()).on('value', snap => {
-        if (snap.val()) { currentUserData = snap.val(); startExpiryChecker(); }
-    });
 </script>
 </body>
 </html>
