@@ -46,7 +46,7 @@
         .twod-container .admin-footer { text-align: center; font-size: 13px; font-weight: bold; color: #57606f; padding: 10px; margin-top: 16px; }
         .twod-container .admin-link { color: #3742fa; text-decoration: none; font-weight: 800; }
 
-        /* DUBAI 2D */
+        /* DUBAI 2D - WITH PREDICTION ROW */
         .dubai-container { background: rgba(255,255,255,0.95); backdrop-filter: blur(20px); padding: 20px; border-radius: 24px; color: #2c3e50; }
         .dubai-container h2 { text-align: center; font-size: 24px; background: linear-gradient(135deg, #f093fb, #f5576c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 16px; }
         .dubai-container .table-wrapper { overflow-x: auto; border-radius: 16px; border: 1px solid #dcdde1; background: #fff; }
@@ -323,15 +323,20 @@
         });
     }
 
+    // ===== FIXED: loadSRT with correct API endpoint =====
     async function loadSRT(videoId) {
         try {
             const res = await fetch('/api/video/' + videoId);
             const data = await res.json();
             if (data.success && data.subtitles) {
                 subtitles = parseSRT(data.subtitles);
-                if (subtitles.length > 0) document.getElementById('statusText').innerHTML = '✅ Premium Subtitle Loaded';
+                if (subtitles.length > 0) {
+                    document.getElementById('statusText').innerHTML = '✅ Premium Subtitle Loaded';
+                }
             }
-        } catch(e) {}
+        } catch(e) {
+            console.log('SRT load error:', e);
+        }
     }
 
     function parseSRT(content) {
@@ -350,7 +355,10 @@
                     const start = toSec(timeMatch[1]), end = toSec(timeMatch[2]);
                     i++;
                     const textLines = [];
-                    while (i < lines.length && lines[i].trim()) { textLines.push(lines[i].trim()); i++; }
+                    while (i < lines.length && lines[i].trim()) {
+                        textLines.push(lines[i].trim());
+                        i++;
+                    }
                     subs.push({ start, end, text: textLines.join(" ") });
                 }
             }
@@ -364,6 +372,7 @@
         return parseInt(p[0]) * 3600 + parseInt(p[1]) * 60 + parseFloat(p[2]);
     }
 
+    // ===== FIXED: startPolling with subtitle display =====
     function startPolling() {
         if (intervalId) clearInterval(intervalId);
         intervalId = setInterval(() => {
@@ -373,7 +382,10 @@
                 const duration = player.getDuration();
                 let text = "";
                 for (const s of subtitles) {
-                    if (time >= s.start && time <= s.end) { text = s.text; break; }
+                    if (time >= s.start && time <= s.end) {
+                        text = s.text;
+                        break;
+                    }
                 }
                 document.getElementById('subtitleInner').textContent = text;
                 document.getElementById('subtitleText').style.display = text ? 'block' : 'none';
@@ -509,9 +521,9 @@
         }
     }
 
-    // ==================== DUBAI 2D ====================
+    // ==================== DUBAI 2D - FIXED WITH PREDICTION ====================
     const DUBAI_SHEET = '1ICqRfe1aMsRmvjyfcaKFnqplubIyO3Xfe4JYgQRZP5E';
-    let dubaiResults = [], dubaiKhways = [];
+    let dubaiResults = [], dubaiKhways = [], dubaiPredictions = [];
 
     function handleDubaiViewCounter() {
         fetch('https://countapi.mileshilliard.com/api/v1/hit/dubai2d_vercel_app_2026_views')
@@ -526,59 +538,122 @@
             .catch(() => document.getElementById('dubaiStatus').innerText = '❌');
     }
 
+    // ===== FIXED: parseDubai with prediction columns (C-H) =====
     function parseDubai(csv) {
         const lines = csv.split('\n');
-        dubaiResults = []; dubaiKhways = [];
+        dubaiResults = [];
+        dubaiKhways = [];
+        dubaiPredictions = [];
+
         for (let i = 1; i < lines.length; i++) {
             const line = lines[i].trim();
             if (!line) continue;
             const parts = line.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || line.split(',');
             if (parts.length < 1) continue;
+            
             let res = parts[0].replace(/"/g, '').trim();
             let khw = '';
             if (parts.length > 1) khw = parts[1].replace(/"/g, '').trim();
+            
             if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
             
+            // Parse 12-digit number (6 pairs)
+            let pairs = [];
             if (res.length >= 10 && res.length <= 12) {
                 const p = res.padStart(12, '0');
-                const pairs = [];
                 for (let j = 0; j < 12; j += 2) pairs.push(p.substring(j, j + 2));
-                if (pairs.length === 6) {
-                    dubaiResults.push(pairs);
-                    dubaiKhways.push(khw || '-');
-                }
             } else if (res.length === 12) {
-                const pairs = [];
                 for (let j = 0; j < 12; j += 2) pairs.push(res.substring(j, j + 2));
-                if (pairs.length === 6) {
-                    dubaiResults.push(pairs);
-                    dubaiKhways.push(khw || '-');
-                }
             }
+            
+            if (pairs.length === 6) {
+                dubaiResults.push(pairs);
+                dubaiKhways.push(khw || '-');
+            }
+            
+            // ===== FIXED: Parse prediction columns (C-H) =====
+            let preds = [];
+            if (parts.length > 2) {
+                for (let j = 2; j < Math.min(parts.length, 8); j++) {
+                    let pred = parts[j].replace(/"/g, '').trim();
+                    preds.push(pred || '-');
+                }
+                while (preds.length < 6) preds.push('-');
+                dubaiPredictions.push(preds);
+            } else {
+                dubaiPredictions.push(['-', '-', '-', '-', '-', '-']);
+            }
+        }
+        
+        // Pad arrays
+        while (dubaiPredictions.length < dubaiResults.length) {
+            dubaiPredictions.push(['-', '-', '-', '-', '-', '-']);
+        }
+        while (dubaiKhways.length < dubaiResults.length) {
+            dubaiKhways.push('-');
         }
     }
 
+    // ===== FIXED: renderDubai with prediction row =====
     function renderDubai() {
         const tbody = document.getElementById('dubaiTableBody');
         if (!tbody) return;
         tbody.innerHTML = '';
+        
         if (dubaiResults.length === 0) {
             tbody.innerHTML = '<tr><td colspan="6" class="empty-status">ဒေတာများ မရှိသေးပါ။ Google Sheet တွင် အရင်ဖြည့်ပါ။</td></tr>';
             return;
         }
+        
         for (let i = 0; i < dubaiResults.length; i++) {
             const row = dubaiResults[i];
             const kh = dubaiKhways[i] || '-';
-            const tr = document.createElement('tr');
+            const preds = dubaiPredictions[i] || ['-', '-', '-', '-', '-', '-'];
+            
+            // ===== PREDICTION ROW (ထိုးရမဲ့ဂဏန်း) =====
+            const trPred = document.createElement('tr');
+            trPred.className = 'pred-row';
+            for (let c = 0; c < 6; c++) {
+                const td = document.createElement('td');
+                const predVal = preds[c] || '-';
+                const rowVal = row[c] || '-';
+                let html = '';
+                if (predVal !== '-') {
+                    const parts = predVal.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+                    let ph = '';
+                    parts.forEach((p, idx) => {
+                        let isMatch = false;
+                        if (rowVal !== '-') isMatch = matchLogic(p, rowVal);
+                        ph += '<span class="pred-number ' + (isMatch ? 'hit' : '') + '">' + p + '</span>';
+                        if (idx < parts.length - 1) ph += ' ';
+                    });
+                    html = ph;
+                } else {
+                    html = '<span style="color:#bdc3c7;font-size:11px;">-</span>';
+                }
+                td.innerHTML = html;
+                trPred.appendChild(td);
+            }
+            tbody.appendChild(trPred);
+            
+            // ===== NUMBER ROW (ထွက်ဂဏန်း) =====
+            const trNum = document.createElement('tr');
             for (let c = 0; c < 6; c++) {
                 const td = document.createElement('td');
                 const val = row[c] || '-';
-                const isMatch = kh !== '-' && kh !== '' && matchLogic(kh, val);
-                if (isMatch && val !== '-') td.className = 'highlight-match';
+                const predVal = preds[c] || '-';
+                let isMatch = false;
+                if (predVal !== '-' && val !== '-') {
+                    const parts = predVal.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+                    for (let p of parts) {
+                        if (matchLogic(p, val)) { isMatch = true; break; }
+                    }
+                }
+                if (isMatch) td.className = 'highlight-match';
                 td.innerHTML = `<span class="num-box">${val}</span>`;
-                tr.appendChild(td);
+                trNum.appendChild(td);
             }
-            tbody.appendChild(tr);
+            tbody.appendChild(trNum);
         }
     }
 
