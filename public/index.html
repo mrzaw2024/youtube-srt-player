@@ -81,6 +81,14 @@
             opacity: 0.3;
             pointer-events: none;
         }
+        /* Keep the renewal/contact buttons tappable even while the tab is locked */
+        .tab-content.disabled .expired-overlay,
+        .tab-content.disabled .expired-overlay *,
+        .tab-content.disabled .video-placeholder,
+        .tab-content.disabled .video-placeholder * {
+            pointer-events: auto !important;
+            opacity: 1 !important;
+        }
 
         /* ===== NOTIFICATION ===== */
         #customNoti {
@@ -537,7 +545,7 @@
             </div>
         </div>
 
-        <div class="table-title">📊 ၆ ကွက် ထွက်ဂဏန်း + ထိုးရမဲ့ဂဏန်း + အခွေပူး ဇယား</div>
+        <div class="table-title">📊 ၆ ကွက် ထွက်ဂဏန်း + အခွေပူး ဇယား</div>
         <div class="table-wrapper">
             <table>
                 <thead>
@@ -770,9 +778,10 @@
                 document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('disabled'));
                 document.querySelectorAll('.tab-content').forEach(content => content.classList.add('disabled'));
                 
-                // Show expired overlay on BOTH tabs
+                // Show expired overlay on ALL tabs
                 const twodContainer = document.getElementById('twodContainer');
                 const movieGrid = document.getElementById('movieGrid');
+                const dubaiContainer = document.getElementById('dubaiContainer');
                 
                 const expiredHTML = `
                     <div class="expired-overlay">
@@ -789,6 +798,9 @@
                 }
                 if (movieGrid) {
                     movieGrid.innerHTML = expiredHTML;
+                }
+                if (dubaiContainer) {
+                    dubaiContainer.innerHTML = expiredHTML;
                 }
                 
                 updatePlayerState(); 
@@ -844,6 +856,44 @@
                             </div>
                         `;
                         fetchDataFromSheets();
+                    }
+                    const dubaiContainer = document.getElementById('dubaiContainer');
+                    if (dubaiContainer) {
+                        dubaiContainer.innerHTML = `
+                            <div class="header-area">
+                                <h2>🇦🇪 Dubai 2D ခန့်မှန်းချက်</h2>
+                                <div class="sub-status-area">
+                                    <span class="status-icon" id="dubaiStatusIcon">✅</span>
+                                    <span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="dubaiViewCount">0</span> views</span>
+                                </div>
+                            </div>
+                            <div class="table-title">📊 ၆ ကွက် ထွက်ဂဏန်း + အခွေပူး ဇယား</div>
+                            <div class="table-wrapper">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>၁၁ နာရီ</th>
+                                            <th>၁ နာရီ</th>
+                                            <th>၃ နာရီ</th>
+                                            <th>၅ နာရီ</th>
+                                            <th>၇ နာရီ</th>
+                                            <th>၉ နာရီ</th>
+                                            <th class="khaway-col-header">🎯 အခွေပူး</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dubaiTableBody">
+                                        <tr><td colspan="7" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="flex-center">
+                                <div class="admin-footer-box">
+                                    👨‍✈️ Admin Telegram: <a href="https://t.me/luckylay01" target="_blank" class="admin-link">@luckylay01</a>
+                                </div>
+                            </div>
+                        `;
+                        handleDubaiViewCounter();
+                        fetchDubaiData();
                     }
                     // Reload movies
                     loadMovies(false);
@@ -1398,61 +1448,11 @@
         for (let rowIndex = 0; rowIndex < dubaiResults.length; rowIndex++) {
             const row = dubaiResults[rowIndex];
             const khwayStr = dubaiKhwayItems[rowIndex] || '-';
-            const hourlyPreds = dubaiHourlyPredictions[rowIndex] || ['-', '-', '-', '-', '-', '-'];
             const khwayParts = (khwayStr && khwayStr !== '-')
                 ? khwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0)
                 : [];
 
-            // ===== ROW 1: Prediction Row (TOP) =====
-            const trPred = document.createElement('tr');
-            trPred.className = 'pred-row';
-            for (let col = 0; col < 6; col++) {
-                const td = document.createElement('td');
-                const predVal = hourlyPreds[col] || '-';
-
-                let displayHtml = '';
-                if (predVal !== '-') {
-                    // Split by / and , and show each number separately
-                    const predParts = predVal.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                    let partsHtml = '';
-                    predParts.forEach((p, idx) => {
-                        // Check if this prediction matches the row value
-                        const rowVal = row[col] || '-';
-                        let isMatch = false;
-                        if (rowVal !== '-') {
-                            isMatch = checkMatchLogicDubai(p, rowVal);
-                        }
-                        partsHtml += `<span class="pred-number ${isMatch ? 'hit' : ''}">${p}</span>`;
-                        if (idx < predParts.length - 1) partsHtml += ' ';
-                    });
-                    displayHtml = partsHtml;
-                } else {
-                    displayHtml = `<span style="color:#bdc3c7;font-size:11px;">-</span>`;
-                }
-                td.innerHTML = displayHtml;
-                trPred.appendChild(td);
-            }
-            // Khaway column prediction
-            const tdPredKhway = document.createElement('td');
-            tdPredKhway.className = 'khaway-col';
-            if (khwayParts.length > 0) {
-                let hitKhways = [];
-                khwayParts.forEach(kh => {
-                    const isHit = row.some(val => val !== '-' && checkMatchLogicDubai(kh, val));
-                    if (isHit) hitKhways.push(kh);
-                });
-                if (hitKhways.length > 0) {
-                    tdPredKhway.innerHTML = `<span class="khaway-box hit">✓ ${hitKhways.join(', ')}</span>`;
-                } else {
-                    tdPredKhway.innerHTML = `<span class="khaway-box">${khwayStr}</span>`;
-                }
-            } else {
-                tdPredKhway.innerHTML = `<span style="color:#bdc3c7;font-size:11px;">-</span>`;
-            }
-            trPred.appendChild(tdPredKhway);
-            tbody.appendChild(trPred);
-
-            // ===== ROW 2: Number Row (BOTTOM) =====
+            // ===== Single row: 6 results + khway, matches highlighted green =====
             const trNum = document.createElement('tr');
             for (let col = 0; col < 6; col++) {
                 const td = document.createElement('td');
@@ -1460,20 +1460,9 @@
                 const displayVal = val === '-' ? '-' : val;
 
                 let isMatch = false;
-                if (val !== '-') {
-                    // 1) Check against this column's hourly prediction
-                    const predVal = hourlyPreds[col] || '-';
-                    if (predVal !== '-') {
-                        const predParts = predVal.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                        for (let p of predParts) {
-                            if (checkMatchLogicDubai(p, val)) { isMatch = true; break; }
-                        }
-                    }
-                    // 2) Also check against the row's khway (အခွေပူး) numbers
-                    if (!isMatch && khwayParts.length > 0) {
-                        for (let kh of khwayParts) {
-                            if (checkMatchLogicDubai(kh, val)) { isMatch = true; break; }
-                        }
+                if (val !== '-' && khwayParts.length > 0) {
+                    for (let kh of khwayParts) {
+                        if (checkMatchLogicDubai(kh, val)) { isMatch = true; break; }
                     }
                 }
 
