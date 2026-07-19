@@ -338,10 +338,11 @@
                     for (let i = 0; i < 12; i += 2) {
                         pairs.push(res.substring(i, i + 2));
                     }
+                    // FIX: pairs ကို ရရှိသည့်အစဉ်အတိုင်းပဲ တန်းစီပေးမည်
+                    // (၁၁နာရီ, ၁နာရီ, ၃နာရီ, ၅နာရီ, ၇နာရီ, ၉နာရီ) column အစဉ်အတိုင်းနှင့် ကိုက်ညီစေရန်
+                    // rotate မလုပ်တော့ပါ
                     if (pairs.length === 6) {
-                        dubaiResults.push([
-                            pairs[5], pairs[0], pairs[1], pairs[2], pairs[3], pairs[4]
-                        ]);
+                        dubaiResults.push(pairs);
                     }
                 }
 
