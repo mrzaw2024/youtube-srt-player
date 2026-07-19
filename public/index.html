@@ -29,7 +29,7 @@
 
         .container {
             width: 100%;
-            max-width: 850px;
+            max-width: 900px;
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
@@ -76,6 +76,7 @@
         .table-wrapper {
             width: 100%;
             overflow-x: auto;
+            overflow-y: visible;
             border-radius: 16px;
             border: 1px solid #dcdde1;
             background: #ffffff;
@@ -92,16 +93,18 @@
             background: linear-gradient(180deg, #e17055 0%, #d63031 100%);
             color: #ffffff;
             font-weight: 700;
-            padding: 14px 4px;
+            padding: 12px 4px;
             font-size: 12px;
         }
         td {
             border-bottom: 1px solid #dee2e6;
             border-right: 1px solid #eef0f2;
-            padding: 12px 6px;
+            padding: 10px 4px;
             color: #2f3542;
             font-weight: 600;
             vertical-align: middle;
+            word-wrap: break-word;
+            word-break: break-word;
         }
         td:last-child { border-right: none; }
         tr:nth-child(even) td { background-color: #f9fbfd; }
@@ -111,6 +114,7 @@
             display: flex;
             justify-content: center;
             align-items: center;
+            flex-wrap: wrap;
         }
         .num-box {
             display: inline-block;
@@ -119,7 +123,7 @@
             font-weight: 800;
             font-size: 14px;
             background: linear-gradient(135deg, #ffeaa7 0%, #fdcb6e 100%);
-            padding: 7px 0;
+            padding: 6px 0;
             border-radius: 10px;
             border: 1px solid #fdcb6e;
             text-align: center;
@@ -135,20 +139,24 @@
             box-shadow: 0 3px 10px rgba(0, 206, 201, 0.3);
         }
 
+        /* ===== PREDICTION ROW (TOP) ===== */
         .pred-row td {
             background: #fef9e7 !important;
             font-weight: 700;
             color: #2c3e50;
+            padding: 10px 4px;
         }
         .pred-number {
             display: inline-block;
-            padding: 4px 10px;
+            padding: 4px 8px;
             border-radius: 8px;
-            font-size: 13px;
+            font-size: 12px;
             font-weight: 700;
             color: #2c3e50;
             background: #e8f0fe;
             border: 1px solid #d2e3fc;
+            margin: 2px;
+            word-break: break-word;
         }
         .pred-number.hit {
             background: #2ecc71;
@@ -156,6 +164,7 @@
             border-color: #27ae60;
         }
 
+        /* ===== KHAWAY COLUMN ===== */
         .khaway-col {
             font-weight: 700;
             color: #2c3e50;
@@ -164,13 +173,14 @@
         .khaway-box {
             display: inline-block;
             background: #e8f0fe;
-            padding: 4px 10px;
+            padding: 4px 8px;
             border-radius: 8px;
             border: 1px solid #d2e3fc;
             font-size: 12px;
             font-weight: 700;
             color: #2c3e50;
             margin: 2px;
+            word-break: break-word;
         }
         .khaway-box.hit {
             background: #2ecc71;
@@ -179,29 +189,6 @@
         }
         .khaway-col-header {
             background: linear-gradient(180deg, #6c5ce7 0%, #6c5ce7 100%) !important;
-        }
-
-        .result-row td {
-            background: #f8f9fa !important;
-        }
-        .result-badge {
-            display: inline-block;
-            padding: 4px 12px;
-            border-radius: 8px;
-            font-weight: 800;
-            font-size: 12px;
-        }
-        .result-badge.hit {
-            background: #2ecc71;
-            color: white;
-        }
-        .result-badge.miss {
-            background: #e74c3c;
-            color: white;
-        }
-        .result-badge.waiting {
-            background: #f39c12;
-            color: white;
         }
 
         .empty-status {
@@ -235,6 +222,24 @@
         table th,
         table td {
             width: 14.28% !important;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 600px) {
+            .container { padding: 12px; }
+            .header-area h2 { font-size: 20px; }
+            .num-box { max-width: 40px; font-size: 12px; padding: 4px 0; }
+            .pred-number { font-size: 10px; padding: 2px 5px; }
+            .khaway-box { font-size: 10px; padding: 2px 5px; }
+            table { font-size: 10px; }
+            th { font-size: 9px; padding: 8px 2px; }
+            td { padding: 6px 2px; }
+            .khaway-col { min-width: 80px; }
+        }
+        @media (max-width: 400px) {
+            .num-box { max-width: 32px; font-size: 10px; }
+            .pred-number { font-size: 9px; padding: 1px 3px; }
+            .khaway-box { font-size: 9px; padding: 1px 3px; }
         }
     </style>
 </head>
@@ -402,25 +407,23 @@
             for (let col = 0; col < 6; col++) {
                 const td = document.createElement('td');
                 const predVal = hourlyPreds[col] || '-';
-                const rowVal = row[col] || '-';
                 
                 let displayHtml = '';
-                if (predVal !== '-' && rowVal !== '-') {
+                if (predVal !== '-') {
+                    // Split by / and , and show each number separately
                     const predParts = predVal.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                    let matched = false;
-                    for (let p of predParts) {
-                        if (checkMatchLogic(p, rowVal)) {
-                            matched = true;
-                            break;
+                    let partsHtml = '';
+                    predParts.forEach((p, idx) => {
+                        // Check if this prediction matches the row value
+                        const rowVal = row[col] || '-';
+                        let isMatch = false;
+                        if (rowVal !== '-') {
+                            isMatch = checkMatchLogic(p, rowVal);
                         }
-                    }
-                    if (matched) {
-                        displayHtml = `<span class="pred-number hit">${predVal}</span>`;
-                    } else {
-                        displayHtml = `<span class="pred-number">${predVal}</span>`;
-                    }
-                } else if (predVal !== '-') {
-                    displayHtml = `<span class="pred-number">${predVal}</span>`;
+                        partsHtml += `<span class="pred-number ${isMatch ? 'hit' : ''}">${p}</span>`;
+                        if (idx < predParts.length - 1) partsHtml += ' ';
+                    });
+                    displayHtml = partsHtml;
                 } else {
                     displayHtml = `<span style="color:#bdc3c7;font-size:11px;">-</span>`;
                 }
@@ -455,6 +458,7 @@
                 const val = row[col] || '-';
                 const displayVal = val === '-' ? '-' : val;
                 
+                // Check if this number matches any prediction in the same column
                 const predVal = hourlyPreds[col] || '-';
                 let isMatch = false;
                 if (predVal !== '-' && val !== '-') {
@@ -496,70 +500,6 @@
             }
             trNum.appendChild(tdKhway);
             tbody.appendChild(trNum);
-
-            // ===== ROW 3: Result Row =====
-            const trResult = document.createElement('tr');
-            trResult.className = 'result-row';
-            const nextRowIndex = rowIndex + 1;
-            
-            for (let col = 0; col < 6; col++) {
-                const td = document.createElement('td');
-                const predVal = hourlyPreds[col] || '-';
-                
-                if (nextRowIndex < dubaiResults.length && predVal !== '-') {
-                    const nextRow = dubaiResults[nextRowIndex];
-                    const nextVal = nextRow[col] || '-';
-                    const predParts = predVal.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                    let isMatch = false;
-                    for (let p of predParts) {
-                        if (checkMatchLogic(p, nextVal)) {
-                            isMatch = true;
-                            break;
-                        }
-                    }
-                    
-                    if (isMatch && nextVal !== '-') {
-                        td.innerHTML = `<span class="result-badge hit">✅ ${nextVal}</span>`;
-                    } else if (isMatch && nextVal === '-') {
-                        td.innerHTML = `<span class="result-badge waiting">⏳</span>`;
-                    } else {
-                        td.innerHTML = `<span class="result-badge miss">❌</span>`;
-                    }
-                } else if (nextRowIndex < dubaiResults.length) {
-                    td.innerHTML = `<span style="color:#bdc3c7;font-size:11px;">-</span>`;
-                } else {
-                    td.innerHTML = `<span style="color:#bdc3c7;font-size:11px;">-</span>`;
-                }
-                trResult.appendChild(td);
-            }
-            
-            // Result for khaway column
-            const tdResultKhway = document.createElement('td');
-            if (nextRowIndex < dubaiResults.length && khwayStr && khwayStr !== '-') {
-                const nextRow = dubaiResults[nextRowIndex];
-                let hitCount = 0;
-                let hitVals = [];
-                const khwayParts = khwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-                for (let col = 0; col < 6; col++) {
-                    const nextVal = nextRow[col] || '-';
-                    for (let kh of khwayParts) {
-                        if (checkMatchLogic(kh, nextVal) && nextVal !== '-') {
-                            hitCount++;
-                            if (!hitVals.includes(nextVal)) hitVals.push(nextVal);
-                            break;
-                        }
-                    }
-                }
-                if (hitCount > 0) {
-                    tdResultKhway.innerHTML = `<span class="result-badge hit">✅ ${hitCount} ကွက်</span>`;
-                } else {
-                    tdResultKhway.innerHTML = `<span class="result-badge miss">❌</span>`;
-                }
-            } else {
-                tdResultKhway.innerHTML = `<span style="color:#bdc3c7;font-size:11px;">-</span>`;
-            }
-            trResult.appendChild(tdResultKhway);
-            tbody.appendChild(trResult);
         }
     }
 
