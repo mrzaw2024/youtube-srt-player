@@ -1028,7 +1028,7 @@
         fetch(BOZAW_SHEET_URL + '&_ts=' + Date.now(), { cache: 'no-store' })
             .then(r => r.text())
             .then(d => { parseBozawCSV(d); document.getElementById('statusIcon').innerText = '✅'; renderBozawTable(); })
-            .catch(() => { document.getElementById('statusIcon').innerText = '❌'; });
+            .catch(() => { document.getElementById('statusIcon').innerText = '❌'); });
     }
 
     function parseBozawCSV(csvText) {
@@ -1120,7 +1120,7 @@
         }
     }
 
-    // ==================== DUBAI 2D ====================
+    // ==================== DUBAI 2D (FIXED) ====================
     const DUBAI_SHEET_ID = '1ICqRfe1aMsRmvjyfcaKFnqplubIyO3Xfe4JYgQRZP5E';
     const DUBAI_SHEET_URL = 'https://docs.google.com/spreadsheets/d/' + DUBAI_SHEET_ID + '/gviz/tq?tqx=out:csv';
     let dubaiResults = [], dubaiKhwayItems = [], dubaiHourlyPredictions = [];
@@ -1139,7 +1139,7 @@
             .catch(() => { document.getElementById('dubaiStatusIcon').innerText = '❌'); });
     }
 
-    // ===== FIXED: Dubai 2D parse with correct order =====
+    // ===== FIXED: Dubai 2D parse - normal order =====
     function parseDubaiCSV(csvText) {
         let lines = csvText.split('\n');
         dubaiResults = [];
@@ -1156,7 +1156,7 @@
                 let res = matches[0].replace(/"/g, '').trim();
                 if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
 
-                // ===== 12-digit number with padding =====
+                // ===== FIXED: Normal order (no reordering) =====
                 if (res.length >= 10 && res.length <= 12) {
                     let paddedRes = res.padStart(12, '0');
                     const pairs = [];
@@ -1164,14 +1164,14 @@
                         pairs.push(paddedRes.substring(j, j + 2));
                     }
                     if (pairs.length === 6) {
-                        // ===== NORMAL ORDER: [1, 3, 5, 7, 9, 11] =====
+                        // ===== NORMAL ORDER: [0,1,2,3,4,5] =====
                         dubaiResults.push([
-                            pairs[0], // 1
-                            pairs[1], // 3
-                            pairs[2], // 5
-                            pairs[3], // 7
-                            pairs[4], // 9
-                            pairs[5]  // 11
+                            pairs[0],
+                            pairs[1],
+                            pairs[2],
+                            pairs[3],
+                            pairs[4],
+                            pairs[5]
                         ]);
                     }
                 } else if (res.length === 12) {
@@ -1181,12 +1181,12 @@
                     }
                     if (pairs.length === 6) {
                         dubaiResults.push([
-                            pairs[0], // 1
-                            pairs[1], // 3
-                            pairs[2], // 5
-                            pairs[3], // 7
-                            pairs[4], // 9
-                            pairs[5]  // 11
+                            pairs[0],
+                            pairs[1],
+                            pairs[2],
+                            pairs[3],
+                            pairs[4],
+                            pairs[5]
                         ]);
                     }
                 }
