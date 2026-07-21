@@ -308,6 +308,11 @@
             background: linear-gradient(135deg, #FFD700 0%, #FF8C00 100%); 
             box-shadow: 0 4px 15px rgba(255, 215, 0, 0.3); 
         }
+        .expired-overlay .admin-btn.channel { 
+            background: linear-gradient(135deg, #29b6f6 0%, #0288d1 100%); 
+            color: #fff;
+            box-shadow: 0 4px 15px rgba(2, 136, 209, 0.35); 
+        }
         .expired-overlay .admin-btn:active { transform: scale(0.95); }
 
         /* ===== 2D SECTION (Bozaw 2D) ===== */
@@ -463,24 +468,31 @@
         /* ===== PENDING / TODAY KHWAY STATUS BANNER ===== */
         .khway-status-row {
             text-align: center;
-            margin: 4px 0 14px 0;
+            margin: 6px 0 16px 0;
         }
         .khway-status-row:empty { margin: 0; }
         .pending-khway-pill {
             display: inline-block;
             background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
-            border: 1px solid #ffd666;
+            border: 2px solid #ffd666;
             color: #7a5b00;
-            font-size: 12px;
-            font-weight: 700;
-            padding: 6px 10px;
-            border-radius: 10px;
-            margin: 3px 4px;
+            font-size: 18px;
+            font-weight: 900;
+            padding: 12px 20px;
+            border-radius: 16px;
+            margin: 4px 6px;
+            box-shadow: 0 4px 12px rgba(255, 193, 7, 0.25);
         }
+        .pending-khway-pill b { font-size: 20px; }
         .pending-khway-pill.today {
             background: linear-gradient(135deg, #d1f7e8 0%, #a8e6cf 100%);
             border-color: #00cec9;
             color: #045c4a;
+            box-shadow: 0 4px 12px rgba(0, 206, 201, 0.25);
+        }
+        @media (max-width: 400px) {
+            .pending-khway-pill { font-size: 15px; padding: 10px 16px; }
+            .pending-khway-pill b { font-size: 17px; }
         }
         @media (max-width: 600px) {
             .dubai-container .num-box { max-width: 40px; font-size: 12px; padding: 4px 0; }
@@ -799,9 +811,8 @@
                 document.getElementById('userStatusText').className = 'expired';
                 document.getElementById('statusDot').className = 'expired';
                 
-                // Disable both tabs
-                document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.add('disabled'));
-                document.querySelectorAll('.tab-content').forEach(content => content.classList.add('disabled'));
+                // Keep tabs clickable and fully visible even when expired —
+                // only the content areas get replaced with the renewal message.
                 
                 // Show expired overlay on ALL tabs
                 const twodContainer = document.getElementById('twodContainer');
@@ -814,6 +825,7 @@
                         <div class="btn-group">
                             <a href="viber://chat?number=%2B959777966119" class="admin-btn viber" target="_blank">💬 Admin Viber: 09777966119</a>
                             <a href="https://t.me/luckylay01" target="_blank" class="admin-btn telegram">📲 Telegram Admin ဆီသွားရန်</a>
+                            <a href="https://t.me/bozaw2d3d" target="_blank" class="admin-btn channel">📢 Main Channel ဆီသွားရန်</a>
                         </div>
                     </div>
                 `;
