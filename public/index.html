@@ -459,6 +459,29 @@
         .dubai-container .admin-link { color: #f5576c; text-decoration: none; font-weight: 800; }
         .dubai-container .flex-center { display: flex; justify-content: center; width: 100%; }
         .dubai-container .view-count-num { color: #f5576c; font-weight: 800; }
+
+        /* ===== PENDING / TODAY KHWAY STATUS BANNER ===== */
+        .khway-status-row {
+            text-align: center;
+            margin: 4px 0 14px 0;
+        }
+        .khway-status-row:empty { margin: 0; }
+        .pending-khway-pill {
+            display: inline-block;
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe8a1 100%);
+            border: 1px solid #ffd666;
+            color: #7a5b00;
+            font-size: 12px;
+            font-weight: 700;
+            padding: 6px 10px;
+            border-radius: 10px;
+            margin: 3px 4px;
+        }
+        .pending-khway-pill.today {
+            background: linear-gradient(135deg, #d1f7e8 0%, #a8e6cf 100%);
+            border-color: #00cec9;
+            color: #045c4a;
+        }
         @media (max-width: 600px) {
             .dubai-container .num-box { max-width: 40px; font-size: 12px; padding: 4px 0; }
             .dubai-container .pred-number { font-size: 10px; padding: 2px 5px; }
@@ -509,6 +532,7 @@
             </div>
         </div>
 
+        <div id="pendingKhwayBanner" class="khway-status-row"></div>
         <div class="table-title">📊 AM / PM & အခွေပူး ဇယားကွက်</div>
         <div class="table-wrapper">
             <table>
@@ -545,6 +569,7 @@
             </div>
         </div>
 
+        <div id="dubaiTodayKhwayBanner" class="khway-status-row"></div>
         <div class="table-title">📊 ၆ ကွက် ထွက်ဂဏန်း + အခွေပူး ဇယား</div>
         <div class="table-wrapper">
             <table>
@@ -833,6 +858,7 @@
                                     <span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="viewCountDisplay">0</span> views</span>
                                 </div>
                             </div>
+                            <div id="pendingKhwayBanner" class="khway-status-row"></div>
                             <div class="table-title">📊 AM / PM & အခွေပူး ဇယားကွက်</div>
                             <div class="table-wrapper">
                                 <table>
@@ -867,6 +893,7 @@
                                     <span>👁️ ကြည့်ရှုသူအရေအတွက်: <span class="view-count-num" id="dubaiViewCount">0</span> views</span>
                                 </div>
                             </div>
+                            <div id="dubaiTodayKhwayBanner" class="khway-status-row"></div>
                             <div class="table-title">📊 ၆ ကွက် ထွက်ဂဏန်း + အခွေပူး ဇယား</div>
                             <div class="table-wrapper">
                                 <table>
@@ -1314,6 +1341,55 @@
             `;
             tbody.appendChild(tr);
         });
+
+        renderPendingKhwayBanner();
+    }
+
+    // Shows the khway sets that have NOT matched yet and are still inside
+    // their 5-day window, with a countdown of how many days are left.
+    function renderPendingKhwayBanner() {
+        const banner = document.getElementById('pendingKhwayBanner');
+        if (!banner) return;
+        if (savedResults.length === 0) { banner.innerHTML = ''; return; }
+
+        const lastIndex = savedResults.length - 1;
+        let pending = [];
+
+        for (let index = lastIndex; index >= 0 && index > lastIndex - 5; index--) {
+            const khwayStr = savedKhwayItems[index];
+            if (!khwayStr || khwayStr === '-') continue;
+
+            const rowsElapsed = lastIndex - index;
+            const remainingDays = 5 - rowsElapsed;
+            if (remainingDays <= 0) continue;
+
+            const subKhways = khwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+            if (subKhways.length === 0) continue;
+
+            let matched = false;
+            for (let i = 1; i <= rowsElapsed && !matched; i++) {
+                const targetNumStr = savedResults[index + i];
+                const targetAm = targetNumStr.slice(0, 2);
+                const targetPm = targetNumStr.slice(2, 4);
+                for (const kh of subKhways) {
+                    if (checkMatchLogic(kh, targetAm) || checkMatchLogic(kh, targetPm)) { matched = true; break; }
+                }
+            }
+
+            if (!matched) {
+                pending.push({ khwayStr: subKhways.join(', '), remainingDays });
+            }
+        }
+
+        if (pending.length === 0) {
+            banner.innerHTML = '';
+            return;
+        }
+
+        pending.sort((a, b) => a.remainingDays - b.remainingDays);
+        banner.innerHTML = pending.map(p =>
+            `<span class="pending-khway-pill">⏳ ${p.remainingDays} ရက်ကျန် အခွေပူး: <b>${p.khwayStr}</b></span>`
+        ).join('');
     }
 
     // ==================== DUBAI 2D ====================
@@ -1509,6 +1585,23 @@
             }
             trNum.appendChild(tdKhway);
             tbody.appendChild(trNum);
+        }
+
+        renderDubaiTodayKhway();
+    }
+
+    // Shows the most recent (bottom-most) row's khway as "today's khway"
+    function renderDubaiTodayKhway() {
+        const banner = document.getElementById('dubaiTodayKhwayBanner');
+        if (!banner) return;
+        if (dubaiResults.length === 0) { banner.innerHTML = ''; return; }
+
+        const khwayStr = dubaiKhwayItems[dubaiResults.length - 1] || '-';
+        if (khwayStr && khwayStr !== '-') {
+            const parts = khwayStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+            banner.innerHTML = `<span class="pending-khway-pill today">🎯 ယနေ့ အခွေပူး: <b>${parts.join(', ')}</b></span>`;
+        } else {
+            banner.innerHTML = '';
         }
     }
 
