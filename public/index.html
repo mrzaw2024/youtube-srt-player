@@ -1490,8 +1490,12 @@
 
             if (dailyBetStr !== '-') {
                 let subBets = dailyBetStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+                let betRows = [];
+                for (let i = 0; i < subBets.length; i += 3) {
+                    betRows.push(subBets.slice(i, i + 3).join(' - '));
+                }
                 dailyBetDisplayHTML = subBets.length > 0
-                    ? `<span class="khway-style daily-bet-row">${subBets.join(' - ')}</span>`
+                    ? `<span class="khway-style daily-bet-row">${betRows.join('<br>')}</span>`
                     : '-';
 
                 if (index + 1 < savedResults.length) {
@@ -1542,7 +1546,11 @@
         const dailyBetStr = savedDailyBetItems[savedResults.length - 1] || '-';
         if (dailyBetStr && dailyBetStr !== '-') {
             const parts = dailyBetStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-            banner.innerHTML = `<span class="pending-khway-pill today">🎯 ယနေ့ ထိုးကွက်: <b>${parts.join(' - ')}</b></span>`;
+            let betRows = [];
+            for (let i = 0; i < parts.length; i += 3) {
+                betRows.push(parts.slice(i, i + 3).join(' - '));
+            }
+            banner.innerHTML = `<span class="pending-khway-pill today">🎯 ယနေ့ ထိုးကွက်: <b>${betRows.join('<br>')}</b></span>`;
         } else {
             banner.innerHTML = '';
         }
