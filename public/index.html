@@ -840,12 +840,50 @@
     }
 
     // ==================== SECURITY ====================
+    // NOTE: These are deterrents only. No front-end trick can fully block a
+    // determined user from viewing page source — the browser must download
+    // the HTML/CSS/JS to render it. Never rely on this to hide real secrets
+    // (API keys, admin logic); those must live on a server.
+
+    // Block right-click / long-press context menu
     document.addEventListener('contextmenu', e => e.preventDefault());
+
+    // Block common "view source / open devtools" shortcuts (Win + Mac)
     document.addEventListener('keydown', e => {
-        if (e.keyCode === 123 || (e.ctrlKey && e.shiftKey && (e.key==='I'||e.key==='J'||e.key==='C')) || (e.ctrlKey && e.key==='U')) {
-            e.preventDefault();
-        }
+        const k = e.key ? e.key.toLowerCase() : '';
+        const blocked =
+            e.keyCode === 123 || k === 'f12' ||                                   // F12
+            ((e.ctrlKey || e.metaKey) && e.shiftKey && ['i','j','c'].includes(k)) || // Ctrl/Cmd+Shift+I/J/C
+            ((e.ctrlKey || e.metaKey) && k === 'u') ||                             // Ctrl/Cmd+U (view-source)
+            ((e.ctrlKey || e.metaKey) && ['s','p'].includes(k));                   // Ctrl/Cmd+S / P (save/print page)
+        if (blocked) e.preventDefault();
     });
+
+    // Block text selection, copy, cut, and drag of content/images
+    document.addEventListener('selectstart', e => e.preventDefault());
+    document.addEventListener('copy', e => e.preventDefault());
+    document.addEventListener('cut', e => e.preventDefault());
+    document.addEventListener('dragstart', e => e.preventDefault());
+
+    // Best-effort DevTools-open detection: if the panel is docked, the
+    // window's outer/inner size gap grows noticeably. Not 100% reliable
+    // (undocked/mobile devtools can evade it) but catches the common case.
+    (function () {
+        const threshold = 160;
+        let warned = false;
+        setInterval(() => {
+            const widthGap = window.outerWidth - window.innerWidth;
+            const heightGap = window.outerHeight - window.innerHeight;
+            if (widthGap > threshold || heightGap > threshold) {
+                if (!warned) {
+                    warned = true;
+                    document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100vh;background:#0b0c10;color:#FFD700;font-size:1.1rem;text-align:center;padding:20px;">🔒 Developer tools ကိုပိတ်ပြီးမှ ပြန်ဝင်ပေးပါ</div>';
+                }
+            } else {
+                warned = false;
+            }
+        }, 1000);
+    })();
 
     // ==================== FIREBASE ====================
     const firebaseConfig = {
