@@ -100,6 +100,29 @@
         }
         #customNoti.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
+        /* ===== ADMIN NOTIFICATION POPUP ===== */
+        .admin-noti-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 9999999;
+            display: none; align-items: center; justify-content: center; padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .admin-noti-overlay.show { display: flex; }
+        .admin-noti-box {
+            background: linear-gradient(160deg, #1f2833 0%, #0b0c10 100%);
+            border: 1px solid var(--gold); border-radius: 20px; padding: 28px 24px;
+            max-width: 380px; width: 100%; text-align: center;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+            animation: notiPop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes notiPop { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .admin-noti-icon { font-size: 2.2rem; margin-bottom: 8px; }
+        .admin-noti-title { color: var(--gold); font-weight: 800; font-size: 1rem; margin-bottom: 10px; }
+        .admin-noti-msg { color: var(--text-main); font-size: 0.9rem; line-height: 1.5; margin-bottom: 20px; white-space: pre-wrap; }
+        .admin-noti-close {
+            background: var(--gold-gradient); border: none; border-radius: 20px; padding: 10px 24px;
+            color: #000; font-weight: 800; cursor: pointer; font-size: 0.85rem;
+        }
+
         /* ===== USER BANNER ===== */
         .user-banner {
             background: rgba(26, 26, 29, 0.6); backdrop-filter: var(--glass);
@@ -508,12 +531,41 @@
             .dubai-container .pred-number { font-size: 9px; padding: 1px 3px; }
             .dubai-container .khaway-box { font-size: 9px; padding: 1px 3px; }
         }
+        .app-download-banner {
+            display: flex;
+            justify-content: center;
+            margin: 8px auto 4px;
+        }
+        .app-download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #3742fa 0%, #9c88ff 100%);
+            color: #fff;
+            font-weight: 800;
+            font-size: 14px;
+            padding: 10px 22px;
+            border-radius: 30px;
+            text-decoration: none;
+            box-shadow: 0 4px 12px rgba(55, 66, 250, 0.35);
+        }
+        .app-download-btn:active { transform: scale(0.97); }
     </style>
 </head>
 <body>
 
 <div id="customNoti">📢 <span id="notiMessage">Notification</span></div>
 <button id="exitFsFloatingBtn" onclick="toggleFullscreen()">✕ Exit Fullscreen</button>
+
+<!-- ===== ADMIN NOTIFICATION POPUP ===== -->
+<div id="adminNotiOverlay" class="admin-noti-overlay">
+    <div class="admin-noti-box">
+        <div class="admin-noti-icon">📢</div>
+        <div class="admin-noti-title">Admin မှ အသိပေးချက်</div>
+        <div class="admin-noti-msg" id="adminNotiMsg"></div>
+        <button class="admin-noti-close" onclick="closeAdminNoti()">✅ OK, နားလည်ပါပြီ</button>
+    </div>
+</div>
 
 <!-- ===== USER BANNER ===== -->
 <div id="userBanner" class="user-banner" style="display:none;">
@@ -528,13 +580,73 @@
 
 <!-- ===== TABS ===== -->
 <div class="app-tabs" id="appTabs">
-    <button class="tab-btn active" id="tab2d" onclick="switchTab('twod')">📊 2D ခန့်မှန်းချက်</button>
+    <button class="tab-btn active" id="tabMovies" onclick="switchTab('movies')">🎬 ဇာတ်ကားများ</button>
+    <button class="tab-btn" id="tab2d" onclick="switchTab('twod')">📊 2D ခန့်မှန်းချက်</button>
     <button class="tab-btn" id="tabDubai" onclick="switchTab('dubai')">🇦🇪 Dubai 2D</button>
-    <button class="tab-btn" id="tabMovies" onclick="switchTab('movies')">🎬 ဇာတ်ကားများ</button>
+</div>
+
+<!-- ===== APP DOWNLOAD ===== -->
+<div class="app-download-banner">
+    <a href="https://median.co/share/bndlywm" target="_blank" class="app-download-btn">📲 App Download</a>
+</div>
+
+<!-- ===== MOVIE TAB ===== -->
+<div id="moviesSection" class="tab-content active">
+    <div id="appContent">
+        <div id="playerSection" class="player-section">
+            <button class="filter-btn" onclick="showGrid()" style="margin: 12px;">← Back Home</button>
+            <div class="video-section">
+                <div class="video-container" id="videoContainer">
+                    <div id="youtubePlayer"></div>
+                    <div class="video-placeholder" id="videoPlaceholder" style="display:none;">
+                        <div>⛔ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ</div>
+                        <div style="font-size:0.8rem; color:#aaa; margin: 4px 0 10px 0;">သက်တမ်းတိုးရန် အောက်ပါအတိုင်း ဆက်သွယ်နိုင်ပါသည်</div>
+                        <a href="viber://chat?number=%2B959777966119" class="contact-link" style="border-color:#bf55ec; color:#bf55ec;">💜 Viber: 09777966119</a>
+                        <a href="https://t.me/mmmovies002" target="_blank" class="contact-link">💙 Telegram Admin ဆီသွားရန်</a>
+                    </div>
+                </div>
+            </div>
+            <div class="status-section">
+                <div id="statusText" class="status-text">⏳ Loading...</div>
+                <div id="fullscreenHint" class="fullscreen-hint" style="display: none;">🎬 စာတန်းထိုးအတွက် Full ကိုနှိပ်ပါ</div>
+            </div>
+            <div class="video-controls">
+                <button onclick="seekVideo(-10)">⏪ -10s</button>
+                <button class="primary" id="playPauseBtn" onclick="togglePlayPause()">⏸ Pause</button>
+                <button onclick="seekVideo(10)">⏩ +10s</button>
+                <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Full</button>
+                <div class="progress-container">
+                    <input type="range" id="progressSlider" class="progress-slider" min="0" max="100" value="0" onchange="seekToPosition()">
+                    <div class="time-text" id="timeDisplay">0:00 / 0:00</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="gridSection" class="grid-section">
+            <div class="top-bar">
+                <div class="nav-controls-group">
+                    <button class="filter-btn active" id="allBtn" onclick="setFilter('all')">All</button>
+                    <button class="filter-btn" id="favBtn" onclick="setFilter('favorites')">Favorites</button>
+                </div>
+                <input type="text" id="searchInput" class="search-input" placeholder="🔍 ရှာရန်..." onkeyup="searchMovies()">
+                <div class="time-display">
+                    <span id="homeTimeText">Loading...</span>
+                    <div class="time-bar-small"><div id="homeTimeBar" class="fill" style="width:100%;"></div></div>
+                </div>
+            </div>
+            <div class="marquee-container">
+                <div class="marquee-text" id="marqueeText">✨ Movie App သက်တမ်းတိုးလိုပါက Admin Viber 09777966119 သို့ ဆက်သွယ်နိုင်ပါသည်။ 🍿</div>
+            </div>
+            <div id="movieGrid" class="movie-grid">
+                <div class="loading-text-center">⏳ Loading Movies...</div>
+            </div>
+        </div>
+    </div>
+    <div id="subtitleText" class="subtitle-text"><div id="subtitleInner" class="subtitle-inner"></div></div>
 </div>
 
 <!-- ===== 2D TAB (Bozaw 2D) ===== -->
-<div id="twodSection" class="tab-content active">
+<div id="twodSection" class="tab-content">
     <div class="twod-container" id="twodContainer">
         <div class="header-area">
             <h2>Bozaw 2D ခန့်မှန်းချက်</h2>
@@ -550,14 +662,16 @@
             <table>
                 <thead>
                     <tr>
-                        <th style="width: 23%;">AM ထွက်</th>
-                        <th style="width: 23%;">PM ထွက်</th>
-                        <th style="width: 26%;">ထိုတန်း၏ အခွေ/ပတ်</th>
-                        <th style="width: 28%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th>
+                        <th style="width: 15%;">AM ထွက်</th>
+                        <th style="width: 15%;">PM ထွက်</th>
+                        <th style="width: 18%;">ထိုတန်း၏ အခွေ/ပတ်</th>
+                        <th style="width: 19%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th>
+                        <th style="width: 15%;">🎯 နေ့စဥ် <br>ထိုးကွက်</th>
+                        <th style="width: 18%;">✅ နောက်တစ်ရက် <br>မှန်သောဂဏန်း</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <tr><td colspan="4" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
+                    <tr><td colspan="6" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
                 </tbody>
             </table>
         </div>
@@ -612,61 +726,6 @@
     </div>
 </div>
 
-<!-- ===== MOVIE TAB ===== -->
-<div id="moviesSection" class="tab-content">
-    <div id="appContent">
-        <div id="playerSection" class="player-section">
-            <button class="filter-btn" onclick="showGrid()" style="margin: 12px;">← Back Home</button>
-            <div class="video-section">
-                <div class="video-container" id="videoContainer">
-                    <div id="youtubePlayer"></div>
-                    <div class="video-placeholder" id="videoPlaceholder" style="display:none;">
-                        <div>⛔ သင့်အသုံးပြုခွင့် သက်တမ်းကုန်ဆုံးသွားပါပြီ</div>
-                        <div style="font-size:0.8rem; color:#aaa; margin: 4px 0 10px 0;">သက်တမ်းတိုးရန် အောက်ပါအတိုင်း ဆက်သွယ်နိုင်ပါသည်</div>
-                        <a href="viber://chat?number=%2B959777966119" class="contact-link" style="border-color:#bf55ec; color:#bf55ec;">💜 Viber: 09777966119</a>
-                        <a href="https://t.me/mmmovies002" target="_blank" class="contact-link">💙 Telegram Admin ဆီသွားရန်</a>
-                    </div>
-                </div>
-            </div>
-            <div class="status-section">
-                <div id="statusText" class="status-text">⏳ Loading...</div>
-                <div id="fullscreenHint" class="fullscreen-hint" style="display: none;">🎬 စာတန်းထိုးအတွက် Full ကိုနှိပ်ပါ</div>
-            </div>
-            <div class="video-controls">
-                <button onclick="seekVideo(-10)">⏪ -10s</button>
-                <button class="primary" id="playPauseBtn" onclick="togglePlayPause()">⏸ Pause</button>
-                <button onclick="seekVideo(10)">⏩ +10s</button>
-                <button id="fullscreenBtn" onclick="toggleFullscreen()">⛶ Full</button>
-                <div class="progress-container">
-                    <input type="range" id="progressSlider" class="progress-slider" min="0" max="100" value="0" onchange="seekToPosition()">
-                    <div class="time-text" id="timeDisplay">0:00 / 0:00</div>
-                </div>
-            </div>
-        </div>
-
-        <div id="gridSection" class="grid-section">
-            <div class="top-bar">
-                <div class="nav-controls-group">
-                    <button class="filter-btn active" id="allBtn" onclick="setFilter('all')">All</button>
-                    <button class="filter-btn" id="favBtn" onclick="setFilter('favorites')">Favorites</button>
-                </div>
-                <input type="text" id="searchInput" class="search-input" placeholder="🔍 ရှာရန်..." onkeyup="searchMovies()">
-                <div class="time-display">
-                    <span id="homeTimeText">Loading...</span>
-                    <div class="time-bar-small"><div id="homeTimeBar" class="fill" style="width:100%;"></div></div>
-                </div>
-            </div>
-            <div class="marquee-container">
-                <div class="marquee-text" id="marqueeText">✨ Movie App သက်တမ်းတိုးလိုပါက Admin Viber 09777966119 သို့ ဆက်သွယ်နိုင်ပါသည်။ 🍿</div>
-            </div>
-            <div id="movieGrid" class="movie-grid">
-                <div class="loading-text-center">⏳ Loading Movies...</div>
-            </div>
-        </div>
-    </div>
-    <div id="subtitleText" class="subtitle-text"><div id="subtitleInner" class="subtitle-inner"></div></div>
-</div>
-
 <script>
     // ==================== TAB SWITCHER ====================
     function switchTab(tabId) {
@@ -695,6 +754,72 @@
         window.notiTimeout = setTimeout(() => noti.classList.remove('show'), 3000);
     }
     window.alert = showNoti;
+
+    // ==================== ADMIN NOTIFICATIONS (from admin.html) ====================
+    // Data model in Firebase Realtime Database:
+    //   notifications/broadcast/{pushId}      -> { message, timestamp }   (goes to everyone)
+    //   notifications/inbox/{deviceId}/{id}   -> { message, timestamp }   (goes to one user only)
+    let _notiQueue = [];
+    let _notiShowing = false;
+
+    function _enqueueAdminNoti(message) {
+        if (!message) return;
+        _notiQueue.push(message);
+        _processNotiQueue();
+    }
+
+    function _processNotiQueue() {
+        if (_notiShowing || _notiQueue.length === 0) return;
+        _notiShowing = true;
+        const message = _notiQueue.shift();
+        document.getElementById('adminNotiMsg').textContent = message;
+        document.getElementById('adminNotiOverlay').classList.add('show');
+    }
+
+    function closeAdminNoti() {
+        document.getElementById('adminNotiOverlay').classList.remove('show');
+        _notiShowing = false;
+        _processNotiQueue();
+    }
+
+    // Starts listening for new admin notifications for this specific device/user.
+    // Only messages sent AFTER this listener first attaches will be shown (so a user
+    // isn't flooded with old announcements the very first time this feature ships).
+    function initAdminNotifications(deviceId) {
+        try {
+            let lastBroadcastTs = parseInt(localStorage.getItem('lastBroadcastNotiTs') || '0', 10);
+            if (!lastBroadcastTs) {
+                lastBroadcastTs = Date.now();
+                localStorage.setItem('lastBroadcastNotiTs', String(lastBroadcastTs));
+            }
+            database.ref('notifications/broadcast')
+                .orderByChild('timestamp')
+                .startAt(lastBroadcastTs + 1)
+                .on('child_added', snap => {
+                    const data = snap.val();
+                    if (!data || !data.message) return;
+                    localStorage.setItem('lastBroadcastNotiTs', String(data.timestamp));
+                    _enqueueAdminNoti(data.message);
+                });
+
+            let lastInboxTs = parseInt(localStorage.getItem('lastInboxNotiTs') || '0', 10);
+            if (!lastInboxTs) {
+                lastInboxTs = Date.now();
+                localStorage.setItem('lastInboxNotiTs', String(lastInboxTs));
+            }
+            database.ref('notifications/inbox/' + deviceId)
+                .orderByChild('timestamp')
+                .startAt(lastInboxTs + 1)
+                .on('child_added', snap => {
+                    const data = snap.val();
+                    if (!data || !data.message) return;
+                    localStorage.setItem('lastInboxNotiTs', String(data.timestamp));
+                    _enqueueAdminNoti(data.message);
+                });
+        } catch (e) {
+            console.error('Notification listener error:', e);
+        }
+    }
 
     // ==================== SECURITY ====================
     document.addEventListener('contextmenu', e => e.preventDefault());
@@ -761,6 +886,7 @@
         currentUserId = accountId;
         document.getElementById('userBanner').style.display = 'flex';
         document.getElementById('accountIdDisplay').textContent = accountId;
+        initAdminNotifications(deviceId);
         loadMoviesFromCache();
         try {
             const userRef = database.ref('devices/' + deviceId);
@@ -876,14 +1002,16 @@
                                 <table>
                                     <thead>
                                         <tr>
-                                            <th style="width: 23%;">AM ထွက်</th>
-                                            <th style="width: 23%;">PM ထွက်</th>
-                                            <th style="width: 26%;">ထိုတန်း၏ အခွေ/ပတ်</th>
-                                            <th style="width: 28%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th>
+                                            <th style="width: 15%;">AM ထွက်</th>
+                                            <th style="width: 15%;">PM ထွက်</th>
+                                            <th style="width: 18%;">ထိုတန်း၏ အခွေ/ပတ်</th>
+                                            <th style="width: 19%;">နောက် ၅ ရက်အတွင်း <br>မှန်သောဂဏန်း</th>
+                                            <th style="width: 15%;">🎯 နေ့စဥ် <br>ထိုးကွက်</th>
+                                            <th style="width: 18%;">✅ နောက်တစ်ရက် <br>မှန်သောဂဏန်း</th>
                                         </tr>
                                     </thead>
                                     <tbody id="tableBody">
-                                        <tr><td colspan="4" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
+                                        <tr><td colspan="6" class="empty-status">ဒေတာများ ဆွဲယူနေပါသည်...</td></tr>
                                     </tbody>
                                 </table>
                             </div>
@@ -1182,6 +1310,7 @@
 
     let savedResults = [];
     let savedKhwayItems = [];
+    let savedDailyBetItems = [];
 
     function handleViewCounter() {
         const COUNTER_KEY = 'bozaw2d_vercel_app_2026_views';
@@ -1215,36 +1344,29 @@
         let lines = csvText.split('\n');
         savedResults = [];
         savedKhwayItems = [];
+        savedDailyBetItems = [];
 
         for (let i = 1; i < lines.length; i++) {
-            let currentLine = lines[i].trim();
-            if (!currentLine) continue;
+            let currentLine = lines[i].replace(/\r$/, '');
+            if (!currentLine.trim()) continue;
 
-            let matches = currentLine.match(/(".*?"|[^",\s]+)(?=\s*,|\s*$)/g) || currentLine.split(',');
-            
-            if (matches.length >= 1) {
-                let res = matches[0].replace(/"/g, '').trim();
-                
-                let khw = '';
-                if (matches.length > 1) {
-                    let textParts = [];
-                    for(let j=1; j<matches.length; j++) {
-                        let part = matches[j].replace(/"/g, '').trim();
-                        if(part) textParts.push(part);
-                    }
-                    khw = textParts.join(',').trim();
-                }
+            // Column-safe parsing (keeps A/B/C aligned even when a cell is empty)
+            let matches = parseDubaiCSVLine(currentLine);
 
-                if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
+            let res = (matches[0] || '').replace(/"/g, '').trim();
+            let khw = (matches[1] || '').replace(/"/g, '').trim();
+            let dailyBet = (matches[2] || '').replace(/"/g, '').trim();
 
-                if (res.length > 0 && res.length < 4) {
-                    res = res.padStart(4, '0');
-                }
+            if (res === 'ထွက်ဂဏန်း' || res === 'results' || res === 'အခွေပူး' || res === 'khways') continue;
 
-                if (res.length === 4) {
-                    savedResults.push(res);
-                    savedKhwayItems.push(khw || '-');
-                }
+            if (res.length > 0 && res.length < 4) {
+                res = res.padStart(4, '0');
+            }
+
+            if (res.length === 4) {
+                savedResults.push(res);
+                savedKhwayItems.push(khw || '-');
+                savedDailyBetItems.push(dailyBet || '-');
             }
         }
     }
@@ -1271,7 +1393,7 @@
         tbody.innerHTML = '';
 
         if(savedResults.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="4" class="empty-status">ဒေတာများ မရှိသေးပါ။ Google Sheet တွင် အရင်ဖြည့်ပါ။</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="6" class="empty-status">ဒေတာများ မရှိသေးပါ။ Google Sheet တွင် အရင်ဖြည့်ပါ။</td></tr>`;
             return;
         }
 
@@ -1341,6 +1463,38 @@
             let amCountStr = amHitCounts[index] > 0 ? `<span class="count-text">(${amHitCounts[index]})</span>` : '';
             let pmCountStr = pmHitCounts[index] > 0 ? `<span class="count-text">(${pmHitCounts[index]})</span>` : '';
 
+            // ===== နေ့စဥ်ထိုးကွက် (column C) vs နောက်တစ်ရက် (immediate next row only) =====
+            let dailyBetStr = savedDailyBetItems[index] && savedDailyBetItems[index] !== '-' ? savedDailyBetItems[index] : '-';
+            let dailyBetDisplayHTML = '-';
+            let nextDayHitHTML = '-';
+            let nextDayIsHit = false;
+
+            if (dailyBetStr !== '-') {
+                let subBets = dailyBetStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+                dailyBetDisplayHTML = subBets.length > 0
+                    ? `<span class="khway-style">${subBets.join('<br><hr style="border:0;border-top:1px dashed #b2bec3;margin:4px 0;">')}</span>`
+                    : '-';
+
+                if (index + 1 < savedResults.length) {
+                    let nextNumStr = savedResults[index + 1];
+                    let nextAm = nextNumStr.slice(0, 2);
+                    let nextPm = nextNumStr.slice(2, 4);
+                    let nextHitList = [];
+                    subBets.forEach(b => {
+                        if (checkMatchLogic(b, nextAm) && !nextHitList.includes(nextAm)) nextHitList.push(nextAm);
+                        if (checkMatchLogic(b, nextPm) && !nextHitList.includes(nextPm)) nextHitList.push(nextPm);
+                    });
+                    if (nextHitList.length > 0) {
+                        nextDayIsHit = true;
+                        nextDayHitHTML = `<span class="badge-hit">${nextHitList.join(', ')}</span>`;
+                    } else {
+                        nextDayHitHTML = '<span style="color:#747d8c;font-size:12px;font-weight:700;">မပါဝင်ပါ</span>';
+                    }
+                } else {
+                    nextDayHitHTML = '<span style="color:#f39c12;font-size:12px;font-weight:700;">⏳ ဂဏန်းမထွက်သေးပါ</span>';
+                }
+            }
+
             tr.innerHTML = `
                 <td class="${amHitCounts[index] > 0 ? 'highlight-am-pm-match' : ''}">
                     <div class="num-box-wrapper"><span class="num-box">${amNum}${amCountStr}</span></div>
@@ -1350,6 +1504,8 @@
                 </td>
                 <td>${khwayDisplayHTML}</td>
                 <td>${finalHitHTML}</td>
+                <td>${dailyBetDisplayHTML}</td>
+                <td class="${nextDayIsHit ? 'highlight-am-pm-match' : ''}">${nextDayHitHTML}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -1622,6 +1778,7 @@
         handleViewCounter();
         fetchDataFromSheets();
         handleDubaiViewCounter();
+        if (allMovies.length === 0) loadMovies();
         if (typeof YT !== 'undefined' && YT.loaded) { autoLogin(); }
     };
 
