@@ -1546,11 +1546,17 @@
         const dailyBetStr = savedDailyBetItems[savedResults.length - 1] || '-';
         if (dailyBetStr && dailyBetStr !== '-') {
             const parts = dailyBetStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
-            let betRows = [];
-            for (let i = 0; i < parts.length; i += 3) {
-                betRows.push(parts.slice(i, i + 3).join(' - '));
+            const meinParts = parts.slice(0, 3);
+            const yanParts = parts.slice(3);
+            let html = `<span class="pending-khway-pill today">🎯 ယနေ့ထိုးကွက်များ<br>`;
+            if (meinParts.length > 0) {
+                html += `မိန်း = <b>${meinParts.join(' - ')}</b>`;
             }
-            banner.innerHTML = `<span class="pending-khway-pill today">🎯 ယနေ့ ထိုးကွက်: <b>${betRows.join('<br>')}</b></span>`;
+            if (yanParts.length > 0) {
+                html += `<br>ရံ = <b>${yanParts.join(' - ')}</b>`;
+            }
+            html += `</span>`;
+            banner.innerHTML = html;
         } else {
             banner.innerHTML = '';
         }
