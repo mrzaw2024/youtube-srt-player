@@ -401,6 +401,7 @@
             color: #2f3542; font-weight: 700; font-size: 13px; background: #e8f0fe;
             padding: 6px 8px; border-radius: 8px; display: inline-block; border: 1px solid #d2e3fc; word-break: break-all;
         }
+        .twod-container .khway-style.daily-bet-row { font-size: 11px; padding: 5px 4px; word-break: break-word; white-space: normal; }
         .twod-container .empty-status { color: #57606f; padding: 30px !important; font-weight: 700; }
         .twod-container .admin-footer-box {
             text-align: center; font-size: 13px; font-weight: bold; color: #57606f;
@@ -673,6 +674,7 @@
         </div>
 
         <div id="pendingKhwayBanner" class="khway-status-row"></div>
+        <div id="todayDailyBetBanner" class="khway-status-row"></div>
         <div class="table-title">📊 AM / PM & အခွေပူး ဇယားကွက်</div>
         <div class="table-wrapper">
             <table>
@@ -1013,6 +1015,7 @@
                                 </div>
                             </div>
                             <div id="pendingKhwayBanner" class="khway-status-row"></div>
+                            <div id="todayDailyBetBanner" class="khway-status-row"></div>
                             <div class="table-title">📊 AM / PM & အခွေပူး ဇယားကွက်</div>
                             <div class="table-wrapper">
                                 <table>
@@ -1488,7 +1491,7 @@
             if (dailyBetStr !== '-') {
                 let subBets = dailyBetStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
                 dailyBetDisplayHTML = subBets.length > 0
-                    ? `<span class="khway-style">${subBets.join('<br><hr style="border:0;border-top:1px dashed #b2bec3;margin:4px 0;">')}</span>`
+                    ? `<span class="khway-style daily-bet-row">${subBets.join(' - ')}</span>`
                     : '-';
 
                 if (index + 1 < savedResults.length) {
@@ -1527,6 +1530,22 @@
         });
 
         renderPendingKhwayBanner();
+        renderTodayDailyBet();
+    }
+
+    // Shows the most recent (bottom-most) row's daily-bet (🎯 နေ့စဥ်ထိုးကွက်) numbers at the top
+    function renderTodayDailyBet() {
+        const banner = document.getElementById('todayDailyBetBanner');
+        if (!banner) return;
+        if (savedResults.length === 0) { banner.innerHTML = ''; return; }
+
+        const dailyBetStr = savedDailyBetItems[savedResults.length - 1] || '-';
+        if (dailyBetStr && dailyBetStr !== '-') {
+            const parts = dailyBetStr.split(/[\/,]+/).map(s => s.trim()).filter(s => s.length > 0);
+            banner.innerHTML = `<span class="pending-khway-pill today">🎯 ယနေ့ ထိုးကွက်: <b>${parts.join(' - ')}</b></span>`;
+        } else {
+            banner.innerHTML = '';
+        }
     }
 
     // Shows the khway sets that have NOT matched yet and are still inside
